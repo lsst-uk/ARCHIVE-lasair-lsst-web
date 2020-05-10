@@ -1,0 +1,66 @@
+---
+- hosts: webserver
+  connection: local
+  gather_facts: no
+  tasks:
+    - name: install pip3
+      apt: 
+          name: python3-pip
+          state: present
+          update_cache: true
+      become: yes
+
+    - name: install apache2
+      apt: 
+          name: apache2
+          state: present
+          update_cache: true
+      become: yes
+
+    - name: install apache2-dev
+      apt: 
+          name: apache2-dev
+          state: present
+          update_cache: true
+      become: yes
+
+    - name: install libmysqlclient
+      apt: 
+          name: libmysqlclient-dev
+          state: present
+          update_cache: true
+      become: yes
+
+    - name: install swig
+      apt: 
+          name: swig
+          state: present
+          update_cache: true
+      become: yes
+
+    - name: install mysql.connector
+      pip: 
+          executable: pip3 
+          name: mysql-connector-python
+
+    - name: install django
+      pip: 
+          executable: pip3 
+          name: django
+
+    - name: install pyephem
+      pip: 
+          executable: pip3 
+          name: pyephem
+
+    - name: install mod-wsgi
+      pip: 
+          executable: pip3 
+          name: mod-wsgi
+
+          #    - name: configure mod-wsgi
+          #      shell: /home/ubuntu/.local/bin/mod_wsgi-express module-config > /etc/apache2/mods-available/wsgi.load
+          #      become: yes
+          #
+          #      copy lasair.conf to /etc/apache2/sites-available
+
