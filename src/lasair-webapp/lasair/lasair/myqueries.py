@@ -6,7 +6,7 @@ from django.contrib.auth.models import User
 import lasair.settings
 from lasair.models import Myqueries
 from lasair.models import Watchlists
-from common import queries
+from utility import queries
 
 def connect_db():
     msl = mysql.connector.connect(

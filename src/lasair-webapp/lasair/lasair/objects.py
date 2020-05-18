@@ -12,9 +12,9 @@ import mysql.connector
 import ephem, math
 from datetime import datetime, timedelta
 import json
-import common.date_nid as date_nid
-from common.mag import dc_mag
-from common import queries
+import utility.date_nid as date_nid
+from utility.mag import dc_mag
+from utility import queries
 
 def connect_db():
     msl = mysql.connector.connect(

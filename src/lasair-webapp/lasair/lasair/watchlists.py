@@ -133,7 +133,7 @@ def show_watchlist(request, wl_id):
 #            from run_crossmatch import run_watchlist
 #            hitlist = run_watchlist(wl_id)
             py = lasair.settings.LASAIR_ROOT + 'anaconda3/envs/lasair/bin/python'
-            process = Popen([py, lasair.settings.LASAIR_ROOT + 'lasair/src/alert_stream_ztf/common/run_crossmatch.py', '%d'%wl_id], stdout=PIPE, stderr=PIPE)
+            process = Popen([py, lasair.settings.LASAIR_ROOT + 'lasair-lsst-web/src/utility/run_crossmatch.py', '%d'%wl_id], stdout=PIPE, stderr=PIPE)
             stdout, stderr = process.communicate()
 
             stdout = stdout.decode('utf-8')

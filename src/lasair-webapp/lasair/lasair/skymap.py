@@ -7,7 +7,7 @@ import mysql.connector
 import json
 import math
 import time
-from common import date_nid
+from utility import date_nid
 
 def connect_db():
     msl = mysql.connector.connect(

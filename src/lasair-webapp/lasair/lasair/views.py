@@ -10,7 +10,7 @@ import mysql.connector
 import json
 import math
 import time
-import common.date_nid as date_nid
+import utility.date_nid as date_nid
 
 from django.contrib.auth.models import User
 from django.contrib.auth import login, authenticate
@@ -167,8 +167,8 @@ def conesearch_impl(cone):
         dra = radius/(3600*math.cos(dec*math.pi/180))
         dde = radius/3600
         cursor = connection.cursor()
-#            query = 'SELECT objectId,ramean,decmean FROM objects WHERE ramean BETWEEN %f and %f AND decmean BETWEEN %f and %f' % (ra-dra, ra+dra, dec-dde, dec+dde)
-        query = 'SELECT DISTINCT objectId FROM candidates WHERE ra BETWEEN %f and %f AND decl BETWEEN %f and %f' % (ra-dra, ra+dra, dec-dde, dec+dde)
+            query = 'SELECT objectId,ramean,decmean FROM objects WHERE ramean BETWEEN %f and %f AND decmean BETWEEN %f and %f' % (ra-dra, ra+dra, dec-dde, dec+dde)
+#        query = 'SELECT DISTINCT objectId FROM candidates WHERE ra BETWEEN %f and %f AND decl BETWEEN %f and %f' % (ra-dra, ra+dra, dec-dde, dec+dde)
         cursor.execute(query)
         hits = cursor.fetchall()
         for hit in hits:
