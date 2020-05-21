@@ -12,17 +12,7 @@ import mysql.connector
 import ephem, math
 from datetime import datetime, timedelta
 import json
-import utility.date_nid as date_nid
 from utility.mag import dc_mag
-from utility import queries
-
-def connect_db():
-    msl = mysql.connector.connect(
-        user    =lasair.settings.READONLY_USER,
-        password=lasair.settings.READONLY_PASS,
-        host    =lasair.settings.DATABASES['default']['HOST'],
-        database='ztf')
-    return msl
 
 def ecliptic(ra, dec):
     np = ephem.Equatorial(math.radians(ra), math.radians(dec), epoch='2000')
@@ -133,14 +123,6 @@ def obj(request, objectId):
         if row['candid'] and row['isdiffpos'] == 'f':
             count_isdiffpos += 1
 
-#        d = dc_mag(row['fid'], row['magpsf'],row['sigmapsf'], row['magnr'],row['sigmagnr'], row['magzpsci'], row['isdiffpos'])
-#        if row['isdiffpos'] == 'f':
-#            row['mag_apparent'] = -2.5*math.log10(10**(-0.4*row['magnr']) - 10**(-0.4*row['magpsf']))
-#        else:
-#            row['mag_apparent'] = -2.5*math.log10(10**(-0.4*row['magnr']) + 10**(-0.4*row['magpsf']))
-#        row['dc_mag'] = d['dc_mag']
-#        row['dc_sigmag'] = d['dc_sigmag']
-
     if len(candidates) == 0:
         message = 'objectId %s does not exist'%objectId
         data = {'objectId':objectId, 'message':message}
@@ -176,140 +158,3 @@ def obj(request, objectId):
         'count_isdiffpos': count_isdiffpos, 'count_real_candidates':count_real_candidates,
         'crossmatches': crossmatches, 'comments':comments}
     return data
-
-def record_query(request, query):
-    onelinequery = query.replace('\r', ' ').replace('\n', ' ')
-    time = datetime.now().replace(microsecond=0).isoformat()
-    
-    if request.user.is_authenticated:
-        name = request.user.first_name +' '+ request.user.last_name
-    else:
-        name = 'anonymous'
-
-    IP       = request.META.get('REMOTE_ADDR')
-    if 'HTTP_X_FORWARDED_FOR' in request.META:
-        IP = record.request.META['HTTP_X_FORWARDED_FOR']
-
-    date = date_nid.nid_to_date(date_nid.nid_now())
-    filename = lasair.settings.QUERY_CACHE + '/' + date
-    f = open(filename, 'a')
-    s = '%s| %s| %s| %s\n' % (IP, name, time, onelinequery)
-    f.write(s)
-    f.close()
-
-def query_list(qs):
-    list = []
-    if not qs:
-        return list
-    for q in qs:
-        d = {
-            'mq_id'      :q.mq_id,
-            'usersname'  :q.user.first_name +' '+ q.user.last_name,
-            'selected'   :q.selected,
-            'tables'     :q.tables,
-            'conditions' :q.conditions,
-            'name'       :q.name,
-            'description':q.description
-        }
-        d['streamlink'] = 'inactive'
-        if q.active:
-            topic = queries.topic_name(q.user.id, q.name)
-            d['streamlink'] = '<a href="/streamdigest/%s">%s</a>' % (topic, topic)
-        list.append(d)
-    return list
-
-def streams(request):
-    public_queries = Myqueries.objects.filter(public=2)
-    return render(request, 'streams.html', {'public_queries':query_list(public_queries)})
-
-def streamdigest(request, topic):
-    try:
-        data = open('/mnt/lasair-head-data/ztf/streams/%s' % topic, 'r').read()
-    except:
-        return render(request, 'error.html', {'message': 'Cannot find digest file for ' + topic})
-    table = json.loads(data)['digest']
-    n = len(table)
-    return render(request, 'streamdigest.html', {'topic':topic, 'n':n, 'table':table})
-
-@csrf_exempt
-def objlist(request):
-    perpage = 1000
-    message = ''
-    # if this is a POST request we need to process the form data
-    if request.method == 'POST':
-        selected   = request.POST['selected'].strip()
-        tables     = request.POST['tables'].strip()
-        conditions = request.POST['conditions'].strip()
-
-        json_checked = False
-        if 'json' in request.POST and request.POST['json'] == 'on':
-            json_checked = True
-
-        check_days_ago = False
-        days_ago = 3000
-        if 'check_days_ago' in request.POST and request.POST['check_days_ago'] == 'on':
-            try:
-                days_ago = float(request.POST['days_ago'])
-                check_days_ago = True
-            except:
-                pass
-
-        page     = request.POST['page']
-        if len(page.strip()) == 0: page = 0
-        else:                      page = int(page)
-        ps = page    *perpage
-        pe = (page+1)*perpage
-
-        sqlquery_real = queries.make_query(selected, tables, conditions, \
-                page, perpage, check_days_ago, days_ago, days_ago)
-        message += sqlquery_real
-
-# lets keep a record of all the queries the people try to execute
-        record_query(request, sqlquery_real)
-
-        nalert = 0
-        msl = connect_db()
-        cursor = msl.cursor(buffered=True, dictionary=True)
-
-        try:
-            cursor.execute(sqlquery_real)
-        except Exception as e:
-            message = 'Your query:<br/><b>' + sqlquery_real + '</b><br/>returned the error<br/><i>' + str(e) + '</i>'
-            return render(request, 'error.html', {'message': message})
-
-        queryset = []
-        for row in cursor:
-            queryset.append(row)
-            nalert += 1
-        lastpage = 0
-        if ps + nalert < pe:
-            pe = ps + nalert
-            lastpage = 1
-
-        if json_checked:
-            return HttpResponse(json.dumps(queryset), content_type="application/json")
-        else:
-            return render(request, 'objlist.html',
-                {'table': queryset, 'nalert': nalert, 'nextpage': page+1, 'ps':ps, 'pe':pe, 
-                    'selected'  :selected, 
-                    'tables'    :tables, 
-                    'conditions'  :conditions, 
-                    'message': message, 'lastpage':lastpage})
-    else:
-        if request.user.is_authenticated:
-            myqueries    = Myqueries.objects.filter(user=request.user)
-        else:
-            myqueries    = None
-        public_queries = Myqueries.objects.filter(public__gte=1)
-
-        if request.user.is_authenticated:
-            watchlists = Watchlists.objects.filter(Q(user=request.user) | Q(public__gte=1))
-        else:
-            watchlists = Watchlists.objects.filter(public__gte=1)
-
-        return render(request, 'objlistquery.html', {
-            'is_authenticated': request.user.is_authenticated,
-            'myqueries':query_list(myqueries), 
-            'watchlists':watchlists,
-            'days_ago': 1, 
-            'public_queries':query_list(public_queries)})

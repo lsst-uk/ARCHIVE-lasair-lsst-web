@@ -18,7 +18,8 @@ from django.contrib.auth import views as authviews
 from django.urls import include, path
 from django.views.generic import TemplateView
 
-from lasair import views, services, candidates, objects, watchlists, myqueries, comments, cs_comments, skymap
+from lasair import views, services, candidates, objects, watchlists, queries, comments, cs_comments, skymap
+from lasair import  myqueries  # ZAP
 import lasair.settings
 
 from django.contrib import admin
@@ -27,34 +28,35 @@ from django.contrib import admin
 urlpatterns = [
     path('',                        views.index,                name='index'),
     path('about',                   views.about,                name='about'),
-    path('sherlock',  TemplateView.as_view(template_name='sherlock.html')),
+    path('sherlock',    TemplateView.as_view(template_name='sherlock.html')),
     path('lasairlsst',  TemplateView.as_view(template_name='lasairlsst.html')),
+    path('conesearch/',             views.conesearch,           name='conesearch'),
+    path('coverage/',               views.coverage,             name='coverage'),
+    path('status/',                 views.status,               name='status'),
+    path('streamlog/<slug:topic>/', views.streamlog,            name='streamlog'),
+
     path('cand/<int:candid>/',      candidates.cand,            name='cand'),
 
-    path('objlist/',                objects.objlist,            name='objlist'),
-    path('streams/',                objects.streams,            name='streams'),
-    path('streamdigest/<slug:topic>/',   objects.streamdigest,           name='streamdigest'),
-    path('object/<slug:objectId>/',      objects.objhtml,                name='objhtml'),
-    path('object/<slug:objectId>/json/', objects.objjson,                name='objjson'),
-
-    path('conesearch/',             views.conesearch,           name='conesearch'),
+    path('object/<slug:objectId>/',      objects.objhtml,       name='objhtml'),
+    path('object/<slug:objectId>/json/', objects.objjson,       name='objjson'),
 
     path('watchlist/',              watchlists.watchlists_home, name='watchlists_home'),
     path('watchlist/<int:wl_id>/',  watchlists.show_watchlist,  name='show_watchlist'),
     path('watchlist/<int:wl_id>/txt/',  watchlists.show_watchlist_txt,  name='show_watchlist_txt'),
 
-    path('myquery/',                myqueries.new_myquery,      name='new_myquery'),
-    path('myquery/<int:mq_id>/',    myqueries.show_myquery,     name='show_myquery'),
+    path('querylist/',            queries.querylist,        name='querylist'),
+    path('query/',                queries.new_myquery,      name='new_myquery'),
+    path('query/<int:mq_id>/',    queries.show_myquery,     name='show_myquery'),
+    path('runquery/',             queries.runquery,         name='runquery'),
+    path('runquery/<int:mq_id>/', queries.runquery_stored,  name='runquery_stored'),
 
     path('comment/',                comments.new_comment,       name='new_comment'),
     path('delete_comment/<int:comment_id>/',    comments.delete_comment,    name='delete_comment'),
     path('cs_comment/',             cs_comments.new_comment,    name='new_comment'),
 
-    path('coverage/',               views.coverage,             name='coverage'),
-    path('status/',                 views.status,               name='status'),
 
     path('skymap/',                 skymap.skymap,              name='skymap'),
-    path('skymap/<skymap_id_version>/',     skymap.show_skymap,         name='show_skymap'),
+    path('skymap/<skymap_id_version>/',     skymap.show_skymap, name='show_skymap'),
 
     path('schema',   TemplateView.as_view(template_name='schema.html')),
     path('jupyter',  TemplateView.as_view(template_name='jupyter.html')),

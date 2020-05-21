@@ -1,0 +1,87 @@
+{% extends "base.html"%}
+{% block content %}
+
+<div class="row">
+<div class="col-sm">
+{{ message }}
+
+
+{% if is_owner %}
+<!-- editing an existing query -->
+{% if new %}
+<form method="POST"  action="/query/">
+{% else %}
+<form method="POST"  action="/query/{{ myquery.mq_id }}/">
+{% endif %}
+{% csrf_token %}
+<h2><input name="name" value="{{ myquery.name }}"></h2>
+<textarea name="description" rows=4 cols=80>{{ myquery.description }}</textarea><br/>
+
+Public: <input type="checkbox" name="public" {% if myquery.public > 0 %}checked{% endif %}><br/>
+Active:<br/>
+&nbsp;&nbsp;&nbsp;<input type="radio" name="active" value="0" {% if myquery.active == 0 %}checked{% endif %}> Inactive <br/>
+&nbsp;&nbsp;&nbsp;<input type="radio" name="active" value="1" {% if myquery.active == 1 %}checked{% endif %}> Email to {{ email }} (max once a day) and log <br/>
+&nbsp;&nbsp;&nbsp;<input type="radio" name="active" value="2" {% if myquery.active == 2 %}checked{% endif %}> Kafka and log <br/>
+
+<hr/>
+{% include "query_builder.html" %}
+
+{% else %}
+<!-- viewing a public query not yours -->
+<table border=1>
+<tr><td>Name</td><td><h2>{{ myquery.name }}</h2></td></tr>
+<tr><td>Description</td><td>{{ myquery.description }}</td></tr>
+<tr><td>Selected</td><td><tt>{{ myquery.selected }}</tt></td></tr>
+<tr><td>Tables</td><td><tt>{{ myquery.tables }}</tt></td></tr>
+<tr><td>Conditions</td><td><tt>{{ myquery.conditions }}</tt></td></tr>
+<tr><td>Active</td><td>{% if myquery.active == 1 %}yes{% else %}no{% endif %} 
+		{% if myquery.active == 1 %}(Topic name is: <b><a href=/streamlog/{{ topic }}/>{{ topic }}</a></b>){% endif %}</td></tr>
+<tr><td>Public</td><td>{% if myquery.public == 1 %}yes{% else %}no{% endif %}</td></tr>
+</table>
+{% endif %}
+
+
+<table cellpadding=30><tr>
+{% if is_owner %}
+<td>
+<input type="submit" class="button" style="color: blue; background-color: #EEEEFF;" 
+{% if new %} value=" Create query" {% else %} value=" Save query" {% endif %} ></td>
+</form>
+</td>
+{% endif %}
+
+{% if is_owner and not new %}
+<td>
+<script>
+function ConfirmDelete()
+{
+  confirm("Are you sure you want to delete?");
+}
+</script>
+<form method="POST"  action="/query/{{ myquery.mq_id }}/">
+{% csrf_token %}
+<input type="hidden" name="delete" value="delete">
+<input type="submit" class="button" style="color: blue; background-color: #EEEEFF;" value=" Delete query" Onclick="ConfirmDelete()"></td>
+</form>
+</td>
+{% endif %}
+
+<td>
+<button style="color: blue; background-color: #EEEEFF;" onclick="window.location.href='/page2'">Run Query</button>
+</td>
+
+<td>
+{% if logged_in and not new %}
+<form method="POST"  action="/query/{{ myquery.mq_id }}/">
+{% csrf_token %}
+<input type="hidden" name="copy" value="delete">
+<input type="submit" class="button" style="color: blue; background-color: #EEEEFF;" value=" Copy query"></td>
+</form>
+{% endif %}
+</td>
+</tr></table>
+
+</div>
+</div>
+
+{% endblock %}

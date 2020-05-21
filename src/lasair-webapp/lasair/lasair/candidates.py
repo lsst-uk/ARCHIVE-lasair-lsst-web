@@ -1,7 +1,6 @@
 from django.shortcuts import render, get_object_or_404
 from django.template.context_processors import csrf
 from django.db import connection
-from lasair.models import Candidates
 import lasair.settings
 import mysql.connector
 import math
@@ -81,8 +80,9 @@ def candlist(request):
 def cand(request, candid):
     """Show a specific transient"""
 
-    cand = get_object_or_404(Candidates, candid=candid)
-    canddict = cand.__dict__
-    message = ''
+#    cand = get_object_or_404(Candidates, candid=candid)
+#    canddict = cand.__dict__
+    canddict = {}
+    message = 'not working right now'
 
     return render(request, 'cand.html',{'cand': canddict, 'message': message})

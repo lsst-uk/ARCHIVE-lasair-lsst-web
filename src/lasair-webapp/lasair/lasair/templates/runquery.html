@@ -16,7 +16,7 @@
 	</div>
 {% if lastpage == 0 %}
 	<div class="col-sm-8">
-		<form method="POST" action="/objlist/">
+		<form method="POST" action="/runquery/">
                 {% csrf_token %}
 		<div class ="form-group">
 			<input type="hidden" name="selected"  value="{{ selected }}"/>

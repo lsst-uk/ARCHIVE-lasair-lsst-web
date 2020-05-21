@@ -4,7 +4,7 @@ from django.template.context_processors import csrf
 from django.views.decorators.csrf import csrf_exempt
 from django.db import connection
 from django.db.models import Q
-from lasair.models import Candidates, Myqueries
+from lasair.models import Myqueries
 import lasair.settings
 import mysql.connector
 import json
@@ -60,8 +60,7 @@ def status(request):
 
 def index(request):
     web_domain = lasair.settings.WEB_DOMAIN
-    public_queries = Myqueries.objects.filter(public=2)
-    return render(request, 'index.html', {'web_domain': web_domain, 'public_queries':public_queries})
+    return render(request, 'index.html', {'web_domain': web_domain})
 
 def about(request):
     jsonstr = open('/mnt/lasair-head-data/ztf/system_status.json').read()
@@ -167,7 +166,7 @@ def conesearch_impl(cone):
         dra = radius/(3600*math.cos(dec*math.pi/180))
         dde = radius/3600
         cursor = connection.cursor()
-            query = 'SELECT objectId,ramean,decmean FROM objects WHERE ramean BETWEEN %f and %f AND decmean BETWEEN %f and %f' % (ra-dra, ra+dra, dec-dde, dec+dde)
+        query = 'SELECT objectId,ramean,decmean FROM objects WHERE ramean BETWEEN %f and %f AND decmean BETWEEN %f and %f' % (ra-dra, ra+dra, dec-dde, dec+dde)
 #        query = 'SELECT DISTINCT objectId FROM candidates WHERE ra BETWEEN %f and %f AND decl BETWEEN %f and %f' % (ra-dra, ra+dra, dec-dde, dec+dde)
         cursor.execute(query)
         hits = cursor.fetchall()
@@ -199,3 +198,12 @@ def coverage(request):
     nid1 = date_nid.date_to_nid(date1)
     nid2 = date_nid.date_to_nid(date2)
     return render(request, 'coverage.html',{'nid1':nid1, 'nid2': nid2, 'date1':date1, 'date2':date2})
+
+def streamlog(request, topic):
+    try:
+        data = open('/data/ztf/streams/%s' % topic, 'r').read()
+    except:
+        return render(request, 'error.html', {'message': 'Cannot find log file for ' + topic})
+    table = json.loads(data)['log']
+    n = len(table)
+    return render(request, 'streamlog.html', {'topic':topic, 'n':n, 'table':table})

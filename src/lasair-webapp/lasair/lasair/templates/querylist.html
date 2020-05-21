@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="row">
+  <div class="col-sm">
+     <h3>Create a new query</h3>
+<form method="GET"  action="/query/">
+{% csrf_token %}
+<input type="submit" class="button" style="color: blue; background-color: #EEEEFF;" value=" Create query"></td>
+</form>
+<hr/>
+
+  </div>		
+</div>
+
+<div class="row">
+  <div class="col-sm">
+     <h3>Stored filters and their streams</h3>
+  </div>		
+</div>
+
+<h4>Promoted Filters</h4>
+The following are stored queries from Lasair. First the "promoted queries",
+then your stored queries, then stored queries from others that have been made public.
+<p>
+<div class="row">
+  <div class="col-xs-6">
+
+<table class="table table-bordered" style="width:80%">
+  <thead>
+    <tr>
+      <th style="width:30%">Name</th>
+      <th class="width:70%">Description</th>
+    </tr>
+  </thead>
+{% for mq in promoted_queries %}
+<tr>
+<td> <a href="/query/{{ mq.mq_id }}"><b>{{ mq.name }}</b></a> </br>
+{% if mq.active %}
+<i><a href={{ mq.streamlink|safe }}>Stream Log</a><i>
+{% endif %}
+</td>
+<td>{{ mq.description|safe }}</td>
+</tr>
+{% endfor %}
+</table>
+  </div>
+</div>
+
+
+{% if is_authenticated %}
+<h4>My Stored Queries</h4>
+Stored filters that you control are listed below.
+Click on the name of the filter to push it into the filter area above,
+or the link below the name to edit it. 
+<br/>
+<table class="table table-bordered" style="width:80%">
+  <thead>
+    <tr>
+      <th style="width:30%">Name</th>
+      <th class="width:70%">Description</th>
+    </tr>
+  </thead>
+{% for mq in myqueries %}
+<tr><td><b> <a href="/query/{{ mq.mq_id }}/">{{ mq.name }}</a></b><br/>
+{% if mq.active %}
+<i><a href={{ mq.streamlink|safe }}>Stream Log</a><i>
+{% endif %}
+</td>
+<td>{{ mq.description }}</td>
+</tr>
+{% endfor %}
+</table>
+<br/>
+{% else %}
+(If you would like to create your own stored filters, you should be signed in. See links at top left.)
+<hr/>
+{% endif %}
+
+<h4>Contributed Stored Filters</h4>
+Stored filters created and made public are listed below. Click on the name of
+the filter to push it into the area above.
+<table class="table table-bordered" style="width:80%">
+  <thead>
+    <tr>
+      <th style="width:30%">Name</th>
+      <th style="width:10%">Owner</th>
+      <th class="width:60%">Description</th>
+    </tr>
+  </thead>
+{% for mq in public_queries %}
+<tr><td><b> <a href="/query/{{ mq.mq_id }}/">{{ mq.name }}</a></b>
+{% if mp.public != 0 %}
+{% endif %}
+<p>
+{% if mq.active %}
+<i><a href={{ mq.streamlink|safe }}>Stream Log</a><i>
+{% endif %}
+</td>
+<td>{{ mq.usersname }}</td>
+<td>{{ mq.description }}</td>
+</tr>
+{% endfor %}
+</table>
+  </div>
+</div>
+
+{% endblock %}
