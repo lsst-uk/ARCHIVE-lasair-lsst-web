@@ -19,7 +19,6 @@ from django.urls import include, path
 from django.views.generic import TemplateView
 
 from lasair import views, services, candidates, objects, watchlists, queries, comments, cs_comments, skymap
-from lasair import  myqueries  # ZAP
 import lasair.settings
 
 from django.contrib import admin
@@ -48,7 +47,6 @@ urlpatterns = [
     path('query/',                queries.new_myquery,      name='new_myquery'),
     path('query/<int:mq_id>/',    queries.show_myquery,     name='show_myquery'),
     path('runquery/',             queries.runquery,         name='runquery'),
-    path('runquery/<int:mq_id>/', queries.runquery_stored,  name='runquery_stored'),
 
     path('comment/',                comments.new_comment,       name='new_comment'),
     path('delete_comment/<int:comment_id>/',    comments.delete_comment,    name='delete_comment'),

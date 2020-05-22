@@ -3,10 +3,63 @@
 
 <div class="row">
 <div class="col-sm">
-{{ message }}
+<!-- {{ message }} -->
+
+<script>
+function showinfodiv(){
+    if(document.getElementById('infodiv' ).style.display == 'block') { 
+        document.getElementById('infodiv' ).style.display = 'none' 
+    } else { 
+        document.getElementById('infodiv' ).style.display = 'block' 
+    }
+}
+</script>
 
 
-{% if is_owner %}
+
+<button style="color: blue; background-color: #EEEEFF;" onclick="showinfodiv();">Show/Hide information</button>
+<div id="infodiv" style="display:none">
+The form below is a builder for SQL SELECT queries on the ZTF database of objects. 
+There are three tables that can be joined in SELECT queries 
+(only SELECT queries are allowed). See examples below.
+The tables are:
+<ul>
+<li> <b>objects</b>: The astrophysical objects which consist of a series
+of candidates (aka detections). The object has a light curve, the candidate has a single magnitude and date.</li>
+<li> <b>sherlock_classifications</b>: The overal classificaiton of the object from <a href=/sherlock>Sherlock</a>.
+<li> <b>sherlock_crossmatches</b>: Information about each object derived from 
+multiple catalogs by the <a href=/sherlock>Sherlock</a> software. 
+The crossmatches have a <i>rank</i> 1,2,3... where 
+1 is considered most likely.</li>
+<li> <b>comments</b>: You can use the comments on each object page in your query.
+<li> <b>watchlists</b>: Select one of the watchlists available to you to restrict searching to 
+	ZTF objects within the radius of the watchlist.
+</ul>
+<p>
+<b>For detailed information about the attributes of these three tables, 
+that you can use in the filters :
+<a target="new" href=/schema>click here</a>.</b>
+
+<ul>
+<li> The public survey uses two filters: fid=1 (g) and fid=2 (r)
+<li> For each observing field of the survey and each of the g and r filters,
+ZTF will only issue alerts when it has
+built up a <i>reference image</i> of that field with that filter, by stacking 15 good images.
+<li> Once that is in place, each fresh image is subtracted from the reference,
+and any 5-sigma difference generates an alert.
+<li> When a detection is within 1.5 arcseconds of a previous detection, it gets the same <i>objectId</i>. 
+Thus a light curve can be obtained from all the detections that have a given objectId.
+<li> More details of the processing pipeline are available
+<a href=http://web.ipac.caltech.edu/staff/fmasci/ztf/ztf_pipelines_deliverables.pdf>here</a>.
+<li> Further cuts can be made to remove spurious detections, using the "drb" attribute of each detection:
+the range is 0 to 1 where closer to 1 is more reliable.
+<li>If you would like to learn the SQL language, <a href=http://cas.sdss.org/dr6/en/help/howto/search/>this</a>
+is a good resource.
+</ul>
+</div>
+
+
+
 <!-- editing an existing query -->
 {% if new %}
 <form method="POST"  action="/query/">
@@ -14,7 +67,11 @@
 <form method="POST"  action="/query/{{ myquery.mq_id }}/">
 {% endif %}
 {% csrf_token %}
-<h2><input name="name" value="{{ myquery.name }}"></h2>
+
+{% if is_owner %}
+Query Name<br/>
+<h3><input name="name" value="{{ myquery.name }}" size=50></h3>
+Description<br/>
 <textarea name="description" rows=4 cols=80>{{ myquery.description }}</textarea><br/>
 
 Public: <input type="checkbox" name="public" {% if myquery.public > 0 %}checked{% endif %}><br/>
@@ -35,23 +92,38 @@ Active:<br/>
 <tr><td>Tables</td><td><tt>{{ myquery.tables }}</tt></td></tr>
 <tr><td>Conditions</td><td><tt>{{ myquery.conditions }}</tt></td></tr>
 <tr><td>Active</td><td>{% if myquery.active == 1 %}yes{% else %}no{% endif %} 
-		{% if myquery.active == 1 %}(Topic name is: <b><a href=/streamlog/{{ topic }}/>{{ topic }}</a></b>){% endif %}</td></tr>
 <tr><td>Public</td><td>{% if myquery.public == 1 %}yes{% else %}no{% endif %}</td></tr>
 </table>
+<input name='selected'   type='hidden' value='{{ myquery.selected }}'/>
+<input name='tables'     type='hidden' value='{{ myquery.tables }}'/>
+<input name='conditions' type='hidden' value='{{ myquery.conditions }}'/>
+<input name='page'       type='hidden' value=0>
 {% endif %}
 
 
-<table cellpadding=30><tr>
+<table border=1 cellpadding=30><tr>
+<!-- SAVE QUERY -->
 {% if is_owner %}
 <td>
 <input type="submit" class="button" style="color: blue; background-color: #EEEEFF;" 
-{% if new %} value=" Create query" {% else %} value=" Save query" {% endif %} ></td>
-</form>
+{% if new %} value=" Create query" {% else %} value=" Save this Query" {% endif %} ></td>
 </td>
 {% endif %}
 
-{% if is_owner and not new %}
+<!-- RUN QUERY -->
 <td>
+<font size=-2><input type="checkbox" name="json"/> Check this box for JSON output</font><br/>
+<input size=6 name="days_ago" value=""/> <font size=-2>Only recent events, days</font><br/>
+<button style="color: blue; background-color: #EEEEFF;" type="submit" formaction=/runquery/>Run this Query</button>
+</td></tr>
+
+{% if is_owner %}
+</form>   <!-- END OF FORM -->
+{% endif %}
+
+<!-- DELETE QUERY -->
+{% if is_owner and not new %}
+<tr><td>
 <script>
 function ConfirmDelete()
 {
@@ -61,24 +133,21 @@ function ConfirmDelete()
 <form method="POST"  action="/query/{{ myquery.mq_id }}/">
 {% csrf_token %}
 <input type="hidden" name="delete" value="delete">
-<input type="submit" class="button" style="color: blue; background-color: #EEEEFF;" value=" Delete query" Onclick="ConfirmDelete()"></td>
+<input type="submit" class="button" style="color: blue; background-color: #EEEEFF;" value=" Delete this Query" Onclick="ConfirmDelete()"></td>
 </form>
 </td>
 {% endif %}
 
-<td>
-<button style="color: blue; background-color: #EEEEFF;" onclick="window.location.href='/page2'">Run Query</button>
-</td>
-
-<td>
+<!-- COPY QUERY -->
 {% if logged_in and not new %}
+<td>
 <form method="POST"  action="/query/{{ myquery.mq_id }}/">
 {% csrf_token %}
 <input type="hidden" name="copy" value="delete">
-<input type="submit" class="button" style="color: blue; background-color: #EEEEFF;" value=" Copy query"></td>
+<input type="submit" class="button" style="color: blue; background-color: #EEEEFF;" value=" Copy this Query"></td>
 </form>
-{% endif %}
 </td>
+{% endif %}
 </tr></table>
 
 </div>

@@ -45,14 +45,14 @@ def objhtml(request, objectId):
     if 'comments' in data2:
         data2.pop('comments')
     return render(request, 'show_object.html',
-        {'data':data, 'json_data':json.dumps(data2),
+        {'data':data, 'json_data':json.dumps(data2, indent=2),
         'authenticated': request.user.is_authenticated})
 
 def objjson(request, objectId):
     data = obj(request, objectId)
     if 'comments' in data:
         data.pop('comments')
-    return HttpResponse(json.dumps(data), content_type="application/json")
+    return HttpResponse(json.dumps(data, indent=2), content_type="application/json")
 
 def obj(request, objectId):
     """Show a specific object, with all its candidates"""

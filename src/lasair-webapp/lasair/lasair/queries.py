@@ -1,6 +1,6 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.template.context_processors import csrf
-from django.db import connection
+from django.http import HttpResponse
 from django.db.models import Q
 from django.contrib.auth.models import User
 import lasair.settings
@@ -10,6 +10,7 @@ from utility import query_utilities
 import utility.date_nid as date_nid
 from datetime import datetime, timedelta
 import mysql.connector
+import string, random, json
 
 def connect_db():
     msl = mysql.connector.connect(
@@ -134,13 +135,17 @@ def handle_myquery(request, mq_id=None):
 
         # Copy the given query
         if 'copy' in request.POST:
-            mq = Myqueries(user=request.user, name='Copy Of ' + myquery.name, 
+            newname = 'Copy_Of_' + myquery.name + '_'
+            letters = string.ascii_lowercase
+            newname += ''.join(random.choice(letters) for i in range(6))
+            mq = Myqueries(user=request.user, name=newname, 
                     description=myquery.description,
                     public=0, active=0, 
                     selected=myquery.selected, 
                     conditions=myquery.conditions, tables=myquery.tables)
-            myquery = mq
+            mq.save()
             message = 'Query copied'
+            return redirect('/query/%d/' % mq.mq_id)
 
         # Update the given query from the post
         else:
@@ -203,38 +208,26 @@ def record_query(request, query):
     f.close()
 
 def runquery(request):
-    return handle_runquery(request)
-
-def runquery_stored(request, mq_id):
-    return handle_runquery(request, mq_id)
-
-def handle_runquery(request, mq_id=None):
     perpage = 1000
     message = ''
     json_checked = False
 
-    if not mq_id is None:
-        myquery = get_object_or_404(Myqueries, mq_id=mq_id)
-        selected   = myquery.selected
-        tables     = myquery.tables
-        conditions = myquery.conditions
-        page       = 0
+    if not request.method == 'POST':
+        return render(request, 'error.html', {'message': 'This code expects a POST'})
 
-    # if this is a POST request we need to process the form data
-    elif request.method == 'POST':
-        selected   = request.POST['selected'].strip()
-        tables     = request.POST['tables'].strip()
-        conditions = request.POST['conditions'].strip()
-        page     = request.POST['page']
-        if len(page.strip()) == 0: page = 0
-        else:                      page = int(page)
+    selected   = request.POST['selected'].strip()
+    tables     = request.POST['tables'].strip()
+    conditions = request.POST['conditions'].strip()
+    page     = request.POST['page']
+    if len(page.strip()) == 0: page = 0
+    else:                      page = int(page)
 
-        if 'json' in request.POST and request.POST['json'] == 'on':
-            json_checked = True
+    if 'json' in request.POST and request.POST['json'] == 'on':
+        json_checked = True
 
     check_days_ago = False
-    days_ago = 3000
-    if 'check_days_ago' in request.POST and request.POST['check_days_ago'] == 'on':
+    days_ago = 0
+    if 'days_ago' in request.POST and len(request.POST['days_ago']) :
         try:
             days_ago = float(request.POST['days_ago'])
             check_days_ago = True
@@ -271,7 +264,7 @@ def handle_runquery(request, mq_id=None):
         lastpage = 1
 
     if json_checked:
-        return HttpResponse(json.dumps(queryset), content_type="application/json")
+        return HttpResponse(json.dumps(queryset, indent=2), content_type="application/json")
     else:
         return render(request, 'runquery.html',
             {'table': queryset, 'nalert': nalert, 'nextpage': page+1, 'ps':ps, 'pe':pe, 

@@ -144,7 +144,7 @@ def conesearch(request):
 
         data = conesearch_impl(cone)
         if json_checked:
-            return HttpResponse(json.dumps(data), content_type="application/json")
+            return HttpResponse(json.dumps(data, indent=2), content_type="application/json")
         else:
             return render(request, 'conesearch.html', {'data':data})
     else:
