@@ -238,7 +238,7 @@ def runquery(request):
     pe = (page+1)*perpage
 
     sqlquery_real = query_utilities.make_query(selected, tables, conditions, \
-            page, perpage, check_days_ago, days_ago, days_ago)
+            page, perpage, check_days_ago, days_ago)
     message += sqlquery_real
 
 # lets keep a record of all the queries the people try to execute

@@ -1,4 +1,5 @@
 function plotlc(data){
+	console.log('hello');
 gmag = []
 gfmag = []
 ngmag = []
@@ -29,7 +30,7 @@ nr = 'rgb(255,209,209)';
 candidates = data.candidates;
 //first_item = data[0];
 //first_ra = Number(first_item.ra)*3600;
-//first_dec = Number(first_item.decl)*3600;
+//first_dec = Number(first_item.dec)*3600;
 first_ra = Number(data.objectData.ramean)*3600;
 first_dec = Number(data.objectData.decmean)*3600;
 
@@ -38,7 +39,7 @@ candidates.forEach(function(item){
     x = Number(item.mjd);
     e = Number(item.sigmapsf);
     x2 = first_ra - Number(item.ra)*3600;
-    y2 = first_dec - Number (item.decl)*3600;
+    y2 = first_dec - Number (item.dec)*3600;
     fid = Number(item.fid);
     det = (item.candid)
     if(det){

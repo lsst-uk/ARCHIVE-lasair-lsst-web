@@ -13,6 +13,15 @@ import ephem, math
 from datetime import datetime, timedelta
 import json
 from utility.mag import dc_mag
+from utility.objectStore import objectStore
+
+def connect_db():
+    msl = mysql.connector.connect(
+        user    =lasair.settings.READONLY_USER,
+        password=lasair.settings.READONLY_PASS,
+        host    =lasair.settings.DATABASES['default']['HOST'],
+        database='ztf')
+    return msl
 
 def ecliptic(ra, dec):
     np = ephem.Equatorial(math.radians(ra), math.radians(dec), epoch='2000')
@@ -45,7 +54,7 @@ def objhtml(request, objectId):
     if 'comments' in data2:
         data2.pop('comments')
     return render(request, 'show_object.html',
-        {'data':data, 'json_data':json.dumps(data2, indent=2),
+        {'data':data, 'json_data':json.dumps(data2),
         'authenticated': request.user.is_authenticated})
 
 def objjson(request, objectId):
@@ -60,9 +69,10 @@ def obj(request, objectId):
     message = ''
     msl = connect_db()
     cursor = msl.cursor(buffered=True, dictionary=True)
-    query = 'SELECT o.primaryId, o.ncand, o.ramean, o.decmean, o.glonmean, o.glatmean, s.classification, s.annotation, s.separationArcsec  '
-    query += 'FROM objects AS o LEFT JOIN sherlock_classifications AS s ON o.primaryId = s.transient_object_id '
-    query += 'WHERE stale != 1 AND o.objectId = "%s"' % objectId
+    query = 'SELECT ncand, ramean, decmean, glonmean, glatmean, '
+    query += 'sherlock_classification, sherlock_annotation, sherlock_separation_arcsec  '
+    query += 'FROM objects '
+    query += 'WHERE objectId = "%s"' % objectId
     cursor.execute(query)
     for row in cursor:
         objectData = row
@@ -82,7 +92,6 @@ def obj(request, objectId):
 
     crossmatches = []
     if objectData:
-        primaryId = int(objectData['primaryId'])
         if objectData and 'annotation' in objectData and objectData['annotation']:
             objectData['annotation'] = objectData['annotation'].replace('"', '').strip()
 
@@ -95,7 +104,7 @@ def obj(request, objectId):
 
         query = 'SELECT catalogue_object_id, catalogue_table_name, catalogue_object_type, separationArcsec, '
         query += '_r AS r, _g AS g, photoZ, rank '
-        query += 'FROM sherlock_crossmatches where transient_object_id = %d ' % primaryId
+        query += 'FROM sherlock_crossmatches where objectId="%s"' % objectId
         query += 'ORDER BY -rank DESC'
         cursor.execute(query)
         for row in cursor:
@@ -103,34 +112,50 @@ def obj(request, objectId):
                 crossmatches.append(row)
     message += ' and %d crossmatches' % len(crossmatches)
 
+    lightcurves = objectStore(suffix = 'json',
+        fileroot=lasair.settings.BLOB_STORE_ROOT + '/lightcurve/')
+#    try:
+    alertjson = lightcurves.getObject(objectId)
+#    except:
+#        message = 'objectId %s does not exist'%objectId
+#        data = {'objectId':objectId, 'message':message}
+#        return data
+
+    alert = json.loads(alertjson)
     candidates = []
-    query = 'SELECT candid, jd-2400000.5 as mjd, ra, decl, fid, nid, magpsf,sigmapsf, '
-    query += 'magnr,sigmagnr, magzpsci, isdiffpos, ssdistnr, ssnamenr, ndethist, '
-    query += 'dc_mag, dc_sigmag,dc_mag_g02,dc_mag_g08,dc_mag_g28,dc_mag_r02,dc_mag_r08,dc_mag_r28, '
-    query += 'drb '
-    query += 'FROM candidates WHERE objectId = "%s" ' % objectId
-    cursor.execute(query)
+    
+#    query = 'SELECT candid, jd-2400000.5 as mjd, ra, decl, fid, nid, magpsf,sigmapsf, '
+#    query += 'magnr,sigmagnr, magzpsci, isdiffpos, ssdistnr, ssnamenr, ndethist, '
+#    query += 'dc_mag, dc_sigmag,dc_mag_g02,dc_mag_g08,dc_mag_g28,dc_mag_r02,dc_mag_r08,dc_mag_r28, '
+#    query += 'drb '
+#    query += 'FROM candidates WHERE objectId = "%s" ' % objectId
+#    cursor.execute(query)
     count_isdiffpos = count_real_candidates = 0
-    for row in cursor:
-        mjd = float(row['mjd'])
+
+    candlist = alert['prv_candidates'] + [alert['candidate']]
+    candidates = []
+    for cand in candlist:
+        row = {}
+        for key in ['candid', 'jd', 'ra', 'dec', 'fid', 'nid', 'magpsf', 'sigmapsf', 'isdiffpos', 
+                'ssdistnr', 'ssnamenr', 'drb']:
+            if key in cand:
+                row[key] = cand[key]
+        row['mjd'] = mjd = float(cand['jd']) - 2400000.5
         date = datetime.strptime("1858/11/17", "%Y/%m/%d")
         date += timedelta(mjd)
         row['utc'] = date.strftime("%Y-%m-%d %H:%M:%S")
-        candidates.append(row)
-        ssnamenr = row['ssnamenr']
+        ssnamenr = cand['ssnamenr']
         if ssnamenr == 'null':
             ssnamenr = None
-        if row['candid'] and row['isdiffpos'] == 'f':
+        if cand['candid'] and cand['isdiffpos'] == 'f':
             count_isdiffpos += 1
-
-    if len(candidates) == 0:
-        message = 'objectId %s does not exist'%objectId
-        data = {'objectId':objectId, 'message':message}
-        return data
+        if not cand['candid']:
+            row['magpsf'] = cand['diffmaglim']
+        candidates.append(row)
 
     if not objectData:
-        ra = float(row['ra'])
-        dec = float(row['decl'])
+        ra = float(cand['ra'])
+        dec = float(cand['dec'])
         objectData = {'ramean': ra, 'decmean': dec, 
             'rasex': rasex(ra), 'decsex': decsex(dec),
             'ncand':len(candidates), 'MPCname':ssnamenr}
@@ -138,18 +163,18 @@ def obj(request, objectId):
         if row['ssdistnr'] > 0 and row['ssdistnr'] < 10:
             objectData['MPCname'] = ssnamenr
 
-    message += 'Got %d candidates' % len(candidates)
+    message += 'Got %d candidates' % len(candlist)
 
-    query = 'SELECT jd-2400000.5 as mjd, fid, diffmaglim '
-    query += 'FROM noncandidates WHERE objectId = "%s"' % objectId
-    cursor.execute(query)
-    for row in cursor:
-        mjd = float(row['mjd'])
-        date = datetime.strptime("1858/11/17", "%Y/%m/%d")
-        date += timedelta(mjd)
-        row['utc'] = date.strftime("%Y-%m-%d %H:%M:%S")
-        row['magpsf'] = row['diffmaglim']
-        candidates.append(row)
+#    query = 'SELECT jd-2400000.5 as mjd, fid, diffmaglim '
+#    query += 'FROM noncandidates WHERE objectId = "%s"' % objectId
+#    cursor.execute(query)
+#    for cand in candlist:
+#        mjd = float(row['mjd'])
+#        date = datetime.strptime("1858/11/17", "%Y/%m/%d")
+#        date += timedelta(mjd)
+#        row['utc'] = date.strftime("%Y-%m-%d %H:%M:%S")
+#        row['magpsf'] = row['diffmaglim']
+#        candidates.append(row)
     message += 'Got %d candidates and noncandidates' % len(candidates)
 
     candidates.sort(key= lambda c: c['mjd'], reverse=True)

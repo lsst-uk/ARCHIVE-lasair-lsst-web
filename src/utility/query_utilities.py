@@ -1,6 +1,6 @@
 # how to make a query from selects, tables, and conditions. Plus pages. Plus time constraints.
 
-def make_query(selected, tables, conditions, page, perpage, check_days_ago, days_ago_candidates, days_ago_objects):
+def make_query(selected, tables, conditions, page, perpage, check_days_ago, days_ago_objects):
 # select some quantitites from some tables
     sqlquery_real  = 'SELECT /*+ MAX_EXECUTION_TIME(300000) */ ' 
     sqlquery_real += selected
@@ -21,8 +21,6 @@ def make_query(selected, tables, conditions, page, perpage, check_days_ago, days
     if check_days_ago:
         if 'objects' in toktables:
             time_conditions.append('objects.jdmax > JDNOW() - %.5f' % days_ago_objects)
-        if 'candidates' in toktables:
-            time_conditions.append('candidates.jd > JDNOW() - %.5f' % days_ago_candidates)
 
     if wl_id >= 0:
         wl_conditions = ['watchlist_hits.wl_id=%d' % wl_id]
@@ -38,9 +36,7 @@ def make_query(selected, tables, conditions, page, perpage, check_days_ago, days
     join_list = []
     if 'objects' in toktables:
         for table in toktables:
-            if table.startswith('sherlock'):
-                join_list.append('objects.primaryId = %s.transient_object_id' % table)
-            elif table != 'objects':
+            if table != 'objects':
                 join_list.append('objects.objectId = %s.objectId' % table)
 
     if len(new_conditions.strip()) > 0:
