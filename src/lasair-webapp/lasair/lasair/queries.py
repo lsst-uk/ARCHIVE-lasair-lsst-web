@@ -97,7 +97,10 @@ def handle_myquery(request, mq_id=None):
                 active  = int(request.POST.get('active'))
             except:
                 active = 0
+
             public      = request.POST.get('public')
+            if public == 'on': 
+                public = 1
 
             myquery = Myqueries(user=request.user, name=name, description=description,
                 public=public, active=active, selected=selected, conditions=conditions, tables=tables)

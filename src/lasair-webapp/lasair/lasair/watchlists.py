@@ -52,7 +52,7 @@ def watchlists_home(request):
                     message += "Bad line %d: %s\n" % (len(cone_list), line)
                     message += str(e)
             if len(cone_list) > 0:
-                wl = Watchlists(user=request.user, name=name, description=description, active=0, prequel_where='', radius=default_radius)
+                wl = Watchlists(user=request.user, name=name, description=description, active=0, radius=default_radius)
                 wl.save()
                 for cone in cone_list:
                     if len(cone) == 3:
