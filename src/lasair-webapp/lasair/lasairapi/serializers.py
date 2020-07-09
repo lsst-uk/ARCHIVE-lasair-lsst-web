@@ -40,6 +40,7 @@ class ConeSerializer(serializers.Serializer):
             return info
 
         replyMessage = 'No object found'
+        info = {"info": replyMessage}
 
         # Is there an object within RADIUS arcsec of this object? - KWS - need to fix the gkhtm code!!
         message, results = coneSearchHTM(ra, dec, radius, 'objects', queryType = QUICK, conn = connection, django = True, prefix='htm', suffix = '')
