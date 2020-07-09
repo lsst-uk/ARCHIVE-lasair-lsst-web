@@ -124,6 +124,9 @@ You must be signed in to post comments.
   <div class ="col-sm-12">
 Image layer is PanSTARRS DR1; use the layers icon to change it &nbsp;(<img src=/lasair/static/img/layers.png>). You can also overlay PanSTARRS and/or Gaia DR2 catalog.
 <p>
+<div class="row">
+  <div id="SV-layerBox"> </div><br/>
+</div>
     <div id="aladin-lite-div" style="width:400px;height:400px;"></div>
   </div>
 </div>
@@ -174,8 +177,11 @@ $(document).ready(function()
 </script>
 
 <script type="text/javascript" src="//aladin.u-strasbg.fr/AladinLite/api/v2/latest/aladin.min.js" charset="utf-8"></script>
+<!--<script src="/lasair/static/js/surveys.js"></script>
+<script src="/lasair/static/js/aladin.js"></script> -->
 <script type="text/javascript">
-    var aladin = A.aladin('#aladin-lite-div', {survey: "P/PanSTARRS/DR1/color-z-zg-g", fov:0.01, target: "{{ data.objectData.ramean }}, {{ data.objectData.decmean }}"});
+	var aladin = A.aladin('#aladin-lite-div', {survey: "P/PanSTARRS/DR1/color-z-zg-g", fov:0.01, target: "{{ data.objectData.ramean }}, {{ data.objectData.decmean }}", showLayersControl:true});
+
     $('input[name=survey]').change(function() {
         aladin.setImageSurvey($(this).val());
     });
