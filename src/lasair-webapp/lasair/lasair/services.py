@@ -1,4 +1,5 @@
-from django.shortcuts import render_to_response, get_object_or_404
+#from django.shortcuts import render_to_response, get_object_or_404
+from django.shortcuts import get_object_or_404
 from django.http import HttpResponseRedirect
 from django.template.context_processors import csrf
 import lasair.settings
