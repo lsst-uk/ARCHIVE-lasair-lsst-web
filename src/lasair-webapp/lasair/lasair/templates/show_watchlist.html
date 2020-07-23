@@ -33,12 +33,12 @@
 
 
 
-Watchlist has {{ count }} sources under watch.
+Watchlist has {{ number_cones }} sources under watch, with {{ count }} shown below..
 To see the original input data, click <a href=/watchlist/{{ watchlist.wl_id }}/txt/>here</a>.
 <hr/>
 {{ message }}
 <hr/>
-{% if is_owner %}
+{% if is_owner and number_count < 10000 %}
 <table cellpadding=10><tr>
 <td><form method="POST"  action="/watchlist/{{ watchlist.wl_id }}/">
 {% csrf_token %}

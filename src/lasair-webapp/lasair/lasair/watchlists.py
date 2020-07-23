@@ -1,5 +1,6 @@
 from django.shortcuts import render, get_object_or_404
 from django.template.context_processors import csrf
+from django.views.decorators.csrf import csrf_exempt
 from django.db import connection
 from django.contrib.auth.models import User
 from django.http import HttpResponse
@@ -7,7 +8,9 @@ import lasair.settings
 from lasair.models import Watchlists, WatchlistCones, WatchlistHits
 import mysql.connector
 import json
+import random
 from subprocess import Popen, PIPE
+import time
 
 def connect_db():
     msl = mysql.connector.connect(
@@ -17,24 +20,33 @@ def connect_db():
         database='ztf')
     return msl
 
+def handle_uploaded_file(f):
+    return f.read().decode('utf-8')
 
+@csrf_exempt
 def watchlists_home(request):
     message = ''
     if request.method == 'POST' and request.user.is_authenticated:
         delete      = request.POST.get('delete')
 
         if delete == None:   # create new watchlist
-            name        = request.POST.get('name')
-            description = request.POST.get('description')
-            d_radius    = request.POST.get('radius')
+
+            t = time.time()
+            name           = request.POST.get('name')
+            description    = request.POST.get('description')
+            d_radius       = request.POST.get('radius')
+
+            cones          = request.POST.get('cones_textarea')
+            if 'cones_file' in request.FILES:
+                cones     = handle_uploaded_file(request.FILES['cones_file'])
+
             try:
                 default_radius      = float(d_radius)
             except:
                 message += 'Cannot parse default radius %s\n' % d_radius
 
             cone_list = []
-            s = request.POST.get('objects')
-            for line in s.split('\n'):
+            for line in cones.split('\n'):
                 if len(line) == 0: continue
                 if line[0] == '#': continue
                 line = line.replace('|', ',')
@@ -46,7 +58,7 @@ def watchlists_home(request):
                         dec      = float(tok[1])
                         objectId = tok[2].strip()
                         if len(tok) >= 4: radius = float(tok[3])
-                        else:             radius = d_radius
+                        else:             radius = None
                         cone_list.append([objectId, ra, dec, radius])
                 except Exception as e:
                     message += "Bad line %d: %s\n" % (len(cone_list), line)
@@ -54,13 +66,15 @@ def watchlists_home(request):
             if len(cone_list) > 0:
                 wl = Watchlists(user=request.user, name=name, description=description, active=0, radius=default_radius)
                 wl.save()
+                cones = []
                 for cone in cone_list:
-                    if len(cone) == 3:
-                        wlc = WatchlistCones(wl=wl, name=cone[0], ra=cone[1], decl=cone[2])
-                    else:
-                        wlc = WatchlistCones(wl=wl, name=cone[0], ra=cone[1], decl=cone[2], radius=cone[3])
-                    wlc.save()
-                message += '\nWatchlist created successfully with %d sources' % len(cone_list)
+                    wlc = WatchlistCones(wl=wl, name=cone[0], ra=cone[1], decl=cone[2], radius=cone[3])
+                    cones.append(wlc)
+                chunks = 1 + int(len(cones)/50000)
+                for i in range(chunks):
+                    WatchlistCones.objects.bulk_create(cones[(i*50000) : ((i+1)*50000)])
+#                wlc.save()
+                message += '\nWatchlist created successfully with %d sources in %d chunks in %.1f sec' % (len(cone_list), chunks, time.time()-t)
         else:
             wl_id = int(delete)
             watchlist = get_object_or_404(Watchlists, wl_id=wl_id)
@@ -77,6 +91,7 @@ def watchlists_home(request):
 
     return render(request, 'watchlists_home.html',
         {'my_watchlists': my_watchlists, 
+            'random': '%d'%random.randrange(1000),
         'other_watchlists': other_watchlists, 
         'authenticated': request.user.is_authenticated,
         'message': message})
@@ -141,8 +156,11 @@ def show_watchlist(request, wl_id):
             message += 'watchlist crossmatched [%s, %s]' % (stdout, stderr)
 
     cursor = connection.cursor()
-#    cursor.execute('SELECT * FROM watchlist_cones AS c LEFT JOIN watchlist_hits AS h ON c.cone_id = h.cone_id WHERE c.wl_id=%d ORDER BY h.objectId DESC' % wl_id)
-    cursor.execute('SELECT * FROM watchlist_cones AS c LEFT JOIN watchlist_hits AS h ON c.cone_id = h.cone_id LEFT JOIN objects on h.objectId = objects.objectId WHERE c.wl_id=%d ' % wl_id)
+    cursor.execute('SELECT count(*) AS count FROM watchlist_cones WHERE wl_id=%d' % wl_id)
+    for row in cursor:
+        number_cones = row[0]
+
+    cursor.execute('SELECT * FROM watchlist_cones AS c LEFT JOIN watchlist_hits AS h ON c.cone_id = h.cone_id LEFT JOIN objects on h.objectId = objects.objectId WHERE c.wl_id=%d LIMIT 1000' % wl_id)
     cones = cursor.fetchall()
     conelist = []
     found = 0
@@ -184,6 +202,7 @@ def show_watchlist(request, wl_id):
         'watchlist':watchlist, 
         'conelist' :conelist, 
         'count'    :count, 
+        'number_cones': number_cones,
         'is_owner' :is_owner,
         'message'  :message})
 

@@ -33,25 +33,27 @@ function exposeDiv(id) {
         </div>
 <br/>
     </div>
-    <div id="new_watchlist" style="display:none" class="col-sm-6">
-<form method="POST"  action="/watchlist/">
-{% csrf_token %}
-<table width=400>
-<tr><td>Name:</td><td> <input name="name"></td></tr>
+    <div id="new_watchlist" style="display:none" class="col-sm-10">
+<form method="POST"  action="/watchlist/" enctype="multipart/form-data">
+<table>
+<tr>
+    <th width="40%"></th>
+    <th width="60%"></th>
+</tr>
 
-<tr><td>Description:</td><td> <textarea name="description" rows=3 cols=40></textarea></td></tr>
+<tr><td>Name:</td><td> <input name="name" width=50 value='Change_Me_{{ random }}'></td></tr>
 
-<tr><td>default radius (arcsec), max 360:</td><td> <input name="radius"></td></tr>
-<tr colspan="2"><td>
+<tr><td>Description:</td><td> <textarea name="description" rows=3 cols=40>Change_Me_{{ random }}</textarea></td></tr>
 
-<font size=-1>Paste here the list of sources to be watched, as comma-separated values 
-	<b>RA, Dec, ID &lt;,radius&gt;</b> with RA and Dec in decimal degrees, and radius in arcseconds:</font></td><td>
-<textarea name="objects" rows="9" cols="50"></textarea></td></tr>
-<tr><td>
+<tr><td>default radius (arcsec), max 360:</td><td> <input name="radius" value="2"></td></tr>
 
-<input type="submit" class="button" style="color: blue; background-color: #EEEEFF;" value="Submit form">
-</td></tr>
+<tr><td> <font size=-1>Paste here the list of sources to be watched, as comma-separated values <br/>
+	<b>RA, Dec, ID &lt;,radius&gt;</b> with RA and Dec in decimal degrees, and radius in arcseconds:</font></td> <td> <textarea name="cones_textarea" rows="5" cols="50"></textarea></td></tr>
+
+<tr><td>Or upload a file with the same information:</td> <td><input type="file" name="cones_file"></td>
+</tr>
 </table>
+<input type="submit" class="button" style="color: blue; background-color: #EEEEFF;" value="Submit form">
 </form>
     </div>
 
