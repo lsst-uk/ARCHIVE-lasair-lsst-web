@@ -131,18 +131,10 @@ var availableTags = [
 "objects.sgmag1",
 "objects.sgscore1",
 "objects.srmag1",
-"objects.sherlock_classification",
-"objects.sherlock_summary",
-"objects.sherlock_association_type",
-"sherlock_crossmatches.catalogue_object_id",
-"sherlock_crossmatches.catalogue_object_type",
-"sherlock_crossmatches.catalogue_table_name",
-"sherlock_crossmatches.distance",
-"sherlock_crossmatches.eastSeparationArcsec",
-"sherlock_crossmatches.northSeparationArcsec",
-"sherlock_crossmatches.rank",
-"sherlock_crossmatches.separationArcsec",
-"sherlock_crossmatches.z",
+"sherlock_classifications.classification",
+"sherlock_classifications.description",
+"sherlock_classifications.summary",
+"sherlock_classifications.separation",
 "watchlist_hits.objectId",
 "watchlist_hits.arcsec",
 "watchlist_hits.name",
@@ -249,7 +241,7 @@ $(document).ready(function(){
 </font></td><td> <font size=+3>
 <input type="checkbox" name="put" id="objects"                  onclick="puttext();"> objects
 </font></td><td> <font size=+1>
-<input type="checkbox" name="put" id="sherlock_crossmatches"    onclick="puttext();"> sherlock_crossmatches
+<input type="checkbox" name="put" id="sherlock_classifications"    onclick="puttext();"> sherlock_classifications
 </td>
 
 <td><font size=+1><input type="checkbox" name="put" id="watchlist"    onclick="showradiolist();puttext();"> Watchlist

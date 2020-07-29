@@ -69,10 +69,8 @@ def obj(request, objectId):
     message = ''
     msl = connect_db()
     cursor = msl.cursor(buffered=True, dictionary=True)
-    query = 'SELECT ncand, ramean, decmean, glonmean, glatmean, '
-    query += 'sherlock_classification, sherlock_annotation, sherlock_separation_arcsec  '
-    query += 'FROM objects '
-    query += 'WHERE objectId = "%s"' % objectId
+    query = 'SELECT ncand, ramean, decmean, glonmean, glatmean '
+    query += 'FROM objects WHERE objectId = "%s"' % objectId
     cursor.execute(query)
     for row in cursor:
         objectData = row
@@ -90,7 +88,7 @@ def obj(request, objectId):
         message += ' and %d comments' % len(comments)
         message += str(comments)
 
-    crossmatches = []
+#    crossmatches = []
     if objectData:
         if objectData and 'annotation' in objectData and objectData['annotation']:
             objectData['annotation'] = objectData['annotation'].replace('"', '').strip()
@@ -102,15 +100,22 @@ def obj(request, objectId):
         objectData['ec_lon'] = ec_lon
         objectData['ec_lat'] = ec_lat
 
-        query = 'SELECT catalogue_object_id, catalogue_table_name, catalogue_object_type, separationArcsec, '
-        query += '_r AS r, _g AS g, photoZ, rank '
-        query += 'FROM sherlock_crossmatches where objectId="%s"' % objectId
-        query += 'ORDER BY -rank DESC'
-        cursor.execute(query)
-        for row in cursor:
-            if row['rank']:
-                crossmatches.append(row)
-    message += ' and %d crossmatches' % len(crossmatches)
+#        query = 'SELECT catalogue_object_id, catalogue_table_name, catalogue_object_type, separationArcsec, '
+#        query += '_r AS r, _g AS g, photoZ, rank '
+#        query += 'FROM sherlock_crossmatches where objectId="%s"' % objectId
+#        query += 'ORDER BY -rank DESC'
+#        cursor.execute(query)
+#        for row in cursor:
+#            if row['rank']:
+#                crossmatches.append(row)
+#    message += ' and %d crossmatches' % len(crossmatches)
+
+    sherlock = {}
+    query = 'SELECT * from sherlock_classifications WHERE objectId = "%s"' % objectId
+    cursor.execute(query)
+    for row in cursor:
+        sherlock = row
+    #message += str(sherlock)   #%%%%%%%
 
     lightcurves = objectStore(suffix = 'json',
         fileroot=lasair.settings.BLOB_STORE_ROOT + '/lightcurve/')
@@ -165,6 +170,7 @@ def obj(request, objectId):
 
     message += 'Got %d candidates' % len(candlist)
 
+
 #    query = 'SELECT jd-2400000.5 as mjd, fid, diffmaglim '
 #    query += 'FROM noncandidates WHERE objectId = "%s"' % objectId
 #    cursor.execute(query)
@@ -181,5 +187,6 @@ def obj(request, objectId):
 
     data = {'objectId':objectId, 'objectData': objectData, 'candidates': candidates, 
         'count_isdiffpos': count_isdiffpos, 'count_real_candidates':count_real_candidates,
-        'crossmatches': crossmatches, 'comments':comments}
+        'sherlock': sherlock, 'message':message,
+        'comments':comments}
     return data
