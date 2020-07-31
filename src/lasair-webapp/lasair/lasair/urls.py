@@ -18,7 +18,7 @@ from django.contrib.auth import views as authviews
 from django.urls import include, path
 from django.views.generic import TemplateView
 
-from lasair import views, services, candidates, objects, watchlists, queries, comments, cs_comments, skymap
+from lasair import views, services, candidates, objects, areas, watchlists, queries, comments, cs_comments, skymap
 import lasair.settings
 
 from django.contrib import admin
@@ -38,6 +38,10 @@ urlpatterns = [
 
     path('object/<slug:objectId>/',      objects.objhtml,       name='objhtml'),
     path('object/<slug:objectId>/json/', objects.objjson,       name='objjson'),
+
+    path('area/',                   areas.areas_home,           name='areas_home'),
+    path('area/<int:ar_id>/',       areas.show_area,            name='show_area'),
+    path('area/<int:ar_id>/file/',  areas.show_area_file,       name='show_area_file'),
 
     path('watchlist/',              watchlists.watchlists_home, name='watchlists_home'),
     path('watchlist/<int:wl_id>/',  watchlists.show_watchlist,  name='show_watchlist'),

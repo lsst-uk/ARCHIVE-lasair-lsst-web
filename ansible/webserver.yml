@@ -53,6 +53,16 @@
           executable: pip3 
           name: pyephem
 
+    - name: install MOCpy
+      pip: 
+          executable: pip3 
+          name: MOCpy
+
+    - name: install astropy
+      pip: 
+          executable: pip3 
+          name: astropy
+
     - name: install mod-wsgi
       pip: 
           executable: pip3 

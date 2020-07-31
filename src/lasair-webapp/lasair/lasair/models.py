@@ -72,6 +72,29 @@ class Watchlists(models.Model):
         managed = False
         db_table = 'watchlists'
 
+class AreaHits(models.Model):
+    ar_id = models.IntegerField(blank=True, null=True)
+    objectid = models.CharField(db_column='objectId', max_length=16, blank=True, null=True)  # Field name made lowercase.
+
+    class Meta:
+        managed = False
+        db_table = 'area_hits'
+
+class Areas(models.Model):
+    ar_id = models.AutoField(primary_key=True)
+    user = models.ForeignKey(User, models.DO_NOTHING, db_column='user', blank=True, null=True)
+    name = models.CharField(max_length=256, blank=True, null=True)
+    description = models.CharField(max_length=4096, blank=True, null=True)
+    moc = models.TextField(blank=True, null=True)
+    mocimage = models.TextField(blank=True, null=True)
+    active = models.IntegerField(blank=True, null=True)
+    public = models.IntegerField(blank=True, null=True)
+    timestamp = models.DateTimeField(blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'areas'
+
 class Myqueries(models.Model):
     mq_id = models.AutoField(primary_key=True)
     user = models.ForeignKey(User, models.DO_NOTHING, db_column='user', blank=True, null=True)

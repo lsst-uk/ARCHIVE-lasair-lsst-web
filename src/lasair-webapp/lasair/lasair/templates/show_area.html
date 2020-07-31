@@ -1,0 +1,50 @@
+{% extends "base.html"%}
+{% block content %}
+
+<div class="row">
+<div class="col-sm">
+
+{% if is_owner %}
+
+<form method="POST"  action="/area/{{ area.ar_id }}/">
+<table>
+{% csrf_token %}
+<tr><td>Name</td><td><h2><input name="name" value="{{ area.name }}"></h2></td></tr>
+<tr><td>Description</td><td><textarea name="description" rows=4 cols=40>{{ area.description }}</textarea></td></tr>
+<tr><td>Active</td><td><h3><input type="checkbox" name="active" {% if area.active == 1 %}checked{% endif %}></h3></td></tr>
+<tr><td>Public</td><td><h3><input type="checkbox" name="public" {% if area.public == 1 %}checked{% endif %}></h3></td></tr>
+</table>
+
+<input type="submit" class="button" style="color: blue; background-color: #EEEEFF;" value=" Update area"></td>
+</form>
+
+{% else %}
+
+<table border=1>
+<tr><td>Name</td><td><h2>{{ area.name }}</h2></td></tr>
+<tr><td>Description</td><td>{{ area.description }}</td></tr>
+<tr><td>Active</td><td>{% if area.active == 1 %}yes{% else %}no{% endif %}</td></tr>
+<tr><td>Public</td><td>{% if area.public == 1 %}yes{% else %}no{% endif %}</td></tr>
+</table>
+
+{% endif %}
+
+<img src="data:image/png;base64,{{ mocimage }}" width=500 /><br/>
+
+
+Area has {{ count }} objects, shown below..
+To see the original input data, click <a href=/area/{{ area.ar_id }}/file/>here</a>.
+<hr/>
+{{ message }}
+<hr/>
+
+<table border=1>
+<tr><th> ObjectId</th></tr>
+{% for objId in objIds %}
+<tr> <td>{{ objId }}</td> </tr>
+{% endfor %}
+</table>
+</div>
+</div>
+
+{% endblock %}
