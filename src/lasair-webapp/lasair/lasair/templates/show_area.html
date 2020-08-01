@@ -41,7 +41,7 @@ To see the original input data, click <a href=/area/{{ area.ar_id }}/file/>here<
 <table border=1>
 <tr><th> ObjectId</th></tr>
 {% for objId in objIds %}
-<tr> <td>{{ objId }}</td> </tr>
+<tr> <td><a href=/object/{{ objId }}/>{{ objId }}</a></td> </tr>
 {% endfor %}
 </table>
 </div>

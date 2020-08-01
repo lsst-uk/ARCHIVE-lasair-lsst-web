@@ -201,9 +201,9 @@ def coverage(request):
 
 def streamlog(request, topic):
     try:
-        data = open('/data/ztf/streams/%s' % topic, 'r').read()
+        data = open('//mnt/cephfs/roy/logs/%s' % topic, 'r').read()
     except:
         return render(request, 'error.html', {'message': 'Cannot find log file for ' + topic})
-    table = json.loads(data)['log']
+    table = json.loads(data)['digest']
     n = len(table)
     return render(request, 'streamlog.html', {'topic':topic, 'n':n, 'table':table})

@@ -154,7 +154,9 @@ def show_area(request, ar_id):
         count = row[0]
 
     cursor.execute('SELECT objectId FROM area_hits WHERE ar_id=%d LIMIT 1000' % ar_id)
-    objIds = cursor.fetchall()
+    objIds = []
+    for row in cursor:
+        objIds.append(row[0])
     
     return render(request, 'show_area.html',{
         'area':area, 

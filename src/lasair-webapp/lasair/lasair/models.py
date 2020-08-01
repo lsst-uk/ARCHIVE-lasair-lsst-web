@@ -89,7 +89,7 @@ class Areas(models.Model):
     mocimage = models.TextField(blank=True, null=True)
     active = models.IntegerField(blank=True, null=True)
     public = models.IntegerField(blank=True, null=True)
-    timestamp = models.DateTimeField(blank=True, null=True)
+    timestamp     = models.DateTimeField(auto_now=True, editable=False, blank=True, null=True)
 
     class Meta:
         managed = False
