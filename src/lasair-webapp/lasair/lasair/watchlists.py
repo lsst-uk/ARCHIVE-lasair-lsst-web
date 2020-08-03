@@ -160,29 +160,33 @@ def show_watchlist(request, wl_id):
     for row in cursor:
         number_cones = row[0]
 
-    cursor.execute('SELECT * FROM watchlist_cones AS c LEFT JOIN watchlist_hits AS h ON c.cone_id = h.cone_id LEFT JOIN objects on h.objectId = objects.objectId WHERE c.wl_id=%d LIMIT 1000' % wl_id)
+    query = """
+SELECT 
+c.ra, c.decl, c.name, c.radius, o.objectId, o.ncand, h.arcsec,
+o.latestgmag-o.maggmean AS gdiff, o.latestrmag-o.magrmean AS rdiff, s.classification
+FROM watchlist_cones AS c 
+LEFT JOIN watchlist_hits           AS h ON c.cone_id = h.cone_id 
+LEFT JOIN objects                  AS o on h.objectId = o.objectId 
+LEFT JOIN sherlock_classifications AS s on o.objectId = s.objectId
+WHERE c.wl_id=%d LIMIT 1000
+"""
+    cursor.execute(query % wl_id)
     cones = cursor.fetchall()
     conelist = []
     found = 0
+
     for c in cones:
-        d = {'name':c[2], 'ra'  :c[3], 'decl' :c[4], 'radius':c[5]}
-        if c[8]:
+        d = {'ra'  :c[0], 'decl' :c[1], 'name':c[2]}
+        if c[3]: d['radius'] = c[3]
+        else:    d['radius'] = watchlist.radius
+        if c[4]:   # objectId, means a hit
             found += 1
-            d['objectId'] = c[8]
-            d['arcsec']   = c[9]
-            d['sherlock_classification'] = c[32]
-            if c[15]:
-                d['ncand'] = c[15]
-                if c[20]: 
-                    grange = c[21] - c[20] 
-                else: grange = 0.0
-                if c[25]: 
-                    rrange = c[25] - c[24] 
-                else: rrange = 0.0
-                if grange > rrange:
-                    d['range'] = grange
-                else:
-                    d['range'] = rrange
+            d['objectId'] = c[4]
+            d['ncand']    = c[5]
+            d['arcsec']   = c[6]
+            d['gdiff']    = c[7]
+            d['rdiff']    = c[8]
+            d['sherlock_classification'] = c[9]
         conelist.append(d)
 
     def first(d):
