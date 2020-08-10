@@ -82,11 +82,6 @@ class StreamlogSerializer(serializers.Serializer):
         if request and hasattr(request, "user"):
             userId = request.user
 
-#        if topic is not a plain string
-#            replyMessage = "%s is not a valid topic name."
-#            info = { "error": replyMessage }
-#            return info
-
         data = open(lasair.settings.BLOB_STORE_ROOT + '/logs/%s' % topic, 'r').read()
         data = json.loads(data)
         replyMessage = 'Success'
