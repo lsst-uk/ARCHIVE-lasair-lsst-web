@@ -82,8 +82,12 @@ class StreamlogSerializer(serializers.Serializer):
         if request and hasattr(request, "user"):
             userId = request.user
 
-        data = open(lasair.settings.BLOB_STORE_ROOT + '/logs/%s' % topic, 'r').read()
-        data = json.loads(data)
-        replyMessage = 'Success'
+        try:
+            data = open(lasair.settings.BLOB_STORE_ROOT + '/logs/%s' % topic, 'r').read()
+            data = json.loads(data)
+            replyMessage = 'Success'
+        except:
+            data = {'digest':[]}
+            replyMessage = 'No alerts'
         info = { "jsonStreamLog": data, "info": replyMessage }
         return info
