@@ -201,7 +201,7 @@ def coverage(request):
 
 def streamlog(request, topic):
     try:
-        data = open('//mnt/cephfs/roy/logs/%s' % topic, 'r').read()
+        data = open(lasair.settings.BLOB_STORE_ROOT + '/logs/%s' % topic, 'r').read()
     except:
         return render(request, 'error.html', {'message': 'Cannot find log file for ' + topic})
     table = json.loads(data)['digest']

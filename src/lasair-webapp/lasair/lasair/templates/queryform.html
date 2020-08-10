@@ -65,8 +65,8 @@ is a good resource.
 {% csrf_token %}
 
 {% if is_owner %}
-Query Name<br/>
-<h3><input name="name" value="{{ myquery.name }}" size=50></h3>
+Query Name {% if random %}(replace this name please){% endif %}<br/>
+<h3><input name="name" value={% if random %}Query-{{ random }}{% else %}{{ myquery.name }}{% endif %} size=50></h3>
 Description<br/>
 <textarea name="description" rows=4 cols=80>{{ myquery.description }}</textarea><br/>
 
@@ -109,7 +109,6 @@ Active:<br/>
 <!-- RUN QUERY -->
 <td>
 <font size=-2><input type="checkbox" name="json"/> Check this box for JSON output</font><br/>
-<input size=6 name="days_ago" value=""/> <font size=-2>Only recent events, days</font><br/>
 <button style="color: blue; background-color: #EEEEFF;" type="submit" formaction=/runquery/>Run this Query</button>
 </td></tr>
 

@@ -3,6 +3,8 @@ from gkutils.commonutils import coneSearchHTM, FULL, QUICK, CAT_ID_RA_DEC_COLS, 
 from datetime import datetime
 from django.db import connection
 from django.db import IntegrityError
+import lasair.settings
+import json
 
 CAT_ID_RA_DEC_COLS['objects'] = [['objectId', 'ramean', 'decmean'],1018]
 
@@ -66,4 +68,27 @@ class ConeSerializer(serializers.Serializer):
             else:
                 info = { "error": "Invalid request type" }
 
+        return info
+
+class StreamlogSerializer(serializers.Serializer):
+    topic = serializers.SlugField(required=True)
+
+    def save(self):
+        topic = self.validated_data['topic']
+
+        # Get the authenticated user, if it exists.
+        userId = 'unknown'
+        request = self.context.get("request")
+        if request and hasattr(request, "user"):
+            userId = request.user
+
+#        if topic is not a plain string
+#            replyMessage = "%s is not a valid topic name."
+#            info = { "error": replyMessage }
+#            return info
+
+        data = open(lasair.settings.BLOB_STORE_ROOT + '/logs/%s' % topic, 'r').read()
+        data = json.loads(data)
+        replyMessage = 'Success'
+        info = { "jsonStreamLog": data, "info": replyMessage }
         return info

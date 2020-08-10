@@ -65,7 +65,6 @@ def querylist(request):
         'is_authenticated' : request.user.is_authenticated,
         'myqueries'        : query_list(myqueries), 
         'watchlists'       : watchlists,
-        'days_ago'         : 1, 
         'public_queries'   : query_list(public_queries)
     })
 
@@ -117,6 +116,7 @@ def handle_myquery(request, mq_id=None):
             # New query, blank query form
             return render(request, 'queryform.html',{
                 'watchlists': watchlists,
+                'random'    : '%d'%random.randrange(1000),
                 'email'     : email,
                 'is_owner'  : True,
                 'logged_in' : logged_in,
@@ -228,20 +228,10 @@ def runquery(request):
     if 'json' in request.POST and request.POST['json'] == 'on':
         json_checked = True
 
-    check_days_ago = False
-    days_ago = 0
-    if 'days_ago' in request.POST and len(request.POST['days_ago']) :
-        try:
-            days_ago = float(request.POST['days_ago'])
-            check_days_ago = True
-        except:
-            pass
-
     ps = page    *perpage
     pe = (page+1)*perpage
 
-    sqlquery_real = query_utilities.make_query(selected, tables, conditions, \
-            page, perpage, check_days_ago, days_ago)
+    sqlquery_real = query_utilities.make_query(selected, tables, conditions, page, perpage)
     message += sqlquery_real
 
 # lets keep a record of all the queries the people try to execute

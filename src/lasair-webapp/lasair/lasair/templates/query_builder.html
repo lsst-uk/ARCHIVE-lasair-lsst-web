@@ -45,10 +45,6 @@ function puttext() {
     text += ':' + checked_wl
   }
   document.getElementById("tables").value = text;
-{% if days_ago %}
-  check_days_ago();
-{% endif %}
-console.log(text);
 }
 
 /* take the table text and fill in the checkboxes */
@@ -68,20 +64,6 @@ function check_boxes() {
       radios[j].checked = true;
       document.getElementById('watchlistradios' ).style.display = 'block';
     }
-  }
-{% if days_ago %}
-  check_days_ago();
-{% endif %}
-}
-
-
-function check_days_ago(){
-  var tables = document.getElementById("tables").value;
-  var obj = document.getElementById('days_ago');
-  if(tables.indexOf('objects') != -1 || tables.indexOf('candidates') != -1){
-    obj.style.display = "block";
-  } else {
-    obj.style.display = "none";
   }
 }
 
@@ -261,10 +243,6 @@ $(document).ready(function(){
 
 <b><font color="red">WHERE</font></b>
 <tt><textarea class="form-control" rows="4" cols="40" name="conditions" id="conditions">{{ myquery.conditions }}</textarea></tt>
-</div>
-<div id="days_ago" style="display:none">
-	<input type="checkbox" id="check_days_ago" name="check_days_ago"> 
-	<font color="red">Include only recent events</font> (<input size=6 name="days_ago" value=""/> days)
 </div>
 
 <input class="form-control" type="hidden" name="page" value="{{ page }}"/><br/>

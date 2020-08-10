@@ -64,8 +64,8 @@ To see the original input data, click <a href=/watchlist/{{ watchlist.wl_id }}/t
 </tr>
 {% for c in conelist %}
 <tr>
-<td>{{ c.ra }}</td>
-<td>{{ c.decl }}</td>
+<td>{{ c.ra|floatformat:4 }}</td>
+<td>{{ c.decl|floatformat:4 }}</td>
 <td>{{ c.name }}</td>
 <td>{{ c.radius }}</td>
 {% if c.ncand %}

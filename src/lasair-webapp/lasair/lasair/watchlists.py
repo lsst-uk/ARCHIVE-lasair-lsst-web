@@ -168,7 +168,7 @@ FROM watchlist_cones AS c
 LEFT JOIN watchlist_hits           AS h ON c.cone_id = h.cone_id 
 LEFT JOIN objects                  AS o on h.objectId = o.objectId 
 LEFT JOIN sherlock_classifications AS s on o.objectId = s.objectId
-WHERE c.wl_id=%d LIMIT 1000
+WHERE c.wl_id=%d ORDER BY o.ncand DESC LIMIT 1000
 """
     cursor.execute(query % wl_id)
     cones = cursor.fetchall()
