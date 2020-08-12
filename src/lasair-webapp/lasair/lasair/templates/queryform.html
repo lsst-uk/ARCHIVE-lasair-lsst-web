@@ -3,7 +3,7 @@
 
 <div class="row">
 <div class="col-sm">
-<!-- {{ message }} -->
+	<!-- {{ message }} -->
 
 <script>
 function showinfodiv(){
@@ -30,6 +30,8 @@ of candidates (aka detections). The object has a light curve, the candidate has 
 multiple catalogs by the <a href=/sherlock>Sherlock</a> software. 
 <li> <b>watchlists</b>: Select one of the watchlists available to you to restrict searching to 
 	ZTF objects within the radius of the watchlist.
+<li> <b>areas</b>: Select one of the areas available to you to restrict searching to 
+	ZTF objects within the area.
 </ul>
 <p>
 <b>For detailed information about the attributes of these three tables, 
@@ -66,7 +68,7 @@ is a good resource.
 
 {% if is_owner %}
 Query Name {% if random %}(replace this name please){% endif %}<br/>
-<h3><input name="name" value={% if random %}Query-{{ random }}{% else %}{{ myquery.name }}{% endif %} size=50></h3>
+<h3><input name="name" value="{% if random %}Query-{{ random }}{% else %}{{ myquery.name }}"{% endif %} size=50></h3>
 Description<br/>
 <textarea name="description" rows=4 cols=80>{{ myquery.description }}</textarea><br/>
 

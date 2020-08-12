@@ -5,7 +5,7 @@ from django.db.models import Q
 from django.contrib.auth.models import User
 import lasair.settings
 from lasair.models import Myqueries
-from lasair.models import Watchlists
+from lasair.models import Watchlists, Areas
 from utility import query_utilities
 import utility.date_nid as date_nid
 from datetime import datetime, timedelta
@@ -57,14 +57,17 @@ def querylist(request):
 
     if request.user.is_authenticated:
         watchlists = Watchlists.objects.filter(Q(user=request.user) | Q(public__gte=1))
+        areas      =      Areas.objects.filter(Q(user=request.user) | Q(public__gte=1))
     else:
         watchlists = Watchlists.objects.filter(public__gte=1)
+        areas      =      Areas.objects.filter(public__gte=1)
 
     return render(request, 'querylist.html', {
         'promoted_queries' : query_list(promoted_queries),
         'is_authenticated' : request.user.is_authenticated,
         'myqueries'        : query_list(myqueries), 
         'watchlists'       : watchlists,
+        'areas'            : areas,
         'public_queries'   : query_list(public_queries)
     })
 
@@ -80,9 +83,11 @@ def handle_myquery(request, mq_id=None):
     if logged_in:
         email = request.user.email
         watchlists = Watchlists.objects.filter(Q(user=request.user) | Q(public__gte=1))
+        areas      =      Areas.objects.filter(Q(user=request.user) | Q(public__gte=1))
     else:
         email = ''
         watchlists = Watchlists.objects.filter(public__gte=1)
+        areas      =      Areas.objects.filter(public__gte=1)
 
     if mq_id is None:
         # New query, returned from form
@@ -108,6 +113,7 @@ def handle_myquery(request, mq_id=None):
             return render(request, 'queryform.html',{
                 'myquery'   : myquery,
                 'watchlists': watchlists,
+                'areas'     : areas,
                 'is_owner'  : True,
                 'logged_in' : logged_in,
                 'new'       : False,
@@ -116,6 +122,7 @@ def handle_myquery(request, mq_id=None):
             # New query, blank query form
             return render(request, 'queryform.html',{
                 'watchlists': watchlists,
+                'areas'     : areas,
                 'random'    : '%d'%random.randrange(1000),
                 'email'     : email,
                 'is_owner'  : True,
@@ -168,12 +175,13 @@ def handle_myquery(request, mq_id=None):
                     myquery.public  = 1 # if set to 1 or 2 leave it as it is
             else:
                 myquery.public  = 0
-            message = 'Query updated'
+            message = 'Query updated: %s' % myquery.name
 
         myquery.save()
         return render(request, 'queryform.html',{
             'myquery'   : myquery,
             'watchlists': watchlists,
+            'areas'     : areas,
             'is_owner'  : is_owner,
             'logged_in' : logged_in,
             'new'       : False,
@@ -184,6 +192,7 @@ def handle_myquery(request, mq_id=None):
     return render(request, 'queryform.html',{
         'myquery'   : myquery,
         'watchlists': watchlists,
+        'areas'     : areas,
         'is_owner'  : is_owner,
         'logged_in' : logged_in,
         'new'       : False,

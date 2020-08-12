@@ -7,24 +7,31 @@ def make_query(selected, tables, conditions, page, perpage):
 
     toktables = []
     wl_id = -1
+    ar_id = -1
     for table in tables.split(','):
         table = table.strip()
         if table.startswith('watchlist'):
             tok = table.split(':')
             toktables.append('watchlist_hits')
             wl_id = int(tok[1])
+        elif table.startswith('area'):
+            tok = table.split(':')
+            toktables.append('area_hits')
+            ar_id = int(tok[1])
         else:
             toktables.append(table)
 
     if wl_id >= 0:
-        wl_conditions = ['watchlist_hits.wl_id=%d' % wl_id]
+        wlar_conditions = ['watchlist_hits.wl_id=%d' % wl_id]
+    elif ar_id >= 0:
+        wlar_conditions = ['area_hits.ar_id=%d' % ar_id]
     else:
-        wl_conditions = []
+        wlar_conditions = []
 
     if len(conditions.strip()) > 0:
-        new_conditions = ' AND '.join(wl_conditions + [conditions])
+        new_conditions = ' AND '.join(wlar_conditions + [conditions])
     else:
-        new_conditions = ' AND '.join(wl_conditions)
+        new_conditions = ' AND '.join(wlar_conditions)
 
 # list of joining conditions is prepended
     join_list = []
