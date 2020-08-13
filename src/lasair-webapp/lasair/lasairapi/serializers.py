@@ -15,16 +15,16 @@ REQUEST_TYPE_CHOICES = (
     )
 
 class ConeSerializer(serializers.Serializer):
-    ra = serializers.FloatField(required=True)
-    dec = serializers.FloatField(required=True)
-    radius = serializers.FloatField(required=True)
+    ra          = serializers.FloatField(required=True)
+    dec         = serializers.FloatField(required=True)
+    radius      = serializers.FloatField(required=True)
     requestType = serializers.ChoiceField(choices=REQUEST_TYPE_CHOICES)
 
     def save(self):
 
-        ra = self.validated_data['ra']
-        dec = self.validated_data['dec']
-        radius = self.validated_data['radius']
+        ra          = self.validated_data['ra']
+        dec         = self.validated_data['dec']
+        radius      = self.validated_data['radius']
         requestType = self.validated_data['requestType']
 
 
@@ -90,4 +90,49 @@ class StreamlogSerializer(serializers.Serializer):
             data = {'digest':[]}
             replyMessage = 'No alerts'
         info = { "jsonStreamLog": data, "info": replyMessage }
+        return info
+
+from utility import query_utilities
+import mysql.connector
+
+def connect_db():
+    msl = mysql.connector.connect(
+        user    =lasair.settings.READONLY_USER,
+        password=lasair.settings.READONLY_PASS,
+        host    =lasair.settings.DATABASES['default']['HOST'],
+        database='ztf')
+    return msl
+
+class QuerySerializer(serializers.Serializer):
+    selected   = serializers.CharField(max_length=1024, required=True)
+    tables     = serializers.CharField(max_length=1024, required=True)
+    conditions = serializers.CharField(max_length=1024, required=True)
+
+    def save(self):
+        selected   = self.validated_data['selected']
+        tables     = self.validated_data['tables']
+        conditions = self.validated_data['conditions']
+
+        # Get the authenticated user, if it exists.
+        userId = 'unknown'
+        request = self.context.get("request")
+        if request and hasattr(request, "user"):
+            userId = request.user
+
+        page = 0
+        perpage = 1000
+        sqlquery_real = query_utilities.make_query(selected, tables, conditions, page, perpage)
+        msl = connect_db()
+        cursor = msl.cursor(buffered=True, dictionary=True)
+
+        result = []
+        try:
+            cursor.execute(sqlquery_real)
+            for row in cursor: result.append(row)
+            message = 'Success'
+        except Exception as e:
+            message = 'Your query:<br/><b>' + sqlquery_real + '</b><br/>returned the error<br/><i>' + str(e) + '</i>'
+
+        query = {'selected':selected, 'tables':tables, 'conditions':conditions}
+        info = { "query": query, "result":result, "info": message }
         return info

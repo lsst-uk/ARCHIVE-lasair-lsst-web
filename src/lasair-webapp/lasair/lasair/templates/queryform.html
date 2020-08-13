@@ -68,7 +68,7 @@ is a good resource.
 
 {% if is_owner %}
 Query Name {% if random %}(replace this name please){% endif %}<br/>
-<h3><input name="name" value="{% if random %}Query-{{ random }}{% else %}{{ myquery.name }}"{% endif %} size=50></h3>
+<h3><input name="name" value="{% if random %}Query-{{ random }}{% else %}{{ myquery.name }}{% endif %}" size=50></h3>
 Description<br/>
 <textarea name="description" rows=4 cols=80>{{ myquery.description }}</textarea><br/>
 
