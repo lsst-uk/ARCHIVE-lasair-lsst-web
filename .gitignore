@@ -130,3 +130,7 @@ dmypy.json
 
 # Config files
 settings.py
+
+# Django packages
+static/admin/
+static/rest_framework/
