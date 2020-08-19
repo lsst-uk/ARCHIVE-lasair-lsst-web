@@ -1,4 +1,5 @@
 {% extends "base.html"%}
+{% load static %}
 {% block content %}
 
 <div class="row">
@@ -9,7 +10,7 @@ You can create a watchlist of sources by preparing a text file, where each comma
 line has RA and Dec in decimal degrees, an identifier,
 with optional radius in arcseconds. One way to do this is with 
 <a href=http://vizier.u-strasbg.fr/viz-bin/VizieR>Vizier</a> and a spreadsheet program such as Excel or Numbers. 
-Here is <a href=/lasair/static/BLLac.txt>an example of the data</a>. The 42 entries are <i>BL Lac candidates for TeV observations (Massaro+, 2013)</i>
+Here is <a href="{% static 'BLLac.txt' %}">an example of the data</a>. The 42 entries are <i>BL Lac candidates for TeV observations (Massaro+, 2013)</i>
 </p><p>
 An "Active" watchlist is one that is run every day, so that it is up to date with the
 latest objects.

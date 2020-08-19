@@ -1,11 +1,11 @@
 {% extends "base.html"%}
 {% load static %}
 {% block content %}
-<script type="text/javascript" src="{% static "/js/plotly-latest.min.js" %}" ></script>
-<script type="text/javascript" src="{% static "/js/lc.js" %}" ></script>
-<!--<script type="text/javascript" src="{% static "/js/lc_apparent.js" %}" ></script> -->
+<script type="text/javascript" src="{% static '/js/plotly-latest.min.js' %}" ></script>
+<script type="text/javascript" src="{% static '/js/lc.js' %}" ></script>
+<!--<script type="text/javascript" src="{% static '/js/lc_apparent.js' %}" ></script> -->
 <script type="text/javascript" src="//code.jquery.com/jquery-1.12.1.min.js" charset="utf-8"></script>
-<script type="text/javascript" src="{% static "/js/jquery.tablesorter.min.js" %}" ></script>
+<script type="text/javascript" src="{% static '/js/jquery.tablesorter.min.js' %}" ></script>
 <link rel="stylesheet" href="//aladin.u-strasbg.fr/AladinLite/api/v2/latest/aladin.min.css" />
 
 <div class="container">
@@ -150,7 +150,7 @@ You must be signed in to post comments.
 
 
             <td> {% if not cand.candid %}<font color="gray" size=-2>non-detection</font>{% else %}<a href="/cand/{{ cand.candid }}/">{{ cand.candid }}</a>{% endif %}</td>
-            <td>{% if cand.candid and cand.ndethist > 0 %}<a href=/lasair/static/ztf/stamps/jpg/{{ cand.nid }}/candid{{ cand.candid }}.jpg><img src=/lasair/static/ztf/stamps/jpg/{{ cand.nid }}/candid{{ cand.candid }}.jpg></a>{% endif %}</td>
+            <td>{% if cand.candid and cand.ndethist > 0 %}<a href="{% static 'ztf/stamps/jpg/' %}{{ cand.nid }}/candid{{ cand.candid }}.jpg"><img src="{% static 'ztf/stamps/jpg/' %}{{ cand.nid }}/candid{{ cand.candid }}.jpg"></a>{% endif %}</td>
             </tr>
 
         {% endfor %}
@@ -169,8 +169,8 @@ $(document).ready(function()
 </script>
 
 <!--<script type="text/javascript" src="//aladin.u-strasbg.fr/AladinLite/api/v2/latest/aladin.min.js" charset="utf-8"></script> -->
-<script src="/lasair/static/js/surveys.js"></script>
-<script src="/lasair/static/js/aladin.js"></script>
+<script src="{% static 'js/surveys.js' %}"></script>
+<script src="{% static 'js/aladin.js' %}"></script>
 <script type="text/javascript">
 	var aladin = A.aladin('#aladin-lite-div', {survey: "P/PanSTARRS/DR1/color-z-zg-g", fov:0.01, target: "{{ data.objectData.ramean }}, {{ data.objectData.decmean }}", showLayersControl:true});
 

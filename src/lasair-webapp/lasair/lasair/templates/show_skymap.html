@@ -1,12 +1,13 @@
 {% extends "base.html"%}
+{% load static %}
 {% block content %}
 
 <link rel="stylesheet" href="//aladin.u-strasbg.fr/AladinLite/api/v2/latest/aladin.min.css" />
-<script src="/lasair/static/js/jquery-3.3.1.js"></script>
-<script src="/lasair/static/js/surveys.js"></script>
-<script src="/lasair/static/js/aladin.js"></script>
-<script src="/lasair/static/js/coverage.js"></script>
-<script src="/lasair/static/js/skymap.js"></script>
+<script src="{% static 'js/jquery-3.3.1.js' %}"></script>
+<script src="{% static 'js/surveys.js' %}"></script>
+<script src="{% static 'js/aladin.js' %}"></script>
+<script src="{% static 'js/coverage.js' %}"></script>
+<script src="{% static 'js/skymap.js' %}"></script>
 
 <div class="row">
 <h3>Gravitational Wave Skymap: <a href="https://gracedb.ligo.org/superevents/{{ skymap_id }}/view/" target=_blank>{{ skymap_id_version }}</a></h3>
@@ -86,7 +87,7 @@ To <input class="form-control" size="14" name="niddate2" type="text" value="{{ n
 
 <div id="galaxies_table"></div>
 
-<font size=-2><a href=/lasair/static/ztf/skymap/{{ skymap_id_version }}.json>json</a>&nbsp;&nbsp;
+<font size=-2><a href="{% static 'ztf/skymap/' %}{{ skymap_id_version }}.json">json</a>&nbsp;&nbsp;
 <a href="#" onclick="exposeDiv('ztfquery');">ztfquery</a> </font>
 <div id="ztfquery" style="display:none">
 <pre>

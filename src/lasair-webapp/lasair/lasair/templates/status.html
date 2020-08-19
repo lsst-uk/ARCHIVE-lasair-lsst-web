@@ -1,4 +1,5 @@
 {% extends "base.html"%}
+{% load static %}
 {% block content %}
 <div class="row">
 	<h3>Lasair Ingestion Status</h3>
@@ -14,9 +15,9 @@
 </table>
 <i>(Some alerts have more than one candidate)</i>
 <hr/>
-<a href=/lasair/static/ztf/logs/ztf_{{ status.date }}_programid1.log>Kafka Log File for {{ status.date }}</a><br/>
-<a href=/lasair/static/ztf/logs/ztf_{{ status.date }}_tns.log>TNS Log for {{ status.date }}</a><br/>
-<a href=/lasair/static/ztf/skymap/log.txt>LIGO-Virgo Log</a><br/>
+<a href="{% static 'ztf/logs/' %}ztf_{{ status.date }}_programid1.log">Kafka Log File for {{ status.date }}</a><br/>
+<a href="{% static 'ztf/logs/' %}ztf_{{ status.date }}_tns.log">TNS Log for {{ status.date }}</a><br/>
+<a href="{% static 'ztf/skymap/log.txt' %}">LIGO-Virgo Log</a><br/>
 	</div>
 </div>
 {% endblock %}

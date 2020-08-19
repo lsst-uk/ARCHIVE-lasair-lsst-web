@@ -27,14 +27,15 @@
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
-<link rel="stylesheet" href=lasair/static/css/lasair-web.css>
+<!-- <link rel="stylesheet" href=lasair/static/css/lasair-web.css> -->
+<link rel="stylesheet" href="{% static 'css/lasair-web.css' %}">
 
 </head>
 <body>
 <div class="col-sm-10 align-items-center">
     <div class="row header align-items-center" style="background-color:#a3e7ff">
         <div class="col-sm-4">
-            <img width=200 src={% static "img/lasair-font.png" %} class="lasair-logo">
+            <img width=200 src="{% static 'img/lasair-font.png' %}" class="lasair-logo">
 	    {% if WEB_DOMAIN == 'lasair-dev' %} <font color="red"><h1>DEVELOPMENT</h1></font> {% endif %}
         </div>
 
@@ -47,10 +48,10 @@
 -->
 
         <div class="col-sm-6 text-right">
-<a href=http://www.roe.ac.uk/ifa/wfau/><img src={% static "img/uoe.png" %} width=70></a>
-<a href=https://star.pst.qub.ac.uk/wiki/doku.php/public/research_areas/supernovae/start><img src={% static "img/qub.png" %} width=100></a>
-<a href=https://www.lsst.ac.uk/><img src={% static "img/lusc.png" %} width=80></a>
-<a href=http://www.ztf.caltech.edu/><img src={% static "img/ztf.png" %} width=70></a>
+<a href=http://www.roe.ac.uk/ifa/wfau/><img src="{% static 'img/uoe.png' %}" width=70></a>
+<a href=https://star.pst.qub.ac.uk/wiki/doku.php/public/research_areas/supernovae/start><img src="{% static 'img/qub.png' %}" width=100></a>
+<a href=https://www.lsst.ac.uk/><img src="{% static 'img/lusc.png' %}" width=80></a>
+<a href=http://www.ztf.caltech.edu/><img src="{% static 'img/ztf.png' %}" width=70></a>
         </div>
     </div>
 </head>

@@ -132,5 +132,4 @@ dmypy.json
 settings.py
 
 # Django packages
-static/admin/
-static/rest_framework/
+static/

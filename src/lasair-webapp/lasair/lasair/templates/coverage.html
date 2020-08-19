@@ -1,4 +1,5 @@
 {% extends "base.html"%}
+{% load static %}
 {% block content %}
 <link rel="stylesheet" href="//aladin.u-strasbg.fr/AladinLite/api/v2/latest/aladin.min.css" />
 <script type="text/javascript" src="//code.jquery.com/jquery-1.12.1.min.js" charset="utf-8"></script>
@@ -30,8 +31,8 @@ ZTF fields and number of candidates. To sort, click the column headings.<hr/>
 </div>
 
 <script type="text/javascript" src="//aladin.u-strasbg.fr/AladinLite/api/v2/latest/aladin.min.js"></script>
-<script type="text/javascript" src="/lasair/static/js/jquery.tablesorter.min.js"></script>
-<script type="text/javascript" src="/lasair/static/js/coverage.js"></script>
+<script type="text/javascript" src="{% static 'js/jquery.tablesorter.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'js/coverage.js' %}"></script>
 <script>
 $(document).ready(function() {
     setupAladin();

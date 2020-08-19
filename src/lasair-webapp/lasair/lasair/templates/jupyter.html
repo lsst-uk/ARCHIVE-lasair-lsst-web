@@ -1,4 +1,5 @@
 {% extends "base.html"%}
+{% load static %}
 {% block content %}
 <div class="row">
 	<h3>Lasair and Jupyter</h3>
@@ -23,40 +24,40 @@ with the command<br/>&nbsp;&nbsp;<b>git clone https://github.com/lsst-uk/jupyter
 </p>
 <ul>
 <li>Fetching data from many sources: Transient Name Server, PanSTARRS images, Open Astronomy catalogs.
-(<a href=/lasair/static/jupyter/DataFromManySources.html>HTML</a>,
-<a href=/lasair/static/jupyter/DataFromManySources.ipynb>ipynb</a>)
+(<a href="{% static 'jupyter/DataFromManySources.html' %}">HTML</a>,
+<a href="{% static 'jupyter/DataFromManySources.ipynb' %}">ipynb</a>)
 </li>
 <li>Find transients in a host galaxy much more luminous than the host
-(<a href=/lasair/static/jupyter/LuminousTransients.html>HTML</a>,
-<a href=/lasair/static/jupyter/LuminousTransients.ipynb>ipynb</a>)
+(<a href="{% static 'jupyter/LuminousTransients.html' %}">HTML</a>,
+<a href="{% static 'jupyter/LuminousTransients.ipynb' %}">ipynb</a>)
 </li>
 <li>Outbursts with Exponential Moving Averages: Synthetic signal
-(<a href=/lasair/static/jupyter/EMA_detect_step.html>HTML</a>,
-<a href=/lasair/static/jupyter/EMA_detect_step.ipynb>ipynb</a>)
+(<a href="{% static 'jupyter/EMA_detect_step.html' %}">HTML</a>,
+<a href="{% static 'jupyter/EMA_detect_step.ipynb' %}">ipynb</a>)
 </li>
 <li>Outbursts with Exponential Moving Averages: from ZTF data
-(<a href=/lasair/static/jupyter/EMA_ztf_outbursts.html>HTML</a>,
-<a href=/lasair/static/jupyter/EMA_ztf_outbursts.ipynb>ipynb</a>)
+(<a href="{% static 'jupyter/EMA_ztf_outbursts.html' %}">HTML</a>,
+<a href="{% static 'jupyter/EMA_ztf_outbursts.ipynb' %}">ipynb</a>)
 </li>
 <li>Plotting the path of a Kuiper belt object Makemake
-(<a href=/lasair/static/jupyter/MakemakeInZTF.html>HTML</a>,
-<a href=/lasair/static/jupyter/MakemakeInZTF.ipynb>ipynb</a>)
+(<a href="{% static 'jupyter/MakemakeInZTF.html' %}">HTML</a>,
+<a href="{% static 'jupyter/MakemakeInZTF.ipynb' %}">ipynb</a>)
 </li>
 <li>Light curves of frequently-observed minor planets
-(<a href=/lasair/static/jupyter/MinorPlanetLightcurves.html>HTML</a>,
-<a href=/lasair/static/jupyter/MinorPlanetLightcurves.ipynb>ipynb</a>)
+(<a href="{% static 'jupyter/MinorPlanetLightcurves.html' %}">HTML</a>,
+<a href="{% static 'jupyter/MinorPlanetLightcurves.ipynb' %}">ipynb</a>)
 </li>
 <li>Display an object in Jupyter that replicates the web page for the object
-(<a href=/lasair/static/jupyter/DisplayObject.html>HTML</a>,
-<a href=/lasair/static/jupyter/DisplayObject.ipynb>ipynb</a>)
+(<a href="{% static 'jupyter/DisplayObject.html' %}">HTML</a>,
+<a href="{% static 'jupyter/DisplayObject.ipynb' %}">ipynb</a>)
 </li>
 <li>Plotting sky coverage on Mollweide projection
-(<a href=/lasair/static/jupyter/Coverage.html>HTML</a>,
-<a href=/lasair/static/jupyter/Coverage.ipynb>ipynb</a>)
+(<a href="{% static 'jupyter/Coverage.html' %}">HTML</a>,
+<a href="{% static 'jupyter/Coverage.ipynb' %}">ipynb</a>)
 </li>
 <li>Star/galaxy separation analysis
-(<a href=/lasair/static/jupyter/PS1StarGalaxy.html>HTML</a>,
-<a href=/lasair/static/jupyter/PS1StarGalaxy.ipynb>ipynb</a>)
+(<a href="{% static 'jupyter/PS1StarGalaxy.html' %}">HTML</a>,
+<a href="{% static 'jupyter/PS1StarGalaxy.ipynb' %}">ipynb</a>)
 </li>
 </ul>	
 Please <a href="mailto:lasair-help@lists.roe.ac.uk?subject=Notebooks">Contact us</a> 

@@ -15,12 +15,16 @@ import json
 from utility.mag import dc_mag
 from utility.objectStore import objectStore
 
+# 2020-08-03 KWS Added cassandra connectivity
+from cassandra.cluster import Cluster
+from cassandra.query import dict_factory
+
 def connect_db():
     msl = mysql.connector.connect(
         user    =lasair.settings.READONLY_USER,
         password=lasair.settings.READONLY_PASS,
         host    =lasair.settings.DATABASES['default']['HOST'],
-        database='ztf')
+        database='lasair')
     return msl
 
 def ecliptic(ra, dec):
@@ -117,46 +121,105 @@ def obj(request, objectId):
         sherlock = row
     #message += str(sherlock)   #%%%%%%%
 
-    lightcurves = objectStore(suffix = 'json',
-        fileroot=lasair.settings.BLOB_STORE_ROOT + '/lightcurve/')
-#    try:
-    alertjson = lightcurves.getObject(objectId)
-#    except:
-#        message = 'objectId %s does not exist'%objectId
-#        data = {'objectId':objectId, 'message':message}
-#        return data
 
-    alert = json.loads(alertjson)
-    candidates = []
-    
-#    query = 'SELECT candid, jd-2400000.5 as mjd, ra, decl, fid, nid, magpsf,sigmapsf, '
-#    query += 'magnr,sigmagnr, magzpsci, isdiffpos, ssdistnr, ssnamenr, ndethist, '
-#    query += 'dc_mag, dc_sigmag,dc_mag_g02,dc_mag_g08,dc_mag_g28,dc_mag_r02,dc_mag_r08,dc_mag_r28, '
-#    query += 'drb '
-#    query += 'FROM candidates WHERE objectId = "%s" ' % objectId
-#    cursor.execute(query)
-    count_isdiffpos = count_real_candidates = 0
 
-    candlist = alert['prv_candidates'] + [alert['candidate']]
-    candidates = []
-    for cand in candlist:
-        row = {}
-        for key in ['candid', 'jd', 'ra', 'dec', 'fid', 'nid', 'magpsf', 'sigmapsf', 'isdiffpos', 
-                'ssdistnr', 'ssnamenr', 'drb']:
-            if key in cand:
-                row[key] = cand[key]
-        row['mjd'] = mjd = float(cand['jd']) - 2400000.5
-        date = datetime.strptime("1858/11/17", "%Y/%m/%d")
-        date += timedelta(mjd)
-        row['utc'] = date.strftime("%Y-%m-%d %H:%M:%S")
-        ssnamenr = cand['ssnamenr']
-        if ssnamenr == 'null':
-            ssnamenr = None
-        if cand['candid'] and cand['isdiffpos'] == 'f':
-            count_isdiffpos += 1
-        if not cand['candid']:
-            row['magpsf'] = cand['diffmaglim']
-        candidates.append(row)
+    if lasair.settings.CASSANDRA is not None:
+
+        # 2020-08-03 KWS Get lightcurve from Cassandra.  By default Django connects to MySQL.  But we'd also
+        #                like to get our lightcurves from Cassandra.  Don't connect to Cassandra here - massive
+        #                overhead.  Place settings in settings.py and connect a session at startup.  This is
+        #                a quick and dirty fix.  Try passing the session to this method.
+
+        cluster = Cluster()
+        session = cluster.connect()
+
+        # Set the row_factory to dict_factory to simulate what Roy is doing below! Otherwise
+        # the data returned will be in the form of object properties.
+        session.row_factory = dict_factory
+
+        session.set_keyspace(lasair.settings.CASSANDRA['default']['KEYSPACE'])
+
+        #noncands = session.execute("""SELECT * from prv_candidates where objectId = %s""", (objectId,) )
+        candidates = []
+        candlist = session.execute("""SELECT * from candidates where objectId = %s""", (objectId,) )
+
+        count_isdiffpos = count_real_candidates = 0
+
+        for cand in candlist:
+            row = {}
+            for key in ['candid', 'jd', 'ra', 'dec', 'fid', 'nid', 'magpsf', 'sigmapsf', 'isdiffpos', 
+                    'ssdistnr', 'ssnamenr', 'drb']:
+                if key in cand:
+                    row[key] = cand[key]
+            row['mjd'] = mjd = float(cand['jd']) - 2400000.5
+            date = datetime.strptime("1858/11/17", "%Y/%m/%d")
+            date += timedelta(mjd)
+            row['utc'] = date.strftime("%Y-%m-%d %H:%M:%S")
+            ssnamenr = cand['ssnamenr']
+            if ssnamenr == 'null':
+                ssnamenr = None
+            if cand['candid'] and cand['isdiffpos'] == 'f':
+                count_isdiffpos += 1
+            if not cand['candid']:
+                row['magpsf'] = cand['diffmaglim']
+            candidates.append(row)
+
+        # Disconnect from Cassandra.
+        cluster.shutdown()
+
+    else:
+
+
+
+        lightcurves = objectStore(suffix = 'json',
+            fileroot=lasair.settings.BLOB_STORE_ROOT + '/lightcurve/')
+
+#        try:
+        alertjson = lightcurves.getObject(objectId)
+#        except:
+#            message = 'objectId %s does not exist'%objectId
+#            data = {'objectId':objectId, 'message':message}
+#            return data
+
+        alert = json.loads(alertjson)
+        candidates = []
+ 
+#        query = 'SELECT candid, jd-2400000.5 as mjd, ra, decl, fid, nid, magpsf,sigmapsf, '
+#        query += 'magnr,sigmagnr, magzpsci, isdiffpos, ssdistnr, ssnamenr, ndethist, '
+#        query += 'dc_mag, dc_sigmag,dc_mag_g02,dc_mag_g08,dc_mag_g28,dc_mag_r02,dc_mag_r08,dc_mag_r28, '
+#        query += 'drb '
+#        query += 'FROM candidates WHERE objectId = "%s" ' % objectId
+#        cursor.execute(query)
+        count_isdiffpos = count_real_candidates = 0
+
+        candlist = alert['prv_candidates'] + [alert['candidate']]
+        candidates = []
+        for cand in candlist:
+            row = {}
+            for key in ['candid', 'jd', 'ra', 'dec', 'fid', 'nid', 'magpsf', 'sigmapsf', 'isdiffpos', 
+                    'ssdistnr', 'ssnamenr', 'drb']:
+                if key in cand:
+                    row[key] = cand[key]
+            row['mjd'] = mjd = float(cand['jd']) - 2400000.5
+            date = datetime.strptime("1858/11/17", "%Y/%m/%d")
+            date += timedelta(mjd)
+            row['utc'] = date.strftime("%Y-%m-%d %H:%M:%S")
+            ssnamenr = cand['ssnamenr']
+            if ssnamenr == 'null':
+                ssnamenr = None
+            if cand['candid'] and cand['isdiffpos'] == 'f':
+                count_isdiffpos += 1
+            if not cand['candid']:
+                row['magpsf'] = cand['diffmaglim']
+            candidates.append(row)
+
+
+
+
+
+
+
+
 
     if not objectData:
         ra = float(cand['ra'])
@@ -168,7 +231,7 @@ def obj(request, objectId):
         if row['ssdistnr'] > 0 and row['ssdistnr'] < 10:
             objectData['MPCname'] = ssnamenr
 
-    message += 'Got %d candidates' % len(candlist)
+    #message += 'Got %d candidates' % len(candlist)
 
 
 #    query = 'SELECT jd-2400000.5 as mjd, fid, diffmaglim '
