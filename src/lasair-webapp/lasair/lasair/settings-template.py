@@ -105,6 +105,16 @@ DATABASES = {
     }
 }
 
+CASSANDRA = {
+    'default': {
+        'KEYSPACE': CASSANDRA_KEYSPACE,
+        'USER':     CASSANDRA_USER,
+        'PASSWORD': CASSANDRA_PASS,
+        'HOSTS':    CASSANDRA_HOSTS,
+    }
+}
+
+
 # Redirect to home URL after login (Default redirects to /accounts/profile/)
 LOGIN_REDIRECT_URL = '/'
 
@@ -130,3 +140,8 @@ USE_L10N = True
 USE_TZ = True
 
 STATIC_URL = "/lasair/static/"
+
+# 2020-08-18 KWS Moved our local static files to a directory called "staticfiles".
+STATICFILES_DIRS = (
+  os.path.join(BASE_DIR, 'staticfiles'),
+)
