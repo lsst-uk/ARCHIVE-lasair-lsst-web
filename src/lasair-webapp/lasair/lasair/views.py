@@ -23,8 +23,8 @@ def id_generator(size=10):
     Args:
         size:
     """
-   chars = string.ascii_lowercase + string.ascii_uppercase + string.digits
-   return ''.join(random.choice(chars) for _ in range(size))
+    chars = string.ascii_lowercase + string.ascii_uppercase + string.digits
+    return ''.join(random.choice(chars) for _ in range(size))
 
 def signup(request):
     """signup.
