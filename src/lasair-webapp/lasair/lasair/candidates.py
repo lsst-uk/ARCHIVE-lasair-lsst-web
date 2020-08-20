@@ -6,6 +6,8 @@ import mysql.connector
 import math
 
 def connect_db():
+    """connect_db.
+    """
     msl = mysql.connector.connect(
         user    =lasair.settings.READONLY_USER,
         password=lasair.settings.READONLY_PASS,
@@ -14,6 +16,11 @@ def connect_db():
     return msl
 
 def candlist(request):
+    """candlist.
+
+    Args:
+        request:
+    """
     perpage = 100
     # if this is a POST request we need to process the form data
     if request.method == 'POST':

@@ -13,6 +13,8 @@ import mysql.connector
 import string, random, json
 
 def connect_db():
+    """connect_db.
+    """
     msl = mysql.connector.connect(
         user    =lasair.settings.READONLY_USER,
         password=lasair.settings.READONLY_PASS,
@@ -21,6 +23,11 @@ def connect_db():
     return msl
 
 def query_list(qs):
+    """query_list.
+
+    Args:
+        qs:
+    """
     # takes the list of queries and adds a strealink for each one
     list = []
     if not qs:
@@ -45,6 +52,11 @@ def query_list(qs):
     return list
 
 def querylist(request):
+    """querylist.
+
+    Args:
+        request:
+    """
     # shows the list of queries
     promoted_queries = Myqueries.objects.filter(public=2)
 
@@ -72,12 +84,29 @@ def querylist(request):
     })
 
 def new_myquery(request):
+    """new_myquery.
+
+    Args:
+        request:
+    """
     return handle_myquery(request)
 
 def show_myquery(request, mq_id):
+    """show_myquery.
+
+    Args:
+        request:
+        mq_id:
+    """
     return handle_myquery(request, mq_id)
 
 def handle_myquery(request, mq_id=None):
+    """handle_myquery.
+
+    Args:
+        request:
+        mq_id:
+    """
     logged_in = request.user.is_authenticated
 
     if logged_in:
@@ -200,6 +229,12 @@ def handle_myquery(request, mq_id=None):
 
 
 def record_query(request, query):
+    """record_query.
+
+    Args:
+        request:
+        query:
+    """
     onelinequery = query.replace('\r', ' ').replace('\n', ' ')
     time = datetime.now().replace(microsecond=0).isoformat()
 
@@ -220,6 +255,11 @@ def record_query(request, query):
     f.close()
 
 def runquery(request):
+    """runquery.
+
+    Args:
+        request:
+    """
     perpage = 1000
     message = ''
     json_checked = False

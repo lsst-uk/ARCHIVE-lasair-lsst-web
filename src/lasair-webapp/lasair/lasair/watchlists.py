@@ -13,6 +13,8 @@ from subprocess import Popen, PIPE
 import time
 
 def connect_db():
+    """connect_db.
+    """
     msl = mysql.connector.connect(
         user    =lasair.settings.READONLY_USER,
         password=lasair.settings.READONLY_PASS,
@@ -21,10 +23,20 @@ def connect_db():
     return msl
 
 def handle_uploaded_file(f):
+    """handle_uploaded_file.
+
+    Args:
+        f:
+    """
     return f.read().decode('utf-8')
 
 @csrf_exempt
 def watchlists_home(request):
+    """watchlists_home.
+
+    Args:
+        request:
+    """
     message = ''
     if request.method == 'POST' and request.user.is_authenticated:
         delete      = request.POST.get('delete')
@@ -97,6 +109,12 @@ def watchlists_home(request):
         'message': message})
 
 def show_watchlist_txt(request, wl_id):
+    """show_watchlist_txt.
+
+    Args:
+        request:
+        wl_id:
+    """
     message = ''
     watchlist = get_object_or_404(Watchlists, wl_id=wl_id)
 
@@ -118,6 +136,12 @@ def show_watchlist_txt(request, wl_id):
     return HttpResponse(s, content_type="text/plain")
 
 def show_watchlist(request, wl_id):
+    """show_watchlist.
+
+    Args:
+        request:
+        wl_id:
+    """
     message = ''
     watchlist = get_object_or_404(Watchlists, wl_id=wl_id)
 
@@ -190,6 +214,11 @@ WHERE c.wl_id=%d ORDER BY o.ncand DESC LIMIT 1000
         conelist.append(d)
 
     def first(d):
+        """first.
+
+        Args:
+            d:
+        """
         if 'objectId' in d: 
             if 'ncand' in d:
                 return '%04d%s' % (d['ncand'], d['objectId'])
@@ -209,4 +238,3 @@ WHERE c.wl_id=%d ORDER BY o.ncand DESC LIMIT 1000
         'number_cones': number_cones,
         'is_owner' :is_owner,
         'message'  :message})
-

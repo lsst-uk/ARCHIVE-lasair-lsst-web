@@ -16,23 +16,37 @@ from utility.mag import dc_mag
 from utility.objectStore import objectStore
 
 # 2020-08-03 KWS Added cassandra connectivity
-from cassandra.cluster import Cluster
-from cassandra.query import dict_factory
+if lasair.settings.CASSANDRA is not None:
+    from cassandra.cluster import Cluster
+    from cassandra.query import dict_factory
 
 def connect_db():
+    """connect_db.
+    """
     msl = mysql.connector.connect(
         user    =lasair.settings.READONLY_USER,
         password=lasair.settings.READONLY_PASS,
         host    =lasair.settings.DATABASES['default']['HOST'],
-        database='lasair')
+        database='ztf')
     return msl
 
 def ecliptic(ra, dec):
+    """ecliptic.
+
+    Args:
+        ra:
+        dec:
+    """
     np = ephem.Equatorial(math.radians(ra), math.radians(dec), epoch='2000')
     e = ephem.Ecliptic(np)
     return (math.degrees(e.lon), math.degrees(e.lat))
 
 def rasex(ra):
+    """rasex.
+
+    Args:
+        ra:
+    """
     h = math.floor(ra/15)
     ra -= h*15
     m = math.floor(ra*4)
@@ -41,6 +55,11 @@ def rasex(ra):
     return '%02d:%02d:%.3f' % (h, m, s)
 
 def decsex(de):
+    """decsex.
+
+    Args:
+        de:
+    """
     ade = abs(de)
     d = math.floor(ade)
     ade -= d
@@ -53,6 +72,12 @@ def decsex(de):
         return '-%02d:%02d:%.3f' % (d, m, s)
 
 def objhtml(request, objectId):
+    """objhtml.
+
+    Args:
+        request:
+        objectId:
+    """
     data = obj(request, objectId)
     data2 = data.copy()
     if 'comments' in data2:
@@ -62,6 +87,12 @@ def objhtml(request, objectId):
         'authenticated': request.user.is_authenticated})
 
 def objjson(request, objectId):
+    """objjson.
+
+    Args:
+        request:
+        objectId:
+    """
     data = obj(request, objectId)
     if 'comments' in data:
         data.pop('comments')

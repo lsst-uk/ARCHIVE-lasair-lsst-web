@@ -7,6 +7,8 @@ import mysql.connector
 from django.http import JsonResponse
 
 def connect_db():
+    """connect_db.
+    """
     msl = mysql.connector.connect(
         user    =lasair.settings.READONLY_USER,
         password=lasair.settings.READONLY_PASS,

@@ -31,6 +31,8 @@ QUERY_CACHE = LASAIR_ROOT + 'query_cache'
 
 CITIZEN_SCIENCE_USERID = 0
 CITIZEN_SCIENCE_KEY    = ''
+
+BLOB_STORE_ROOT = '/blah/blah'
 ################################################################
 import os
 

@@ -19,6 +19,8 @@ import matplotlib.pyplot as plt
 import io
 
 def connect_db():
+    """connect_db.
+    """
     msl = mysql.connector.connect(
         user    =lasair.settings.READONLY_USER,
         password=lasair.settings.READONLY_PASS,
@@ -27,16 +29,31 @@ def connect_db():
     return msl
 
 def bytes2string(bytes):
+    """bytes2string.
+
+    Args:
+        bytes:
+    """
     base64_bytes   = base64.b64encode(bytes)
     str = base64_bytes.decode('utf-8')
     return str
 
 def string2bytes(str):
+    """string2bytes.
+
+    Args:
+        str:
+    """
     base64_bytes  = str.encode('utf-8')
     bytes = base64.decodebytes(base64_bytes)
     return bytes
 
 def make_image_of_MOC(fits_bytes):
+    """make_image_of_MOC.
+
+    Args:
+        fits_bytes:
+    """
     inbuf = io.BytesIO(fits_bytes)
     moc = MOC.from_fits(inbuf)
     notmoc = moc.complement()
@@ -57,6 +74,11 @@ def make_image_of_MOC(fits_bytes):
 
 @csrf_exempt
 def areas_home(request):
+    """areas_home.
+
+    Args:
+        request:
+    """
     message = ''
     if request.method == 'POST' and request.user.is_authenticated:
         delete      = request.POST.get('delete')
@@ -101,6 +123,12 @@ def areas_home(request):
         'message': message})
 
 def show_area_file(request, ar_id):
+    """show_area_file.
+
+    Args:
+        request:
+        ar_id:
+    """
     message = ''
     area = get_object_or_404(Areas, ar_id=ar_id)
 
@@ -124,6 +152,12 @@ def show_area_file(request, ar_id):
     return r
 
 def show_area(request, ar_id):
+    """show_area.
+
+    Args:
+        request:
+        ar_id:
+    """
     message = ''
     area = get_object_or_404(Areas, ar_id=ar_id)
 

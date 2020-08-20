@@ -1,6 +1,9 @@
 from django.db import models
 
 class Objects(models.Model):
+    """Objects.
+    """
+
     primaryid = models.AutoField(db_column='primaryId', primary_key=True)  # Field name made lowercase.
     objectid = models.CharField(db_column='objectId', unique=True, max_length=16, blank=True, null=True)  # Field name made lowercase.
     ncand = models.IntegerField()
@@ -21,6 +24,9 @@ class Objects(models.Model):
     jdmax = models.FloatField()
 
     class Meta:
+        """Meta.
+        """
+
         managed = False
         db_table = 'objects'
 
@@ -34,6 +40,9 @@ from django.contrib.auth.models import User
 # If the same run happens again, that candidate will not go in again to the same watchlist.
 
 class WatchlistCones(models.Model):
+    """WatchlistCones.
+    """
+
     cone_id = models.AutoField(primary_key=True)
     wl      = models.ForeignKey('Watchlists', models.DO_NOTHING, blank=True, null=True)
     name    = models.CharField(max_length=32, blank=True, null=True)
@@ -42,10 +51,16 @@ class WatchlistCones(models.Model):
     radius  = models.FloatField(blank=True, null=True)
 
     class Meta:
+        """Meta.
+        """
+
         managed = False
         db_table = 'watchlist_cones'
 
 class WatchlistHits(models.Model):
+    """WatchlistHits.
+    """
+
     candid   = models.BigIntegerField(primary_key=True)
     wl       = models.ForeignKey('Watchlists', models.DO_NOTHING)
     cone     = models.ForeignKey(WatchlistCones, models.DO_NOTHING, blank=True, null=True)
@@ -54,11 +69,17 @@ class WatchlistHits(models.Model):
     name     = models.CharField(max_length=32, blank=True, null=True)
 
     class Meta:
+        """Meta.
+        """
+
         managed         = False
         db_table        = 'watchlist_hits'
         unique_together = (('candid', 'wl'),)
 
 class Watchlists(models.Model):
+    """Watchlists.
+    """
+
     wl_id         = models.AutoField(primary_key=True)
     user          = models.ForeignKey(User, models.DO_NOTHING, db_column='user', blank=True, null=True)
     name          = models.CharField(max_length=256, blank=True, null=True)
@@ -69,18 +90,30 @@ class Watchlists(models.Model):
     timestamp     = models.DateTimeField(auto_now=True, editable=False, blank=True, null=True)
 
     class Meta:
+        """Meta.
+        """
+
         managed = False
         db_table = 'watchlists'
 
 class AreaHits(models.Model):
+    """AreaHits.
+    """
+
     ar_id = models.IntegerField(blank=True, null=True)
     objectid = models.CharField(db_column='objectId', max_length=16, blank=True, null=True)  # Field name made lowercase.
 
     class Meta:
+        """Meta.
+        """
+
         managed = False
         db_table = 'area_hits'
 
 class Areas(models.Model):
+    """Areas.
+    """
+
     ar_id = models.AutoField(primary_key=True)
     user = models.ForeignKey(User, models.DO_NOTHING, db_column='user', blank=True, null=True)
     name = models.CharField(max_length=256, blank=True, null=True)
@@ -92,10 +125,16 @@ class Areas(models.Model):
     timestamp     = models.DateTimeField(auto_now=True, editable=False, blank=True, null=True)
 
     class Meta:
+        """Meta.
+        """
+
         managed = False
         db_table = 'areas'
 
 class Myqueries(models.Model):
+    """Myqueries.
+    """
+
     mq_id = models.AutoField(primary_key=True)
     user = models.ForeignKey(User, models.DO_NOTHING, db_column='user', blank=True, null=True)
     name = models.CharField(max_length=256, blank=True, null=True)
@@ -107,11 +146,17 @@ class Myqueries(models.Model):
     active = models.IntegerField(blank=True, null=True)
 
     class Meta:
+        """Meta.
+        """
+
         managed = False
         db_table = 'myqueries'
 
 
 class Comments(models.Model):
+    """Comments.
+    """
+
     comment_id = models.AutoField(primary_key=True)
     user = models.ForeignKey(User, models.DO_NOTHING, db_column='user', blank=True, null=True)
     objectid = models.CharField(db_column='objectId', unique=True, max_length=16, blank=True, null=True)  # Field name made lowercase.
@@ -119,6 +164,8 @@ class Comments(models.Model):
     time = models.DateTimeField()
 
     class Meta:
+        """Meta.
+        """
+
         managed = False
         db_table = 'comments'
-

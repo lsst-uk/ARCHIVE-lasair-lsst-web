@@ -18,10 +18,20 @@ from django.contrib.auth import login, authenticate
 import string
 import random
 def id_generator(size=10):
+    """id_generator.
+
+    Args:
+        size:
+    """
    chars = string.ascii_lowercase + string.ascii_uppercase + string.digits
    return ''.join(random.choice(chars) for _ in range(size))
 
 def signup(request):
+    """signup.
+
+    Args:
+        request:
+    """
     if request.method == 'POST':
         first_name    = request.POST['first_name']
         last_name     = request.POST['last_name']
@@ -35,6 +45,8 @@ def signup(request):
         return render(request, 'signup.html')
 
 def connect_db():
+    """connect_db.
+    """
     msl = mysql.connector.connect(
         user    =lasair.settings.READONLY_USER,
         password=lasair.settings.READONLY_PASS,
@@ -43,6 +55,11 @@ def connect_db():
     return msl
 
 def status(request):
+    """status.
+
+    Args:
+        request:
+    """
     message = ''
     web_domain = lasair.settings.WEB_DOMAIN
     jsonstr = open('/mnt/lasair-head-data/ztf/system_status.json').read()
@@ -59,24 +76,52 @@ def status(request):
     return render(request, 'status.html', {'web_domain': web_domain, 'status':status, 'message':message})
 
 def index(request):
+    """index.
+
+    Args:
+        request:
+    """
     web_domain = lasair.settings.WEB_DOMAIN
     return render(request, 'index.html', {'web_domain': web_domain})
 
 def about(request):
+    """about.
+
+    Args:
+        request:
+    """
     jsonstr = open('/mnt/lasair-head-data/ztf/system_status.json').read()
     j = json.loads(jsonstr)
     n_candidates = j['total_candidates']
     return render(request, 'about.html', {'n_candidates':n_candidates})
 
 def distance(ra1, de1, ra2, de2):
+    """distance.
+
+    Args:
+        ra1:
+        de1:
+        ra2:
+        de2:
+    """
     dra = (ra1 - ra2)*math.cos(de1*math.pi/180)
     dde = (de1 - de2)
     return math.sqrt(dra*dra + dde*dde)
 
 def sexra(tok):
+    """sexra.
+
+    Args:
+        tok:
+    """
     return 15*(float(tok[0]) + (float(tok[1]) + float(tok[2])/60)/60)
 
 def sexde(tok):
+    """sexde.
+
+    Args:
+        tok:
+    """
     if tok[0].startswith('-'):
         de = (float(tok[0]) - (float(tok[1]) + float(tok[2])/60)/60)
     else:
@@ -84,6 +129,11 @@ def sexde(tok):
     return de
 
 def readcone(cone):
+    """readcone.
+
+    Args:
+        cone:
+    """
     error = False
     message = ''
     cone = cone.replace(',', ' ').replace('\t',' ').replace(';',' ').replace('|',' ')
@@ -136,6 +186,11 @@ def readcone(cone):
         return {'ra':ra, 'dec':de, 'radius':radius, 'message':message}
 
 def conesearch(request):
+    """conesearch.
+
+    Args:
+        request:
+    """
     if request.method == 'POST':
         cone = request.POST['cone']
         json_checked = False
@@ -151,6 +206,11 @@ def conesearch(request):
         return render(request, 'conesearch.html', {})
 
 def conesearch_impl(cone):
+    """conesearch_impl.
+
+    Args:
+        cone:
+    """
     ra = dec = radius = 0.0
 #    hitdict = {}
     hitlist = []
@@ -184,6 +244,11 @@ def conesearch_impl(cone):
         return data
 
 def coverage(request):
+    """coverage.
+
+    Args:
+        request:
+    """
     # if this is a POST request we need to process the form data
     if request.method == 'POST':
         date1 = request.POST['date1'].strip()
@@ -200,6 +265,12 @@ def coverage(request):
     return render(request, 'coverage.html',{'nid1':nid1, 'nid2': nid2, 'date1':date1, 'date2':date2})
 
 def streamlog(request, topic):
+    """streamlog.
+
+    Args:
+        request:
+        topic:
+    """
     try:
         data = open(lasair.settings.BLOB_STORE_ROOT + '/logs/%s' % topic, 'r').read()
     except:

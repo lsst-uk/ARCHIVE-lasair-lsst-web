@@ -7,6 +7,11 @@ from lasair.models import Comments
 import datetime
 
 def new_comment(request):
+    """new_comment.
+
+    Args:
+        request:
+    """
     if not request.method == 'POST':
         return render(request, 'error.html',{ 'message': "Illegal input no POST"})
 
@@ -29,6 +34,12 @@ def new_comment(request):
         return render(request, 'new_comment.html', {'objectId': objectId})
 
 def delete_comment(request, comment_id):
+    """delete_comment.
+
+    Args:
+        request:
+        comment_id:
+    """
     message = ''
     comment = get_object_or_404(Comments, comment_id=comment_id)
     objectId = comment.objectid

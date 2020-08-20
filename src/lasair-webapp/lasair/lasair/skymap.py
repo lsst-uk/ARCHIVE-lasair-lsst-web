@@ -10,6 +10,8 @@ import time
 from utility import date_nid
 
 def connect_db():
+    """connect_db.
+    """
     msl = mysql.connector.connect(
         user    =lasair.settings.READONLY_USER,
         password=lasair.settings.READONLY_PASS,
@@ -19,6 +21,11 @@ def connect_db():
 
 from subprocess import Popen, PIPE
 def skymap(request):
+    """skymap.
+
+    Args:
+        request:
+    """
     message = ''
     p = Popen(['ls', '-lrt', '/mnt/lasair-head-data/ztf/skymap/'], stdout=PIPE)
     skymap_list = []
@@ -34,6 +41,11 @@ def skymap(request):
 
 import dateutil.parser as dp
 def jd_from_iso(date):
+    """jd_from_iso.
+
+    Args:
+        date:
+    """
     if not date.endswith('Z'): 
         date += 'Z'
     parsed_t = dp.parse(date)
@@ -42,6 +54,12 @@ def jd_from_iso(date):
     return jd
 
 def show_skymap(request, skymap_id_version):
+    """show_skymap.
+
+    Args:
+        request:
+        skymap_id_version:
+    """
     json_text = open("/mnt/lasair-head-data/ztf/skymap/%s.json" % skymap_id_version).read()
     skymap_data = json.loads(json_text)
     isodate = skymap_data['meta']['DATE-OBS']

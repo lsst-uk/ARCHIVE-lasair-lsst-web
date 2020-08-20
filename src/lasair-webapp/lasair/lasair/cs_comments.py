@@ -10,6 +10,8 @@ from lasair.models import Comments
 import datetime
 
 def connect_db():
+    """connect_db.
+    """
     msl = mysql.connector.connect(
         user    =lasair.settings.READWRITE_USER,
         password=lasair.settings.READWRITE_PASS,
@@ -19,6 +21,11 @@ def connect_db():
 
 @csrf_exempt
 def new_comment(request):
+    """new_comment.
+
+    Args:
+        request:
+    """
     if not request.method == 'POST':
         return render(request, 'error.html',{ 'message': "Illegal input no POST"})
 
