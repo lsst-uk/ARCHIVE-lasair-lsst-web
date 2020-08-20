@@ -7,12 +7,25 @@ sys.path.append('/home/roy/lasair/src/alert_stream_ztf/common/htm/python2')
 import htmCircle
 
 def distance(ra1, de1, ra2, de2):
+    """distance.
+
+    Args:
+        ra1:
+        de1:
+        ra2:
+        de2:
+    """
     dra = (ra1 - ra2)*math.cos(de1*math.pi/180)
     dde = (de1 - de2)
     return math.sqrt(dra*dra + dde*dde)
 
 import dateutil.parser as dp
 def jd_from_iso(date):
+    """jd_from_iso.
+
+    Args:
+        date:
+    """
     if not date.endswith('Z'):
         date += 'Z'
     parsed_t = dp.parse(date)
@@ -30,6 +43,11 @@ config = {
 }
 
 def run_tns_crossmatch(radius):
+    """run_tns_crossmatch.
+
+    Args:
+        radius:
+    """
 # runs the crossmatch of TNS with all the objects
     msl = mysql.connector.connect(**config)
     cursor  = msl.cursor(buffered=True, dictionary=True)

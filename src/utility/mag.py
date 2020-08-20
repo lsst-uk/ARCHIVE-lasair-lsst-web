@@ -1,21 +1,18 @@
 import math
 
 def dc_mag(fid, magpsf,sigmapsf, magnr,sigmagnr, magzpsci, isdiffpos):
-    """ Compute apparent magnitude from difference magnitude supplied by ZTF
-    Parameters
-    ----------
-    fid
-        filter, 1 for green and 2 for red
-    magpsf,sigmapsf
-        magnitude from PSF-fit photometry, and 1-sigma error
-    magnr,sigmagnr
-        magnitude of nearest source in reference image PSF-catalog within 30 arcsec
-        and 1-sigma error
-    magzpsci
-        Magnitude zero point for photometry estimates
-    isdiffpos
-        t or 1 => candidate is from positive (sci minus ref) subtraction; 
-        f or 0 => candidate is from negative (ref minus sci) subtraction
+    """dc_mag. Compute apparent magnitude from difference magnitude supplied by ZTF
+
+    Args:
+        fid: filter, 1 for green and 2 for red
+        magpsf: magnitude from PSF-fit photometry, and 1-sigma error
+        sigmapsf: magnitude from PSF-fit photometry, and 1-sigma error
+        magnr: magnitude of nearest source in reference image PSF-catalog within 30 arcsec
+        sigmagnr: magnitude of nearest source in reference image PSF-catalog within 30 arcsec
+        magzpsci: Magnitude zero point for photometry estimates
+        isdiffpos: 
+            t or 1 => candidate is from positive (sci minus ref) subtraction; 
+            f or 0 => candidate is from negative (ref minus sci) subtraction
     """
 
     # zero points. Looks like they are fixed.
@@ -53,4 +50,3 @@ def dc_mag(fid, magpsf,sigmapsf, magnr,sigmagnr, magzpsci, isdiffpos):
         dc_sigmag = sigmapsf
 
     return {'dc_mag':dc_mag, 'dc_sigmag':dc_sigmag}
-

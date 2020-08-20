@@ -5,6 +5,14 @@ sys.path.append(settings.LASAIR_ROOT + 'lasair/src/alert_stream_ztf/common/htm/p
 import htmCircle
 
 def distance(ra1, de1, ra2, de2):
+    """distance.
+
+    Args:
+        ra1:
+        de1:
+        ra2:
+        de2:
+    """
     dra = (ra1 - ra2)*math.cos(de1*math.pi/180)
     dde = (de1 - de2)
     return math.sqrt(dra*dra + dde*dde)
@@ -20,6 +28,12 @@ config = {
 msl = mysql.connector.connect(**config)
 
 def run_watchlist(wl_id, delete_old=True):
+    """run_watchlist.
+
+    Args:
+        wl_id:
+        delete_old:
+    """
 # runs the crossmatch of a given watchlist with all the objects
     cursor  = msl.cursor(buffered=True, dictionary=True)
     cursor2 = msl.cursor(buffered=True, dictionary=True)
