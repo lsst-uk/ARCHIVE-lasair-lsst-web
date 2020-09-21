@@ -108,6 +108,7 @@ def handle_myquery(request, mq_id=None):
         mq_id:
     """
     logged_in = request.user.is_authenticated
+    message = ''
 
     if logged_in:
         email = request.user.email
@@ -134,11 +135,13 @@ def handle_myquery(request, mq_id=None):
             public      = request.POST.get('public')
             if public == 'on': 
                 public = 1
+            else:
+                public = 0
 
             myquery = Myqueries(user=request.user, name=name, description=description,
                 public=public, active=active, selected=selected, conditions=conditions, tables=tables)
             myquery.save()
-            message = "Query saved successfully"
+            message += "Query saved successfully"
             return render(request, 'queryform.html',{
                 'myquery'   : myquery,
                 'watchlists': watchlists,
@@ -183,7 +186,7 @@ def handle_myquery(request, mq_id=None):
                     selected=myquery.selected, 
                     conditions=myquery.conditions, tables=myquery.tables)
             mq.save()
-            message = 'Query copied'
+            message += 'Query copied'
             return redirect('/query/%d/' % mq.mq_id)
 
         # Update the given query from the post
@@ -199,12 +202,12 @@ def handle_myquery(request, mq_id=None):
             except:
                 myquery.active = 0
 
-            if public:
-                if myquery.public == 0:
+            if public == 'on':
+                if myquery.public is None or myquery.public == 0:
                     myquery.public  = 1 # if set to 1 or 2 leave it as it is
             else:
                 myquery.public  = 0
-            message = 'Query updated: %s' % myquery.name
+            message += 'Query updated: %s' % myquery.name
 
         myquery.save()
         return render(request, 'queryform.html',{

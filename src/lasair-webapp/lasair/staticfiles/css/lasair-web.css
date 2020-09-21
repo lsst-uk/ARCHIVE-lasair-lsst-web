@@ -48,3 +48,29 @@
 .main-svg{
     padding:5px;
 }
+
+dl dt {
+    color: #7b8994;
+    float: left;
+    width: 100px;
+    text-align: right;
+    padding-top: 3px;
+    font-size: 11px;
+    font-weight: 400;
+    text-transform: uppercase;
+}
+
+dd {
+    margin: 0 0 20px 120px;
+}
+
+pre {
+    overflow: auto;
+}
+.literal-block {
+    background: #f6f9fc;
+    padding: 10px;
+    border: 1px solid #d0d4d9;
+    font-family: monospace;
+    border-radius: 3px;
+}

@@ -7,17 +7,14 @@
 <div class="row">
 	<div class="col-sm">
 <font color="red"><h4>{{ message }}</h4> </font>
-<table cellpadding="8">
-<tr><td>Last Lasair update time</td><td> {{ status.update_time }}</td></tr>
-<tr><td>Minutes since update</td><td> {{ status.minutes_since }}</td></tr>
-<tr><td>Alerts from ZTF today</td><td> {{ status.today_candidates_ztf }}</td></tr>
-<tr><td>Candidates ingested to Lasair today</td><td> {{ status.today_candidates_lasair }}</td></tr>
+<table class="table">
+<tr><td>Last Lasair update time (UTC)</td><td> {{ status.update_time }}</td></tr>
+<tr><td>Alerts sent by ZTF today</td><td> {{ status.today_ztf }}</td></tr>
+<tr><td>Alerts received by Ingest stage today</td><td> {{ status.today_ingest }}</td></tr>
+<tr><td>Alerts sent from Ingest today</td><td> {{ status.today_ingest_out }}</td></tr>
+<tr><td>Alerts received by Filter stage today</td><td> {{ status.today_filter }}</td></tr>
+<tr><td>Alerts sent from Filter today</td><td> {{ status.today_filter_out }}</td></tr>
+<tr><td>Updated objects in database today</td><td> {{ status.today_database }}</td></tr>
 </table>
-<i>(Some alerts have more than one candidate)</i>
-<hr/>
-<a href="{% static 'ztf/logs/' %}ztf_{{ status.date }}_programid1.log">Kafka Log File for {{ status.date }}</a><br/>
-<a href="{% static 'ztf/logs/' %}ztf_{{ status.date }}_tns.log">TNS Log for {{ status.date }}</a><br/>
-<a href="{% static 'ztf/skymap/log.txt' %}">LIGO-Virgo Log</a><br/>
-	</div>
 </div>
 {% endblock %}

@@ -1,0 +1,246 @@
+{% extends "base.html"%}
+{% load static %}
+{% block content %}
+<div class="container">
+
+<h1>Lasair API</h1>
+The Lasair API allows developers to run queries and cone-searches, 
+and to see outputs from streaming queries.
+<h2>Request and response formats</h2>
+In general, the Lasair API uses HTTP POST requests with JSON arguments and JSON responses. 
+
+
+<h2>Authorisation</h2>
+Request authentication is via authentication tokens. 
+An example of a token is:
+<pre class="literal-block">
+4b762569bb349bd8d60f1bc7da3f39dbfaefff9a
+</pre>
+This "starter" token can be used for experiments with the API.
+However, this key is throttled ans restricted, and should only be used
+for discovery and play, not serious use.
+we recommend that users request their own key by writing to 
+<a href="mailto:lasair-help@lists.roe.ac.uk?subject=AuthKey">lasair-help@lists.roe.ac.uk</a> and we will supply your own key. 
+
+<h2>Methods</h2>
+
+<h3>/api/cone</h3>
+<dl>
+
+<dt class="url-label">Description</dt> <dd>
+<p>
+This method runs a cone search on all the objects in the Lasair database.
+The arguments are:<ul>
+<li><code>ra</code>: (float) the right ascension (ra) in decimal degrees, </li>
+<li><code>dec</code>: (float) the declination in decimal degrees,</li>
+<li><code>radius</code>: (float) the angular radius of the cone in arcseconds, the maximum being 1000 arcseconds.</li>
+<li><code>requestType</code>: (string) the type pf request, which can be:
+<ul>
+  <li><code>nearest</code>: returns only the nearest objects within the cone
+  <li><code>all</code>: returns all the objects within the cone
+  <li><code>count</code>: returns the numbert of objects within the cone
+</ul></li>
+</ul>
+</p>
+</dd>
+
+<dt class="url-label">Curl Example</dt> <dd>
+<p> The authorization token goes in the header of the request, and the data in the data section.  </p>
+<pre class="literal-block">
+curl --header 'Authorization: Token 4b762569bb349bd8d60f1bc7da3f39dbfaefff9a' \
+--data 'ra=194.494&dec=48.851&radius=60.0&requestType=all' \
+https://lasair-iris.roe.ac.uk/api/cone/
+</pre>
+</dd>
+
+<dt class="url-label">Python Example</dt> <dd>
+<p> This code requires the <code>requests</code> library.
+<pre class="literal-block">
+import requests, json
+headers = { 'Authorization': 'Token 4b762569bb349bd8d60f1bc7da3f39dbfaefff9a' }
+url = 'https://lasair-iris.roe.ac.uk/api/cone/'
+data = {'ra': '194.494', 'dec': '48.851', 'radius': '60', 'requestType':'all' }
+r = requests.post(url, data, headers=headers)
+print('status=', r.status_code)
+response = r.json()
+print(response)
+</pre>
+<p>and the return is something like: </p>
+<pre class="literal-block">
+status= 200
+{'objects': [
+    {'object': 'ZTF17aaajmtw', 'separation': 2.5271898373111465}
+], 
+'info': 'Success'}
+</pre>
+</dd>
+</dl>
+</dt>
+
+
+<h3>/api/query</h3>
+<dl>
+
+<dt class="url-label">Description</dt> <dd>
+<p>
+This method runs a query on the Lasair database.
+The arguments are:<ul>
+<li><code>selected</code>: (string) the list of attributes to be returned, </li>
+<li><code>tables</code>: (string) the list of tables to be joined,</li>
+<li><code>conditions</code>: (string) the "WHERE" criteria to restrict what is returned</li>
+</ul>
+</p>
+</dd>
+
+<dt class="url-label">Curl Example</dt> <dd>
+<p> The authorization token goes in the header of the request, and the data in the data section.  </p>
+<pre class="literal-block">
+curl --header 'Authorization: Token 4b762569bb349bd8d60f1bc7da3f39dbfaefff9a' \
+--data 'selected=objectId,latestgmag&tables=objects&conditions=latestgmag&lt;12.0' \
+https://lasair-iris.roe.ac.uk/api/query/
+</pre>
+</dd>
+
+<dt class="url-label">Python Example</dt> <dd>
+<p> This code requires the <code>requests</code> library.
+<pre class="literal-block">
+import requests, json
+headers = { 'Authorization': 'Token 4b762569bb349bd8d60f1bc7da3f39dbfaefff9a' }
+url = 'https://lasair-iris.roe.ac.uk/api/query/'
+data = {
+'selected'  : 'objectId, latestgmag',
+'tables'    : 'objects',
+'conditions': 'latestgmag &lt; 12.0'
+}
+r = requests.post(url, data, headers=headers)
+print('status=', r.status_code)
+response = r.json()
+print(json.dumps(response,  indent=2))
+</pre>
+<p>and the return is something like: </p>
+<pre class="literal-block">
+status= 200
+{
+  "query": {
+    "selected": "objectId, latestgmag",
+    "tables": "objects",
+    "conditions": "latestgmag &lt; 12.0"
+  },
+  "result": [
+    {
+      "objectId": "ZTF18abszdyo",
+      "latestgmag": 11.5082
+    },
+    {
+      "objectId": "ZTF18abmogqt",
+      "latestgmag": 11.5527
+    },
+    {
+      "objectId": "ZTF18abcdajo",
+      "latestgmag": 11.7786
+    },
+    {
+      "objectId": "ZTF18abwklfu",
+      "latestgmag": 11.8384
+    },
+    {
+      "objectId": "ZTF18abvkkaq",
+      "latestgmag": 11.843
+    }
+  ],
+  "info": "Success"
+}
+</pre>
+</dd>
+</dl>
+</dt>
+
+<h3>/api/streamlog</h3>
+<dl>
+
+<dt class="url-label">Description</dt> <dd>
+<p>
+This method returns a record of the outpot from a Lasair streaming query. It represents an alternative
+to using a Kafka client to fetch from the Kafka server.
+The arguments are:<ul>
+<li><code>topic</code>: (stream) the topic name to be fetched</li>
+</ul>
+</p>
+</dd>
+
+<dt class="url-label">Curl Example</dt> <dd>
+<p> The authorization token goes in the header of the request, and the data in the data section.  
+For more information about this stream, see <a href=https://lasair-iris.roe.ac.uk/query/2/>https://lasair-iris.roe.ac.uk/query/2/</a>.
+</p>
+<pre class="literal-block">
+curl --header 'Authorization: Token 4b762569bb349bd8d60f1bc7da3f39dbfaefff9a' \
+--data 'topic=2SN-likecandidates' \
+https://lasair-iris.roe.ac.uk/api/streamlog/
+</pre>
+</dd>
+
+<dt class="url-label">Python Example</dt> <dd>
+<p> This code requires the <code>requests</code> library.
+For more information about this stream, see <a href=https://lasair-iris.roe.ac.uk/query/2/>https://lasair-iris.roe.ac.uk/query/2/</a>.
+<pre class="literal-block">
+import requests,json
+headers = { 'Authorization': 'Token a8f6df0e27618012c7cfbd957e8db267b82dc8c6' }
+url = 'https://lasair-iris.roe.ac.uk/api/streamlog/'
+data = { 'topic': '2SN-likecandidates' }
+r = requests.post(url, data, headers=headers)
+print('status=', r.status_code)
+response = r.json()
+if 'jsonStreamLog' in response:
+    # print first 3 results only
+    data = response['jsonStreamLog']['digest'][:3]
+    print(json.dumps(data, indent=2))
+print('info:', response['info'])
+</pre>
+<p>and the return is something like: </p>
+<pre class="literal-block">
+status= 200
+[
+  {
+    "objectId": "ZTF18acpsdtl",
+    "ramean": 32.203889958823524,
+    "decmean": 45.364292688235295,
+    "mjdmin": 59053.42844909988,
+    "mjdmax": 59081.42621529987,
+    "magrmin": 18.1173,
+    "latestrmag": 18.2281,
+    "classification": "NT",
+    "score": "Not Near PS1 star",
+    "UTC": "2020-08-20 12:36:12"
+  },
+  {
+    "objectId": "ZTF18abvfafa",
+    "ramean": 5.082597047826087,
+    "decmean": 28.26374956956522,
+    "mjdmin": 59052.451261600014,
+    "mjdmax": 59081.46531250002,
+    "magrmin": 19.4799,
+    "latestrmag": 19.9639,
+    "classification": "NT",
+    "score": "Not Near PS1 star",
+    "UTC": "2020-08-20 12:36:12"
+  },
+  {
+    "objectId": "ZTF18abtgidi",
+    "ramean": 41.88432473970589,
+    "decmean": 36.82709041617647,
+    "mjdmin": 59052.431504600216,
+    "mjdmax": 59081.47545140004,
+    "magrmin": 19.0019,
+    "latestrmag": 19.4075,
+    "classification": "NT",
+    "score": "Not Near PS1 star",
+    "UTC": "2020-08-20 12:36:12"
+  }
+]
+info: Success
+</pre>
+</dd>
+
+
+</div>
+{% endblock %}

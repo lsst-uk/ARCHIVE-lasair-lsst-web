@@ -62,17 +62,8 @@ def status(request):
     """
     message = ''
     web_domain = lasair.settings.WEB_DOMAIN
-    jsonstr = open('/mnt/lasair-head-data/ztf/system_status.json').read()
+    jsonstr = open(lasair.settings.SYSTEM_STATUS).read()
     status = json.loads(jsonstr)
-    unix_time = time.time()
-    time_since_update = time.time() - status['update_time_unix']
-    if time_since_update > 3600:
-        message = 'No update in %d seconds! ' % int(time_since_update)
-    z = status['today_candidates_ztf']
-    l = status['today_candidates_lasair']
-    if z > 2000 and z-l > 60000:
-        message += 'ZTF reports %d candidates today, only %d ingested by Lasair!' % (z, l)
-    status['minutes_since'] = int(time_since_update/60.0)
     return render(request, 'status.html', {'web_domain': web_domain, 'status':status, 'message':message})
 
 def index(request):
