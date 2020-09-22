@@ -31,14 +31,14 @@ we recommend that users request their own key by writing to
 <p>
 This method runs a cone search on all the objects in the Lasair database.
 The arguments are:<ul>
-<li><code>ra</code>: (float) the right ascension (ra) in decimal degrees, </li>
+<li><code>ra</code>: (float) the right ascension in decimal degrees, </li>
 <li><code>dec</code>: (float) the declination in decimal degrees,</li>
 <li><code>radius</code>: (float) the angular radius of the cone in arcseconds, the maximum being 1000 arcseconds.</li>
-<li><code>requestType</code>: (string) the type pf request, which can be:
+<li><code>requestType</code>: (string) the type of request, which can be:
 <ul>
   <li><code>nearest</code>: returns only the nearest objects within the cone
   <li><code>all</code>: returns all the objects within the cone
-  <li><code>count</code>: returns the numbert of objects within the cone
+  <li><code>count</code>: returns the number of objects within the cone
 </ul></li>
 </ul>
 </p>
@@ -160,10 +160,11 @@ status= 200
 
 <dt class="url-label">Description</dt> <dd>
 <p>
-This method returns a record of the outpot from a Lasair streaming query. It represents an alternative
+This method returns a record of the output from a Lasair streaming query. It represents an alternative
 to using a Kafka client to fetch from the Kafka server.
 The arguments are:<ul>
 <li><code>topic</code>: (stream) the topic name to be fetched</li>
+<li><code>max</code>: (int) the maximum number of records to return</li>
 </ul>
 </p>
 </dd>
@@ -174,7 +175,7 @@ For more information about this stream, see <a href=https://lasair-iris.roe.ac.u
 </p>
 <pre class="literal-block">
 curl --header 'Authorization: Token 4b762569bb349bd8d60f1bc7da3f39dbfaefff9a' \
---data 'topic=2SN-likecandidates' \
+--data 'topic=2SN-likecandidates&max=3' \
 https://lasair-iris.roe.ac.uk/api/streamlog/
 </pre>
 </dd>
@@ -186,13 +187,12 @@ For more information about this stream, see <a href=https://lasair-iris.roe.ac.u
 import requests,json
 headers = { 'Authorization': 'Token a8f6df0e27618012c7cfbd957e8db267b82dc8c6' }
 url = 'https://lasair-iris.roe.ac.uk/api/streamlog/'
-data = { 'topic': '2SN-likecandidates' }
+data = { 'topic': '2SN-likecandidates', 'max': 3 }
 r = requests.post(url, data, headers=headers)
 print('status=', r.status_code)
 response = r.json()
 if 'jsonStreamLog' in response:
-    # print first 3 results only
-    data = response['jsonStreamLog']['digest'][:3]
+    data = response['jsonStreamLog']['digest']
     print(json.dumps(data, indent=2))
 print('info:', response['info'])
 </pre>

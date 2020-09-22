@@ -72,9 +72,11 @@ class ConeSerializer(serializers.Serializer):
 
 class StreamlogSerializer(serializers.Serializer):
     topic = serializers.SlugField(required=True)
+    max   = serializers.IntegerField(required=False, default=1000)
 
     def save(self):
         topic = self.validated_data['topic']
+        max = self.validated_data['max']
 
         # Get the authenticated user, if it exists.
         userId = 'unknown'
@@ -85,6 +87,8 @@ class StreamlogSerializer(serializers.Serializer):
         try:
             data = open(lasair.settings.BLOB_STORE_ROOT + '/logs/%s' % topic, 'r').read()
             data = json.loads(data)
+            datalist = data['digest'][:max]
+            data['digest'] = datalist
             replyMessage = 'Success'
         except:
             data = {'digest':[]}
@@ -121,7 +125,8 @@ class QuerySerializer(serializers.Serializer):
 
         page = 0
         perpage = 1000
-        sqlquery_real = query_utilities.make_query(selected, tables, conditions, page, perpage)
+        limitseconds = 300
+        sqlquery_real = query_utilities.make_query(selected, tables, conditions, page, perpage, limitseconds)
         msl = connect_db()
         cursor = msl.cursor(buffered=True, dictionary=True)
 
@@ -129,7 +134,7 @@ class QuerySerializer(serializers.Serializer):
         try:
             cursor.execute(sqlquery_real)
             for row in cursor: result.append(row)
-            message = 'Success'
+            message = 'Success for user %s' % userId
         except Exception as e:
             message = 'Your query:<br/><b>' + sqlquery_real + '</b><br/>returned the error<br/><i>' + str(e) + '</i>'
 

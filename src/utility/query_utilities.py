@@ -1,6 +1,6 @@
 # how to make a query from selects, tables, and conditions. Plus pages. Plus time constraints.
 
-def make_query(selected, tables, conditions, page, perpage):
+def make_query(selected, tables, conditions, page, perpage, limitseconds = 300):
     """make_query.
 
     Args:
@@ -11,7 +11,7 @@ def make_query(selected, tables, conditions, page, perpage):
         perpage:
     """
 # select some quantitites from some tables
-    sqlquery_real  = 'SELECT /*+ MAX_EXECUTION_TIME(300000) */ ' 
+    sqlquery_real  = 'SELECT /*+ MAX_EXECUTION_TIME(%d) */ ' % (1000*limitseconds)
     sqlquery_real += selected
 
     toktables = []
