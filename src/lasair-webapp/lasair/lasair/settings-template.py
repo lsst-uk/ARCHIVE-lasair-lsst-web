@@ -13,7 +13,7 @@ LASAIR_ROOT = '/home/roy/'
 # Database
 # https://docs.djangoproject.com/en/2.0/ref/settings/#databases
 DEBUG          = True
-WEB_DOMAIN     = 'lasair-openstack'
+WEB_DOMAIN     = 'lasair-iris'
 READONLY_USER  = ''
 READONLY_PASS  = ''
 
@@ -72,7 +72,13 @@ MIDDLEWARE = [
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.TokenAuthentication',
-    ]
+    ],
+    'DEFAULT_THROTTLE_CLASSES': (
+        'rest_framework.throttling.UserRateThrottle',
+     ),
+     'DEFAULT_THROTTLE_RATES': {
+         'user': '10/hour',
+     },
 }
 
 ROOT_URLCONF = 'lasair.urls'

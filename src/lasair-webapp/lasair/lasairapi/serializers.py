@@ -124,8 +124,13 @@ class QuerySerializer(serializers.Serializer):
             userId = request.user
 
         page = 0
-        perpage = 1000
-        limitseconds = 300
+        if userId == 'dummy':
+            perpage = 1000
+            limitseconds = 300
+        else:
+            perpage = 10000
+            limitseconds = 3000
+
         sqlquery_real = query_utilities.make_query(selected, tables, conditions, page, perpage, limitseconds)
         msl = connect_db()
         cursor = msl.cursor(buffered=True, dictionary=True)
