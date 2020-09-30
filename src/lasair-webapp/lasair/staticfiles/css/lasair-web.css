@@ -2,36 +2,22 @@
     margin: 0px;
 }
 
-/* .row{
-    margin: 10px;
-} */
+.blue {
+    background-color: #5dedfc;
+}
+.camblue {
+    background-color: #a0e1e8;
+}
 
 .nav-link{
     margin:auto;
     margin-top:2px;
-    background-color: 	#fcfcfc;
-    width: 100px;
+    color: black;
 }
 
 .nav-link:hover { 
-    background-color: #bbded6;
-}
-
-.header{
-    /*position: absolute;*/
-    left: 0;
-    top: 0;
-    margin: 0px;
-    /*background-color:#dfe6ea;*/
-    /* background-color:	#bbded6; */
-    background-color:	#aeddf5;
-    height: 16%;
-}
-
-.lasair-logo{
-    /* width:350px;  */
-    width:90%;
-    margin:20px;
+    background-color: turquoise;
+    color: black;
 }
 
 .content{

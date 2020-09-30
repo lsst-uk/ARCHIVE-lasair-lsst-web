@@ -8,6 +8,7 @@
 	<div class="col-sm">
 <font color="red"><h4>{{ message }}</h4> </font>
 <table class="table">
+<tr><td>Total objects in database</td><td> {{ status.total_count }}</td></tr>
 <tr><td>Last Lasair update time (UTC)</td><td> {{ status.update_time }}</td></tr>
 <tr><td>Alerts sent by ZTF today</td><td> {{ status.today_ztf }}</td></tr>
 <tr><td>Alerts received by Ingest stage today</td><td> {{ status.today_ingest }}</td></tr>

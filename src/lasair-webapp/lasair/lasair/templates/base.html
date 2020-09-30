@@ -24,38 +24,32 @@
   gtag('config', 'UA-130805761-1');
 </script>
 
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
 <!-- <link rel="stylesheet" href=lasair/static/css/lasair-web.css> -->
 <link rel="stylesheet" href="{% static 'css/lasair-web.css' %}">
 
 </head>
 <body>
-<div class="col-sm-10 align-items-center">
-    <div class="row header align-items-center" style="background-color:#a3e7ff">
-        <div class="col-sm-4">
-            <img width=200 src="{% static 'img/lasair-font.png' %}" class="lasair-logo">
-	    {% if WEB_DOMAIN == 'lasair-dev' %} <font color="red"><h1>DEVELOPMENT</h1></font> {% endif %}
-        </div>
 
-<!--        <div class="col-sm-4">
-<form method="POST"  action="/conesearch/">
-{% csrf_token %}
-<input size=30 name="cone"><br/> <font size=-2><a href="#" onclick="document.getElementById('cone').submit">do conesearch</a></font>
-</form>
-        </div>
--->
+<header>
+<div class="jumbotron blue">
+   <img class="float-left align-top" width=200 src="{% static 'img/lasair-font.png' %}" >
+  {% if WEB_DOMAIN == 'lasair-dev' %} <font color="red"><h1>DEVELOPMENT</h1></font> {% endif %}
 
-        <div class="col-sm-6 text-right">
-<a href=http://www.roe.ac.uk/ifa/wfau/><img src="{% static 'img/uoe.png' %}" width=70></a>
-<a href=https://star.pst.qub.ac.uk/wiki/doku.php/public/research_areas/supernovae/start><img src="{% static 'img/qub.png' %}" width=100></a>
-<a href=https://www.lsst.ac.uk/><img src="{% static 'img/lusc.png' %}" width=80></a>
-<a href=http://www.ztf.caltech.edu/><img src="{% static 'img/ztf.png' %}" width=70></a>
-        </div>
-    </div>
-</head>
+  <a class="float-right mx-2" href=http://www.roe.ac.uk/ifa/wfau/>
+	  <img class="align-middle" src="{% static 'img/uoe.png' %}" width=70></a>
+  <a class="float-right mx-2" href=https://star.pst.qub.ac.uk/wiki/doku.php/public/research_areas/supernovae/start>
+	  <img class="align-middle" src="{% static 'img/qub.png' %}" width=100></a>
+  <a class="float-right mx-2" href=https://www.lsst.ac.uk/>
+	  <img class="align-middle" src="{% static 'img/lusc.png' %}" width=80></a>
+  <a class="float-right mx-2" href=http://www.ztf.caltech.edu/>
+	  <img class="align-middle" src="{% static 'img/ztf.png' %}" width=70></a>
+</div>
+</header>
 
+<div class="container container-lg">
 {% if user.is_authenticated %}
 Logged in as {{ user.get_username }}
 (<a href=/accounts/logout>Logout</a>)
@@ -63,53 +57,69 @@ Logged in as {{ user.get_username }}
 <a href=/accounts/login>Login</a> | <a href=/signup>Signup</a>
 {% endif %}
 
-<div class="container-fluid">
-<div class="navbar navbar-fixed-left" style="background-color: #dbf5ff">
-  <ul class="nav navbar-nav">
-   <li><a href="/">Home</a></li>
-   <li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown">About <span class="caret"></span></a>
-     <ul class="dropdown-menu" role="menu">
-      <li><a href="/about">About Lasair</a></li>
-      <li><a href="/sherlock">Classification and Annotation</a></li>
-      <li><a href="/jupyter">Jupyter</a></li>
-      <li><a href="/lasairlsst">Lasair-LSST</a></li>
-     </ul>
-   </li>
-   <li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown">Data <span class="caret"></span></a>
-     <ul class="dropdown-menu" role="menu">
-      <li><a href="/conesearch">Conesearch</a></li>
-      <li><a href="/querylist">Queries and Streams</a></li>
-      <li><a href="/query">Make a Query</a></li>
-      <li><a href="/watchlist">Watchlists</a></li>
-      <li><a href="/area">Areas</a></li>
-      <li><a href="/skymap">Gravitational waves</a></li>
-     </ul>
-   </li>
-   <li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown">Documents <span class="caret"></span></a>
-     <ul class="dropdown-menu" role="menu">
-      <li><a href="https://lsst-uk.atlassian.net/wiki/x/DICIN">Lasair Cookbook</a></li>
-      <li><a href="/about">About Lasair</a></li>
-      <li><a href="https://doi.org/10.3847/2515-5172/ab020f">Short paper</a></li>
-      <li><a href="/api">Lasair API guide</a></li>
-     </ul>
-   </li>
-   <li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown">Status <span class="caret"></span></a>
-     <ul class="dropdown-menu" role="menu">
-      <li><a href="/status">Ingestion Status</a></li>
-      <li><a href="/coverage">Sky Coverage</a></li>
-     </ul>
-   </li>
-   <li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown">Contact <span class="caret"></span></a>
-     <ul class="dropdown-menu" role="menu">
-      <li><a href="/sherlock">Contact</a></li>
-      <li><a href="mailto:lasair-help@lists.roe.ac.uk?subject=Enquiry">Email Lasair-help</a></li>
-      <li><a href="/release">Release Notes</a></li>
-     </ul>
-   </li>
-  </ul>
-</div>
+  <nav class="navbar navbar-expand-lg camblue">
 
-    {% block content %}{% endblock %}
-</div>
+  <div class="dropdown">
+    <a class="nav-link camblue" href="/">Home</a>
+  </div>
+
+    <div class="dropdown">
+      <a class="nav-item nav-link dropdown-toggle camblue " data-toggle="dropdown" 
+	   id="services-dropdown" href="#">About</a>
+      <div class="dropdown-menu">
+        <a class="dropdown-item" href="/about">About Lasair</a>
+        <a class="dropdown-item" href="/sherlock">Context Classification</a>
+        <a class="dropdown-item" href="/jupyter">Jupyter</a>
+        <a class="dropdown-item" href="/lasairlsst">Lasair-LSST</a>
+      </div>
+    </div>
+
+    <div class="dropdown">
+      <a class="nav-item nav-link dropdown-toggle camblue " data-toggle="dropdown" 
+ 	   id="data-dropdown" href="#">Data</a>
+      <div class="dropdown-menu">
+       <a class="dropdown-item" href="/conesearch">Conesearch</a>
+       <a class="dropdown-item" href="/querylist">Queries and Streams</a>
+       <a class="dropdown-item" href="/query">Make a Query</a>
+       <a class="dropdown-item" href="/watchlist">Watchlists</a>
+       <a class="dropdown-item" href="/area">Areas</a>
+       <a class="dropdown-item" href="/skymap">Gravitational waves</a>
+      </div>
+    </div>
+ 
+    <div class="dropdown">
+      <a class="nav-item nav-link dropdown-toggle camblue " data-toggle="dropdown" 
+ 	   id="documents-dropdown" href="#">Documents</a>
+      <div class="dropdown-menu">
+       <a class="dropdown-item" href="https://lsst-uk.atlassian.net/wiki/x/DICIN">Lasair Cookbook</a>
+       <a class="dropdown-item" href="/about">About Lasair</a>
+       <a class="dropdown-item" href="https://doi.org/10.3847/2515-5172/ab020f">Short paper</a>
+       <a class="dropdown-item" href="/api">Lasair API guide</a>
+      </div>
+    </div>
+ 
+    <div class="dropdown">
+      <a class="nav-item nav-link dropdown-toggle camblue " data-toggle="dropdown" 
+ 	   id="status-dropdown" href="#">Status</a>
+      <div class="dropdown-menu">
+       <a class="dropdown-item" href="/status">Ingestion Status</a>
+       <a class="dropdown-item" href="/coverage">Sky Coverage</a>
+      </div>
+    </div>
+ 
+    <div class="dropdown">
+      <a class="nav-item nav-link dropdown-toggle camblue " data-toggle="dropdown" 
+ 	   id="contact-dropdown" href="#">Contact</a>
+      <div class="dropdown-menu">
+       <a class="dropdown-item" href="/sherlock">Contact</a>
+       <a class="dropdown-item" href="mailto:lasair-help@lists.roe.ac.uk?subject=Enquiry">Email Lasair-help</a>
+       <a class="dropdown-item" href="/release">Release Notes</a>
+      </div>
+    </div>
+
+  </nav>
+  <hr/>
+
+{% block content %}{% endblock %}
 </body>
 </html>

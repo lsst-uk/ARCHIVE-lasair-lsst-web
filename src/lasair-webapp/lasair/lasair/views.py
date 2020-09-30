@@ -81,10 +81,7 @@ def about(request):
     Args:
         request:
     """
-    jsonstr = open('/mnt/lasair-head-data/ztf/system_status.json').read()
-    j = json.loads(jsonstr)
-    n_candidates = j['total_candidates']
-    return render(request, 'about.html', {'n_candidates':n_candidates})
+    return render(request, 'about.html')
 
 def distance(ra1, de1, ra2, de2):
     """distance.
