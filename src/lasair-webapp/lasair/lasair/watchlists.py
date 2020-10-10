@@ -187,7 +187,7 @@ def show_watchlist(request, wl_id):
     query = """
 SELECT 
 c.ra, c.decl, c.name, c.radius, o.objectId, o.ncand, h.arcsec,
-o.latestgmag-o.maggmean AS gdiff, o.latestrmag-o.magrmean AS rdiff, s.classification
+o.gmag-o.maggmean AS gdiff, o.rmag-o.magrmean AS rdiff, s.classification
 FROM watchlist_cones AS c 
 LEFT JOIN watchlist_hits           AS h ON c.cone_id = h.cone_id 
 LEFT JOIN objects                  AS o on h.objectId = o.objectId 

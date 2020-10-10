@@ -244,14 +244,6 @@ def obj(request, objectId):
                 row['magpsf'] = cand['diffmaglim']
             candidates.append(row)
 
-
-
-
-
-
-
-
-
     if not objectData:
         ra = float(cand['ra'])
         dec = float(cand['dec'])
