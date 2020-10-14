@@ -82,6 +82,8 @@ def objhtml(request, objectId):
     data2 = data.copy()
     if 'comments' in data2:
         data2.pop('comments')
+    if 'sherlock' in data2:
+        data2.pop('sherlock')
     return render(request, 'show_object.html',
         {'data':data, 'json_data':json.dumps(data2),
         'authenticated': request.user.is_authenticated})

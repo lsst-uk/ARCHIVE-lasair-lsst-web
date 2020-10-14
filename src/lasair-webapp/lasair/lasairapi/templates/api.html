@@ -96,7 +96,7 @@ The arguments are:<ul>
 <p> The authorization token goes in the header of the request, and the data in the data section.  </p>
 <pre class="literal-block">
 curl --header 'Authorization: Token 4b762569bb349bd8d60f1bc7da3f39dbfaefff9a' \
---data 'selected=objectId,latestgmag&tables=objects&conditions=latestgmag&lt;12.0' \
+--data 'selected=objectId,gmag&tables=objects&conditions=gmag&lt;12.0' \
 https://lasair-iris.roe.ac.uk/api/query/
 </pre>
 </dd>
@@ -108,9 +108,9 @@ import requests, json
 headers = { 'Authorization': 'Token 4b762569bb349bd8d60f1bc7da3f39dbfaefff9a' }
 url = 'https://lasair-iris.roe.ac.uk/api/query/'
 data = {
-'selected'  : 'objectId, latestgmag',
+'selected'  : 'objectId, gmag',
 'tables'    : 'objects',
-'conditions': 'latestgmag &lt; 12.0'
+'conditions': 'gmag &lt; 12.0'
 }
 r = requests.post(url, data, headers=headers)
 print('status=', r.status_code)
@@ -122,30 +122,30 @@ print(json.dumps(response,  indent=2))
 status= 200
 {
   "query": {
-    "selected": "objectId, latestgmag",
+    "selected": "objectId, gmag",
     "tables": "objects",
-    "conditions": "latestgmag &lt; 12.0"
+    "conditions": "gmag &lt; 12.0"
   },
   "result": [
     {
       "objectId": "ZTF18abszdyo",
-      "latestgmag": 11.5082
+      "gmag": 11.5082
     },
     {
       "objectId": "ZTF18abmogqt",
-      "latestgmag": 11.5527
+      "gmag": 11.5527
     },
     {
       "objectId": "ZTF18abcdajo",
-      "latestgmag": 11.7786
+      "gmag": 11.7786
     },
     {
       "objectId": "ZTF18abwklfu",
-      "latestgmag": 11.8384
+      "gmag": 11.8384
     },
     {
       "objectId": "ZTF18abvkkaq",
-      "latestgmag": 11.843
+      "gmag": 11.843
     }
   ],
   "info": "Success"
@@ -207,7 +207,7 @@ status= 200
     "mjdmin": 59053.42844909988,
     "mjdmax": 59081.42621529987,
     "magrmin": 18.1173,
-    "latestrmag": 18.2281,
+    "rmag": 18.2281,
     "classification": "NT",
     "score": "Not Near PS1 star",
     "UTC": "2020-08-20 12:36:12"
@@ -219,7 +219,7 @@ status= 200
     "mjdmin": 59052.451261600014,
     "mjdmax": 59081.46531250002,
     "magrmin": 19.4799,
-    "latestrmag": 19.9639,
+    "rmag": 19.9639,
     "classification": "NT",
     "score": "Not Near PS1 star",
     "UTC": "2020-08-20 12:36:12"
@@ -231,7 +231,7 @@ status= 200
     "mjdmin": 59052.431504600216,
     "mjdmax": 59081.47545140004,
     "magrmin": 19.0019,
-    "latestrmag": 19.4075,
+    "rmag": 19.4075,
     "classification": "NT",
     "score": "Not Near PS1 star",
     "UTC": "2020-08-20 12:36:12"

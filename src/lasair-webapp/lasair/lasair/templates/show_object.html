@@ -16,22 +16,21 @@
 </div>
 
 <div class="row">
-    <div class="col-sm-8">
+    <div class="col-sm-7">
         <div id="lc" style="width:100%;height:500px;"></div>
 <!--	<div id="lc_apparent" style="width:100%;height:300px"></div> -->
 <!--<center>        <input type="radio" name="mag" id="lc_button" checked="checked"> Difference Magnitude |
 <input type="radio" name="mag" id="lc_apparent_button"> Apparent Magnitude (see <a href=/about#photometry>note</a>) </center> -->
     </div>
-    <div class = "col-sm-4">
+
+    <div class = "col-sm-5">
 <!--        <div id="radec" style="width:100%;height:300px;"></div> -->
 
-    <div class="row">
-      <div id="SV-layerBox"> </div><br/>
-    </div>
-    <div id="aladin-lite-div" style="width:400px;height:400px;"></div>
-
-
-
+      <div class="row">
+        <div id="SV-layerBox"> </div><br/>
+        <div id="aladin-lite-div" style="width:450px;height:450px;"></div>
+        <span class="small">Transient position: red square.<br/>Sherlock source: blue square.</span>
+      </div>
     </div>
 </div>
 
@@ -50,14 +49,6 @@
 <li>NOTE: There are {{ data.count_isdiffpos }} of {{ data.objectData.ncand }} candidates (below) where the detected brightness is less than the reference brightness (where the magnitude is followed by "f"), also indicated by an open circle in the light curve above.</li>
 {% endif %}
 
-{% if data.sherlock.classification %}
-<li>Classified as {{ data.sherlock.classification }},
-{% if data.sherlock.separation %} at {{ data.sherlock.separation|floatformat:2 }} arcsec.{% endif %}
-{% if data.sherlock.catalogue_object_type %} Rank 1 crossmatch is {{ data.sherlock.catalogue_object_type }}{% endif %}
-{% if data.sherlock.z %} at z = {{ data.sherlock.z }}{% endif %}
-</li> <li>
-	<b>{{ data.sherlock.description }}</b>
-</li>{% endif %}
 
 {% if data.objectData.MPCname %}
 <li><form method="post" id="JPLsearch" action="https://ssd.jpl.nasa.gov/sbdb.cgi">
@@ -91,9 +82,32 @@ Moving object, MPC name is <a href="#" onclick="document.forms[1].submit();">{{ 
 </div>
 
 <div class="row">
-<div class="col-sm-8">
+{% if data.sherlock.classification %}
+<h4>Sherlock</h4>
+<ul>
+
+<li>Classified as {{ data.sherlock.classification }},
+{% if data.sherlock.separationArcsec %} 
+at {{ data.sherlock.separationArcsec|floatformat:2 }} arcsec.{% endif %}
+</li>
+
+<li>
+{% if data.sherlock.catalogue_object_type %}
+Best crossmatch is {{ data.sherlock.catalogue_object_type }}{% endif %}
+{% if data.sherlock.z %} at z = {{ data.sherlock.z }}{% endif %}
+</li> 
+
+<li>
+{{ data.sherlock.description|safe }}
+</li>
+</ul>
+{% endif %}
+</div>
+
+<!--
+<div class="row">
 <h4>Comments</h4>
-<!--{{ data.message }}-->
+{ data.message }}
 <table border=1>
 {% for c in data.comments %}
 <tr><td><font size=-1>{{ c.name }}</font></td>
@@ -111,15 +125,14 @@ Moving object, MPC name is <a href="#" onclick="document.forms[1].submit();">{{ 
 You must be signed in to post comments.
 {% endif %}
 </div>
-</div>
 <p>&nbsp;</p>
 
-<hr/>
 <div class="row">
   <div class ="col-sm-12">
   </div>
 </div>
 <hr/>
+-->
 
 
 
@@ -180,6 +193,20 @@ $(document).ready(function()
     $('input[name=survey]').change(function() {
         aladin.setImageSurvey($(this).val());
     });
+
+    var alertcat = A.catalog({name: 'Alert', sourceSize: 18});
+    var alert = A.source({{ data.objectData.ramean }}, {{ data.objectData.decmean }});
+    alertcat.addSources([alert]);
+    aladin.addCatalog(alertcat);
+
+{% if data.sherlock.eastSeparationArcsec %}
+    var sherlockcat = A.catalog({name: 'Sherlock', sourceSize: 18});
+    var sherlock = A.source(
+	    {{ data.objectData.ramean }} + {{ data.sherlock.eastSeparationArcsec }}/3600, 
+	    {{ data.objectData.decmean }} + {{ data.sherlock.northSeparationArcsec }}/3600);
+    sherlockcat.addSources([sherlock]);
+    aladin.addCatalog(sherlockcat);
+{% endif %}
 /*
     var hipsCats = {
         'ps1': A.catalogHiPS('https://axel.u-strasbg.fr/HiPSCatService/II/349/ps1', {name: 'PanSTARRS DR1 sources', shape: 'circle', sourceSize: 8, color: '#6baed6', onClick: 'showTable', name: '          PanSTARRS DR1'}),
