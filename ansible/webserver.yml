@@ -53,6 +53,11 @@
           executable: pip3 
           name: pyephem
 
+    - name: install requests
+      pip: 
+          executable: pip3 
+          name: requests
+
     - name: install MOCpy
       pip: 
           executable: pip3 

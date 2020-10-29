@@ -4,6 +4,7 @@ from datetime import datetime
 from django.db import connection
 from django.db import IntegrityError
 import lasair.settings
+import requests
 import json
 
 CAT_ID_RA_DEC_COLS['objects'] = [['objectId', 'ramean', 'decmean'],1018]
@@ -96,6 +97,63 @@ class StreamlogSerializer(serializers.Serializer):
         info = { "jsonStreamLog": data, "info": replyMessage }
         return info
 
+class SherlockObjectSerializer(serializers.Serializer):
+    objectId = serializers.SlugField(required=True)
+    lite     = serializers.BooleanField()
+
+    def save(self):
+        objectId = self.validated_data['objectId']
+        lite     = self.validated_data['lite']
+
+        # Get the authenticated user, if it exists.
+        userId = 'unknown'
+        request = self.context.get("request")
+        if request and hasattr(request, "user"):
+            userId = request.user
+
+        url = 'http://%s/object/%s' % (lasair.settings.SHERLOCK_SERVICE, objectId)
+        if lite:
+            url += '?lite=true'
+        r = requests.get(url)
+        try:
+            data = json.loads(r.text)
+            replyMessage = 'Success'
+        except:
+            data = ''
+            replyMessage = r.text
+        info = { "data": data, "info": replyMessage }
+        return info
+
+class SherlockQuerySerializer(serializers.Serializer):
+    ra          = serializers.FloatField(required=True)
+    dec         = serializers.FloatField(required=True)
+    lite        = serializers.BooleanField()
+
+    def save(self):
+        ra          = self.validated_data['ra']
+        dec         = self.validated_data['dec']
+        lite        = self.validated_data['lite']
+
+        # Get the authenticated user, if it exists.
+        userId = 'unknown'
+        request = self.context.get("request")
+        if request and hasattr(request, "user"):
+            userId = request.user
+
+        url = 'http://%s/query?ra=%f&dec=%f' % (lasair.settings.SHERLOCK_SERVICE, ra, dec)
+        if lite:
+            url += '&lite=true'
+        r = requests.get(url)
+        try:
+            data = json.loads(r.text)
+            replyMessage = 'Success'
+        except:
+            data = ''
+            replyMessage = r.text
+
+        info = { "data": data, "info": replyMessage }
+        return info
+
 from utility import query_utilities
 import mysql.connector
 
@@ -145,4 +203,51 @@ class QuerySerializer(serializers.Serializer):
 
         query = {'selected':selected, 'tables':tables, 'conditions':conditions}
         info = { "query": query, "result":result, "info": message }
+        return info
+
+def get_lightcurve(objectId):
+    lightcurves = objectStore(suffix = 'json',
+        fileroot=lasair.settings.BLOB_STORE_ROOT + '/lightcurve/')
+
+    alertjson = lightcurves.getObject(objectId)
+    alert = json.loads(alertjson)
+    candidates = []
+    candlist = alert['prv_candidates'] + [alert['candidate']]
+    candidates = []
+    for cand in candlist:
+        row = {}
+        for key in ['candid', 'fid', 'magpsf', 'sigmapsf', 'isdiffpos']:
+            if key in cand: row[key] = cand[key]
+        row['mjd'] = mjd = float(cand['jd']) - 2400000.5
+        if cand['candid']:
+            candidates.append(row)
+    return candidates
+
+def get_lightcurves(objectIds):
+    ncand = 0
+    lightcurves = {}
+    for objectId in objectIds:
+        lightcurve = get_lightcurve(objectId)
+        ncand += len(lightcurve)
+        lightcurves[objectId] = lightcurve
+    return {'ncand':ncand, 'data':lightcurves}
+
+from utility.objectStore import objectStore
+class LightcurvesSerializer(serializers.Serializer):
+    objectIdsTxt = serializers.CharField(max_length=16384, required=True)
+    def save(self):
+        objectIdsTxt = self.validated_data['objectIdsTxt']
+        objectIds = []
+        for tok in objectIdsTxt.split(','):
+            objectIds.append(tok.strip())
+
+        # Get the authenticated user, if it exists.
+        userId = 'unknown'
+        request = self.context.get("request")
+        if request and hasattr(request, "user"):
+            userId = request.user
+
+        lightcurves = get_lightcurves(objectIds)
+        replyMessage = 'Success'
+        info = { "lightcurves": lightcurves, "info": replyMessage }
         return info
