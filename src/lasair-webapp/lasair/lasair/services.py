@@ -1,10 +1,26 @@
 #from django.shortcuts import render_to_response, get_object_or_404
 from django.shortcuts import get_object_or_404
-from django.http import HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect
 from django.template.context_processors import csrf
 import lasair.settings
 import mysql.connector
 from django.http import JsonResponse
+import gzip
+from utility.objectStore import objectStore
+
+def fits(request, filename):
+# examples of image file name
+# candid1189406621015015005_pid1189406621015_targ_sci
+# candid1189406621015015005_ref
+# candid1189406621015015005_pid1189406621015_targ_scimref
+    fitsos = objectStore(suffix = 'fits.gz',
+        fileroot=lasair.settings.BLOB_STORE_ROOT + '/fits')
+    cephfilename = fitsos.getFileName(filename)
+    with gzip.open(cephfilename, 'rb') as f:
+        content = f.read()
+    response = HttpResponse(content, content_type='image/fits')
+    response['Content-Disposition'] = 'attachment; filename="%s.fits"' % filename
+    return response
 
 def connect_db():
     """connect_db.

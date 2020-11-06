@@ -33,6 +33,7 @@ urlpatterns = [
     path('coverage/',               views.coverage,             name='coverage'),
     path('status/',                 views.status,               name='status'),
     path('streamlog/<slug:topic>/', views.streamlog,            name='streamlog'),
+    path('fitsview/<filename>/'   , views.fitsview,             name='fitsview'),
 
     path('cand/<int:candid>/',      candidates.cand,            name='cand'),
 
@@ -64,6 +65,7 @@ urlpatterns = [
     path('jupyter',  TemplateView.as_view(template_name='jupyter.html')),
     path('release',  TemplateView.as_view(template_name='release.html')),
     path('contact',  TemplateView.as_view(template_name='contact.html')),
+    path('fits/<filename>/',  services.fits,     name='fits'),
     path('coverageAjax/<int:nid1>/<int:nid2>/',\
                                      services.coverageAjax,     name='coverageAjax'),
     path('accounts/', include('django.contrib.auth.urls')),

@@ -173,6 +173,14 @@ def readcone(cone):
         message += 'RA,Dec,radius=%.5f,%.5f,%.1f' % (ra, de, radius)
         return {'ra':ra, 'dec':de, 'radius':radius, 'message':message}
 
+def fitsview(request, filename):
+    """fitsview.
+
+    Args:
+        request:
+    """
+    return render(request, 'fitsview.html', {'filename':filename})
+
 def conesearch(request):
     """conesearch.
 

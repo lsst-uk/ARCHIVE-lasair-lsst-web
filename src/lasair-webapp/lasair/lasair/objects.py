@@ -205,7 +205,7 @@ def obj(request, objectId):
 
 
         lightcurves = objectStore(suffix = 'json',
-            fileroot=lasair.settings.BLOB_STORE_ROOT + '/lightcurve/')
+            fileroot=lasair.settings.BLOB_STORE_ROOT + '/lightcurve')
 
 #        try:
         alertjson = lightcurves.getObject(objectId)
@@ -225,10 +225,14 @@ def obj(request, objectId):
 #        cursor.execute(query)
         count_isdiffpos = count_real_candidates = 0
 
+        fits = objectStore(suffix = 'fits.gz',
+            fileroot=lasair.settings.BLOB_STORE_ROOT + '/fits')
+
         candlist = alert['prv_candidates'] + [alert['candidate']]
         candidates = []
         for cand in candlist:
             row = {}
+            candid = cand['candid']
             for key in ['candid', 'jd', 'ra', 'dec', 'fid', 'nid', 'magpsf', 'sigmapsf', 'isdiffpos', 
                     'ssdistnr', 'ssnamenr', 'drb']:
                 if key in cand:
@@ -240,10 +244,33 @@ def obj(request, objectId):
             ssnamenr = cand['ssnamenr']
             if ssnamenr == 'null':
                 ssnamenr = None
-            if cand['candid'] and cand['isdiffpos'] == 'f':
+            if candid and cand['isdiffpos'] == 'f':
                 count_isdiffpos += 1
-            if not cand['candid']:
+            if not candid:
                 row['magpsf'] = cand['diffmaglim']
+
+
+
+# examples of image file name
+# candid1189406621015015005_pid1189406621015_targ_sci
+# candid1189406621015015005_ref
+# candid1189406621015015005_pid1189406621015_targ_scimref
+
+            if candid:
+                candidtxt = '%d' % candid
+                pid = candidtxt[:13]
+                file_sci     = 'candid%s_pid%s_targ_sci' % (candidtxt, pid)
+                file_ref     = 'candid%s_ref' % (candidtxt)
+
+                if cand['isdiffpos'] == 'f':
+                    file_diff = 'candid%s_pid%s_targ_refmsci' % (candidtxt, pid)
+                else:
+                    file_diff = 'candid%s_pid%s_targ_scimref' % (candidtxt, pid)
+
+                row['fits'] = {
+                    'sci' :file_sci, 'ref' :file_ref, 'diff':file_diff
+                }
+
             candidates.append(row)
 
     if not objectData:

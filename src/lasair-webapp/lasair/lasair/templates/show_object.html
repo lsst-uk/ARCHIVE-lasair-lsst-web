@@ -164,8 +164,12 @@ You must be signed in to post comments.
             <td> {{ cand.drb|floatformat:2 }}</td>
 
 
-            <td> {% if not cand.candid %}<font color="gray" size=-2>non-detection</font>{% else %}<a href="/cand/{{ cand.candid }}/">{{ cand.candid }}</a>{% endif %}</td>
-            <td>{% if cand.candid and cand.ndethist > 0 %}<a href="{% static 'ztf/stamps/jpg/' %}{{ cand.nid }}/candid{{ cand.candid }}.jpg"><img src="{% static 'ztf/stamps/jpg/' %}{{ cand.nid }}/candid{{ cand.candid }}.jpg"></a>{% endif %}</td>
+            <td> {% if not cand.candid %}<font color="gray" size=-2>non-detection</font>{% else %}<a href="/cand/{{ cand.candid }}/">lc</a>{% endif %}</td>
+	    <td>{% if cand.candid > 0 %}
+		    <a href=/fitsview/{{ cand.fits.sci }}/ target=_blank>target</a> 
+		    <a href=/fitsview/{{cand.fits.ref }}/ target=_blank>ref</a>
+		    <a href=/fitsview/{{ cand.fits.diff }}/ target=_blank>diff</a>
+                {% endif %}</td>
             </tr>
 
         {% endfor %}
