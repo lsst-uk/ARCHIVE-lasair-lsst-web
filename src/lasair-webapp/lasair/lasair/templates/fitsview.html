@@ -13,6 +13,7 @@ border:3px solid black;
 }
 td {
 padding: 4px;
+line-height: 80%;
 }
 .monospaced {
 font-family:monospace;
@@ -135,12 +136,16 @@ function pad (s, n) {
           <table class='thick-border' style='width:320px' >
             <tr>
               <td class='thick-bottom' >
+		<table width=300><tr><td>
                 <select id="stretch_sel" onchange='onStretchSel()' >
                 <option value='linear' selected >Linear</option>
                 <option value='square' >Square</option>
                 <option value='sqrt'>Square root</option>
                 </select>
-                <br>
+		</td>
+		<td style="text-align:right">
+		      <a href="/fits/{{ filename }}"><small>download fits</small></a>
+		</td></tr></table>
 
                 <table width='100%'>
                   <tr>
@@ -170,6 +175,7 @@ function pad (s, n) {
                       <label id='roiinfo_0' class='monospaced' > <br><br><br><br><br> </label>
                     </td>
                   </tr>
+		  <tr><td><small>forked from <a href=https://www.clearskyinstitute.com/fits/>fitsview</a> by Elwood Downey</small></td></tr>
                 </table>
               </td>
 	    </tr>

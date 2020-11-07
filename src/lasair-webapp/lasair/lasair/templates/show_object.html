@@ -149,7 +149,7 @@ You must be signed in to post comments.
         <th>diffpos</th>
         <th>drb</th>
         <th>candidate</th>
-        <th>Image(target, ref, diff)</th>
+        <th>Image</th>
         </tr></thead>
                 <tbody>
         {% for cand in data.candidates %}
@@ -166,9 +166,9 @@ You must be signed in to post comments.
 
             <td> {% if not cand.candid %}<font color="gray" size=-2>non-detection</font>{% else %}<a href="/cand/{{ cand.candid }}/">lc</a>{% endif %}</td>
 	    <td>{% if cand.candid > 0 %}
-		    <a href=/fitsview/{{ cand.fits.sci }}/ target=_blank>target</a> 
-		    <a href=/fitsview/{{cand.fits.ref }}/ target=_blank>ref</a>
-		    <a href=/fitsview/{{ cand.fits.diff }}/ target=_blank>diff</a>
+		    <a href=/fitsview/{{ cand.fits.sci }}/ target=_blank><small>target</small></a> 
+		    <a href=/fitsview/{{cand.fits.ref }}/ target=_blank><small>ref</small></a>
+		    <a href=/fitsview/{{ cand.fits.diff }}/ target=_blank><small>diff</small></a>
                 {% endif %}</td>
             </tr>
 
