@@ -14,6 +14,7 @@ from datetime import datetime, timedelta
 import json
 from utility.mag import dc_mag
 from utility.objectStore import objectStore
+import time
 
 # 2020-08-03 KWS Added cassandra connectivity
 if lasair.settings.CASSANDRA is not None:
@@ -29,6 +30,9 @@ def connect_db():
         host    =lasair.settings.DATABASES['default']['HOST'],
         database='ztf')
     return msl
+
+def mjd_now():
+    return time.time()/86400 + 40587.0
 
 def ecliptic(ra, dec):
     """ecliptic.
@@ -155,6 +159,8 @@ def obj(request, objectId):
     #message += str(sherlock)   #%%%%%%%
 
 
+    now = mjd_now()
+    objectData['now_mjd'] = '%.2f' % now
 
     if lasair.settings.CASSANDRA is not None:
 
@@ -238,6 +244,7 @@ def obj(request, objectId):
                 if key in cand:
                     row[key] = cand[key]
             row['mjd'] = mjd = float(cand['jd']) - 2400000.5
+            row['since_now'] = mjd - now;
             date = datetime.strptime("1858/11/17", "%Y/%m/%d")
             date += timedelta(mjd)
             row['utc'] = date.strftime("%Y-%m-%d %H:%M:%S")

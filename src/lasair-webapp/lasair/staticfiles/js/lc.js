@@ -33,10 +33,11 @@ candidates = data.candidates;
 //first_dec = Number(first_item.dec)*3600;
 first_ra = Number(data.objectData.ramean)*3600;
 first_dec = Number(data.objectData.decmean)*3600;
+now_mjd = data.objectData.now_mjd;
 
 candidates.forEach(function(item){
     y = Number(item.magpsf);
-    x = Number(item.mjd);
+    x = Number(item.since_now);
     e = Number(item.sigmapsf);
     x2 = first_ra - Number(item.ra)*3600;
     y2 = first_dec - Number (item.dec)*3600;
@@ -146,7 +147,8 @@ Plotly.plot(lc_div, [lcg, lcr, lcfg, lcfr, nlcg, nlcr], {
     displayModeBar: false, 
     showlegend: false,
     xaxis: {
-        title:'MJD',
+        title:'MJD - ' + now_mjd,
+	rangemode: 'tozero',
         tickformat :".f" },
     yaxis: {
         title: 'Difference Magnitude',
