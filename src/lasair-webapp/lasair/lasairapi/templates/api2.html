@@ -9,6 +9,7 @@ and to see outputs from streaming queries.
 <h2>Request and response formats</h2>
 In general, the Lasair API uses either HTTP POST or GET requests. Arguments can be passed in the query string, as JSON or form encoded. Responses are JSON. 
 
+<em>Note: GET method is an addition</em>
 
 <h2>Authorisation</h2>
 Request authentication is via authentication tokens. 
@@ -79,6 +80,9 @@ status= 200
 
 
 <h3>/api/query</h3>
+
+<p><em>Note: this method is unchanged except for the addition of limit.</em></p>
+
 <dl>
 
 <dt class="url-label">Description</dt> <dd>
@@ -88,6 +92,7 @@ The arguments are:<ul>
 <li><code>selected</code>: (string) the list of attributes to be returned, </li>
 <li><code>tables</code>: (string) the list of tables to be joined,</li>
 <li><code>conditions</code>: (string) the "WHERE" criteria to restrict what is returned</li>
+<li><code>limit</code>: (int) the maximum number of records to return (default is ??)</li>
 </ul>
 </p>
 </dd>
@@ -159,8 +164,7 @@ status= 200
 <dl>
 <dt class="url-label">Description</dt> <dd>
 <p>
-<em>Note: I have this method returning a list topic names rather than the contents, which I think is likely more useful, but is not consistent with lightcurves and sherlock.</em>
-This method returns a list of all available topics. The list can be limited to a subset if desired.
+<em>Note: This API call partially replaces &quot;streamlog&quot; and returns a list of topic names rather than the contents.</em>
 </p>
 The arguments are:<ul>
 <li><code>name</code>: (str) an expression used to restrict the set of topics (same syntax as SQL &quot;LIKE&quot;)</li>
@@ -195,6 +199,7 @@ status= 200
 <dl>
 
 <dt class="url-label">Description</dt> <dd>
+<p><em>Note: this API call partially replaces  &quot;streamlog&quot; and returns the contents of a topic. Note that this may include multiple alerts for the same object. If we want to remove duplicates and it's easy to do then we could add that as an option maybe?</em></p>
 <p>
 This method returns a record of the output from the specified Lasair streaming query. It represents an alternative
 to using a Kafka client to fetch from the Kafka server. <code>&lt;topic&gt;</code> is the topic name to be fetched</p>
@@ -281,7 +286,7 @@ info: Success
 <dl>
 
 <dt class="url-label">Description</dt> <dd>
-<p><em>We may want to have an implicit limit on the number of lightcurves returned here and suggest using a 2 step process when the likely number of lightcurves exceeds this.</em></p>
+<p><em>Note: this API call changes the arguments from a list of objectIDs to a query. This means that many queries that would otherwise require two API calls (one to /query and one to /lightcurves) can be done in a single step. Of course it can still be used with a list of IDs as shown here, it just requires a bit of extra syntactic sugar. I've assumed that we will always want to actually get the lightcurves and not just a list of metadata, but I'm not certain whether this is correct.</em></p>
 <p>
 This method returns simple lightcurves for a number of objects. Each lightcurve is a sequence of
 detections, each of which has the quantities:
@@ -295,6 +300,7 @@ detections, each of which has the quantities:
 </ul>
 The arguments are:<ul>
 <li><code>conditions</code>: (string) the criteria to restrict what is returned. The format is the same as a <code>/query</code> on the object table.</li>
+<li><code>limit</code>: (int) the maximum number of lightcurves to return (default ??)</li>
 </ul>
 </p>
 </dd>
@@ -343,12 +349,31 @@ status= 200
   {
 ... snip ...
 </pre>
+
+<p><em>Note: this has a problem - how do we know which lightcurve belongs to which object? Could we have something like the following instead maybe?<em></p>
+<pre class="literal-block">
+status= 200
+4 lightcurves, 50 candidates
+{
+  "ZTF18abmaxrs": {
+    "candid": 1342476680415015004,
+    "fid": 1,
+    "magpsf": 15.941200256347656,
+    "sigmapsf": 0.04821600019931793,
+    "isdiffpos": "t",
+    "mjd": 59096.476689800154
+  },
+  "ZTF18abmaxud": {
+... snip ...
+</pre>
+
 </dd>
 
 <h3>/api/lightcurves/&lt;ObjectID&gt;</h3>
 <dl>
 
 <dt class="url-label">Description</dt> <dd>
+<p><em>Note: this API call is provided primarily for consistency as it could be replicated with the above call.</em></p>
 <p>
 This method returns the lightcurve for a single object specified by <code>&lt;objectID&gt;</code>.
 </p>
@@ -364,8 +389,60 @@ https://lasair-iris.roe.ac.uk/api/lightcurves/ZTF18abmaxrs
 </pre>
 </dd>
 
+<h3>/api/sherlock/objects</h3>
+<dl>
 
-<h3>/api/sherlock/&lt;objectID&gt;</h3>
+<dt class="url-label">Description</dt> <dd>
+<p>
+This method returns Sherlock information for a collection of objects, either the "lite" record that
+is also in the Lasair database, or the full record including many possible crossmatches.
+The arguments are <em>either:</em><ul>
+<li><code>conditions</code>: (string) the criteria to restrict what is returned. The format is the same as a <code>/query</code> on the object table.</li>
+<li><code>limit</code>: (int) the maximum number of recrods to return (default ??)</li>
+<li><code>lite</code>: Set to 'true' to get the lite information only</li>
+</ul>
+</p>
+</dd>
+
+<dt class="url-label">Curl Example</dt> <dd>
+<p> The authorization token goes in the header of the request, and the data in the data section.  
+For more information about this stream, see <a href=https://lasair-iris.roe.ac.uk/query/2/>https://lasair-iris.roe.ac.uk/query/2/</a>.
+</p>
+<pre class="literal-block">
+curl --header 'Authorization: Token 4b762569bb349bd8d60f1bc7da3f39dbfaefff9a' \
+--data "conditions=objectId IN ('ZTF18abmaxrs','ZTF18abmaxud','ZTF18abmaxvv','ZTF18abmaxwc')" \
+https://lasair-iris.roe.ac.uk/api/sherlock/query/
+</pre>
+</dd>
+
+<dt class="url-label">Python Example</dt> <dd>
+<p> This code requires the <code>requests</code> library.
+For more information about this stream, see <a href=https://lasair-iris.roe.ac.uk/query/2/>https://lasair-iris.roe.ac.uk/query/2/</a>.
+<pre class="literal-block">
+import requests, json
+headers = { 'Authorization': 'Token 4b762569bb349bd8d60f1bc7da3f39dbfaefff9a' }
+url = 'https://lasair-iris.roe.ac.uk/api/sherlock/objects'
+data = { "conditions": "objectId IN ('ZTF18abmaxrs','ZTF18abmaxud','ZTF18abmaxvv','ZTF18abmaxwc')" }
+r = requests.post(url, data, headers=headers)
+print('status=', r.status_code)
+response = r.json()
+s = json.dumps(response, indent=2)
+print(s[:200])
+</pre>
+<p>and the return is something like: </p>
+<pre class="literal-block">
+status= 200
+{
+  "ZTF18abmaxrs": {
+    "classifications": {
+      "query": [
+        "VS",
+        "The transient is synonymous with 
+</pre>
+</dd>
+
+
+<h3>/api/sherlock/objects/&lt;objectID&gt;</h3>
 <dl>
 
 <dt class="url-label">Description</dt> <dd>
@@ -385,7 +462,7 @@ For more information about this stream, see <a href=https://lasair-iris.roe.ac.u
 </p>
 <pre class="literal-block">
 curl --header 'Authorization: Token 4b762569bb349bd8d60f1bc7da3f39dbfaefff9a' \
-https://lasair-iris.roe.ac.uk/api/sherlock/object/ZTF17aaaaaan
+https://lasair-iris.roe.ac.uk/api/sherlock/objects/ZTF17aaaaaan
 </pre>
 </dd>
 
@@ -395,7 +472,7 @@ For more information about this stream, see <a href=https://lasair-iris.roe.ac.u
 <pre class="literal-block">
 import requests, json
 headers = { 'Authorization': 'Token 4b762569bb349bd8d60f1bc7da3f39dbfaefff9a' }
-url = 'https://lasair-iris.roe.ac.uk/api/sherlock/object/ZTF17aaaaaan'
+url = 'https://lasair-iris.roe.ac.uk/api/sherlock/objects/ZTF17aaaaaan'
 r = requests.post(url, data, headers=headers)
 print('status=', r.status_code)
 response = r.json()
@@ -406,29 +483,24 @@ print(s[:200])
 <pre class="literal-block">
 status= 200
 {
-  "data": {
-    "classifications": {
-      "ZTF17aaaaaan": [
-        "VS",
-        "The transient is synonymous with <em>232996070233157632</em>; a G=16.03 mag stellar source found in the GAIA/PS1
+  "classifications": {
+    "ZTF17aaaaaan": [
+      "VS",
+      "The transient is synonymous with <em>232996070233157632</em>; a G=16.03 mag stellar source found in the GAIA/PS1
 </pre>
 </dd>
 
-<h3>/api/sherlock</h3>
+
+
+<h3>/api/sherlock/position</h3>
 <dl>
 
 <dt class="url-label">Description</dt> <dd>
 <p>
-This method returns Sherlock information for a list of named objects or positions in the sky, either the "lite" record that
-is also in the Lasair database, or the full record including many possible crossmatches.
-The arguments are <em>either:</em><ul>
-<li><code>ObjectIds</code>: A list of objectIDs</li>
-<li><code>lite</code>: Set to 'true' to get the lite information only</li>
-</ul>
-<em>or:</em>
-<ul>
-<li><code>ra</code>: A list of right ascensions of the points in the sky</li>
-<li><code>dec</code>: A list of declinations of the points in the sky</li>
+This method returns Sherlock information for a position specified by right ascension and declination.
+The arguments are <ul>
+<li><code>ra</code>: Right ascension of a point in the sky</li>
+<li><code>dec</code>: Declination of a point in the sky</li>
 <li><code>lite</code>: Set to 'true' to get the lite information only</li>
 </ul>
 </p>
@@ -441,7 +513,7 @@ For more information about this stream, see <a href=https://lasair-iris.roe.ac.u
 <pre class="literal-block">
 curl --header 'Authorization: Token 4b762569bb349bd8d60f1bc7da3f39dbfaefff9a' \
 --data 'ra=16.851866&dec=34.53307' \
-https://lasair-iris.roe.ac.uk/api/sherlock/query/
+https://lasair-iris.roe.ac.uk/api/sherlock/position
 </pre>
 </dd>
 
@@ -451,7 +523,7 @@ For more information about this stream, see <a href=https://lasair-iris.roe.ac.u
 <pre class="literal-block">
 import requests, json
 headers = { 'Authorization': 'Token 4b762569bb349bd8d60f1bc7da3f39dbfaefff9a' }
-url = 'https://lasair-iris.roe.ac.uk/api/sherlock/query/'
+url = 'https://lasair-iris.roe.ac.uk/api/sherlock/position'
 data = {'ra': 16.851866, 'dec':34.53307}
 r = requests.post(url, data, headers=headers)
 print('status=', r.status_code)
@@ -463,13 +535,10 @@ print(s[:200])
 <pre class="literal-block">
 status= 200
 {
-  "data": {
-    "classifications": {
-      "query": [
-        "VS",
-        "The transient is synonymous with 
+  "classifications": {
+    "query": [
+      "VS",
+      "The transient is synonymous with
 </pre>
-</dd>
-
 </div>
 {% endblock %}
