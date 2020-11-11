@@ -213,22 +213,16 @@ def obj(request, objectId):
         lightcurves = objectStore(suffix = 'json',
             fileroot=lasair.settings.BLOB_STORE_ROOT + '/lightcurve')
 
-#        try:
-        alertjson = lightcurves.getObject(objectId)
-#        except:
-#            message = 'objectId %s does not exist'%objectId
-#            data = {'objectId':objectId, 'message':message}
-#            return data
+        try:
+            alertjson = lightcurves.getObject(objectId)
+        except:
+            message = 'objectId %s does not exist'%objectId
+            data = {'objectId':objectId, 'message':message}
+            return data
 
         alert = json.loads(alertjson)
         candidates = []
  
-#        query = 'SELECT candid, jd-2400000.5 as mjd, ra, decl, fid, nid, magpsf,sigmapsf, '
-#        query += 'magnr,sigmagnr, magzpsci, isdiffpos, ssdistnr, ssnamenr, ndethist, '
-#        query += 'dc_mag, dc_sigmag,dc_mag_g02,dc_mag_g08,dc_mag_g28,dc_mag_r02,dc_mag_r08,dc_mag_r28, '
-#        query += 'drb '
-#        query += 'FROM candidates WHERE objectId = "%s" ' % objectId
-#        cursor.execute(query)
         count_isdiffpos = count_real_candidates = 0
 
         fits = objectStore(suffix = 'fits.gz',
@@ -236,6 +230,8 @@ def obj(request, objectId):
 
         candlist = alert['prv_candidates'] + [alert['candidate']]
         candidates = []
+        brightest_fits = ''
+        brightest_mag = 1000
         for cand in candlist:
             row = {}
             candid = cand['candid']
@@ -256,8 +252,6 @@ def obj(request, objectId):
             if not candid:
                 row['magpsf'] = cand['diffmaglim']
 
-
-
 # examples of image file name
 # candid1189406621015015005_pid1189406621015_targ_sci
 # candid1189406621015015005_ref
@@ -277,6 +271,10 @@ def obj(request, objectId):
                 row['fits'] = {
                     'sci' :file_sci, 'ref' :file_ref, 'diff':file_diff
                 }
+                if row['magpsf'] < brightest_mag:
+                    brightest_mag = row['magpsf']
+                    # display brightest diff mag on object page
+                    objectData['brightest_fits']  = file_sci
 
             candidates.append(row)
 

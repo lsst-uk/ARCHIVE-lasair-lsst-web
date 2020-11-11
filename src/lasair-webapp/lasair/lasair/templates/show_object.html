@@ -16,26 +16,19 @@
 </div>
 
 <div class="row">
-    <div class="col-sm-7">
-        <div id="lc" style="width:100%;height:500px;"></div>
+        <div class="w-50" id="lc" style="width:100%;height:500px;"></div>
 <!--	<div id="lc_apparent" style="width:100%;height:300px"></div> -->
 <!--<center>        <input type="radio" name="mag" id="lc_button" checked="checked"> Difference Magnitude |
 <input type="radio" name="mag" id="lc_apparent_button"> Apparent Magnitude (see <a href=/about#photometry>note</a>) </center> -->
-    </div>
 
-    <div class = "col-sm-5">
 <!--        <div id="radec" style="width:100%;height:300px;"></div> -->
-
-      <div class="row">
+      <div class="w-50">
         <div id="SV-layerBox"> </div><br/>
         <div id="aladin-lite-div" style="width:450px;height:450px;"></div>
         <span class="small">Transient position: red square.<br/>Sherlock source: blue square.</span>
       </div>
-    </div>
-</div>
 
-<hr/>
-<div class="row">
+<div class="w-50">
 <ul>
 <li>Object has {{ data.objectData.ncand }} candidates, at mean position:
 <ul>
@@ -79,9 +72,7 @@ Moving object, MPC name is <a href="#" onclick="document.forms[1].submit();">{{ 
 </li>
 
 </ul>
-</div>
 
-<div class="row">
 {% if data.sherlock.classification %}
 <h4>Sherlock</h4>
 <ul>
@@ -103,6 +94,17 @@ Best crossmatch is {{ data.sherlock.catalogue_object_type }}{% endif %}
 </ul>
 {% endif %}
 </div>
+
+<div class="w-50">
+<table class="table"><tr><td>
+  <div id="fits_div" style='width:317px; height:317px; '>
+</td></tr><tr align="center"><td>
+  <small>This image shows the transient at its brightest. To inspect the traget, reference, and difference
+  images in detail, click on the links in the candidates table below.</small>
+</td></tr></table
+</div>
+</div>
+<hr/>
 
 <!--
 <div class="row">
@@ -190,8 +192,10 @@ $(document).ready(function()
 <!--<script type="text/javascript" src="//aladin.u-strasbg.fr/AladinLite/api/v2/latest/aladin.min.js" charset="utf-8"></script> -->
 <script src="{% static 'js/surveys.js' %}"></script>
 <script src="{% static 'js/aladin.js' %}"></script>
+<script src="{% static 'js/fitsview_init.js' %}"></script>
+<script src="{% static 'js/fitsview.js' %}"></script>
 <script type="text/javascript">
-	var aladin = A.aladin('#aladin-lite-div', {survey: "P/PanSTARRS/DR1/color-z-zg-g", fov:0.01, target: "{{ data.objectData.ramean }}, {{ data.objectData.decmean }}", showLayersControl:true});
+	var aladin = A.aladin('#aladin-lite-div', {survey: "P/PanSTARRS/DR1/color-z-zg-g", fov:0.025, target: "{{ data.objectData.ramean }}, {{ data.objectData.decmean }}", showLayersControl:true});
 
     aladin.showLayerBox();
     $('input[name=survey]').change(function() {
@@ -221,7 +225,12 @@ $(document).ready(function()
     aladin.addCatalog(hipsCats['ps1']);
     aladin.addCatalog(hipsCats['gdr2']);
 */
+    console.log('starting fitsview');
+    var fits_url = '/fits/{{ data.objectData.brightest_fits }}';
+    var fits = new FITS (gebi ("fits_div"), 0);
+    start_fitsview(fits, fits_url);
 
+    console.log('starting light curve');
     var pd = "{{ json_data }}";
     pd = pd.replace(/&quot;/g,'"')
     var json_data = JSON.parse(pd);

@@ -260,17 +260,17 @@ def coverage(request):
     nid2 = date_nid.date_to_nid(date2)
     return render(request, 'coverage.html',{'nid1':nid1, 'nid2': nid2, 'date1':date1, 'date2':date2})
 
-def streamlog(request, topic):
-    """streamlog.
+def streams(request, topic):
+    """stream.
 
     Args:
         request:
         topic:
     """
     try:
-        data = open(lasair.settings.BLOB_STORE_ROOT + '/logs/%s' % topic, 'r').read()
+        data = open(lasair.settings.BLOB_STORE_ROOT + '/streams/%s' % topic, 'r').read()
     except:
         return render(request, 'error.html', {'message': 'Cannot find log file for ' + topic})
     table = json.loads(data)['digest']
     n = len(table)
-    return render(request, 'streamlog.html', {'topic':topic, 'n':n, 'table':table})
+    return render(request, 'streams.html', {'topic':topic, 'n':n, 'table':table})

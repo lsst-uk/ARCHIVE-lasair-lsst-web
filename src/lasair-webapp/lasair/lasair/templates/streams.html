@@ -4,8 +4,11 @@
 <div class="row">
 	<div class="col-sm">
 		<div class="alert alert-primary" role="alert">
-			<p> Showing latest {{ n }} for topic: {{ topic }} </p>
-			{{ message }}
+			<ul>
+				<li> Showing latest {{ n }} for topic: <b>{{ topic }}</b> </li>
+			<li> This topic available as <a href=/lasair/static/streams/{{ topic }}>JSON</a></li>
+			</ul>
+<!--			{{ message }} -->
 		</div>		
 	</div>
 </div>

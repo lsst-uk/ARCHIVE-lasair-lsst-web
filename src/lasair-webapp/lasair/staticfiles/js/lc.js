@@ -1,5 +1,4 @@
 function plotlc(data){
-	console.log('hello');
 gmag = []
 gfmag = []
 ngmag = []

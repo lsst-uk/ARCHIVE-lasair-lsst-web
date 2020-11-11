@@ -180,7 +180,7 @@ function FITS (div_id, n_rois)
     this.height = undefined;                    // handy image size
     this.resize_scale = undefined;                // display size / image size
     this.header_win = undefined;                // separate window for header
-    this.stretch = "square";                    // default stretch
+    this.stretch = "linear";                    // default stretch
 
     // place to record user's callbacks
     this.userMouseHandler = undefined;                // user's mouse event callback
@@ -253,7 +253,6 @@ FITS.prototype.setNewImage = function (filename, fitsab)
 
     try {
     for (hlen = 0; hlen < fitsab.byteLength; hlen += 80) {
-        console.log(x);
 
         var card = String.fromCharCode.apply(null, new Uint8Array(fitsab, hlen, 80));
         if (card.match(/^END */)) {        // finished when see END
@@ -768,7 +767,8 @@ FITS.prototype.renderROI = function (roi, redef, moved)
     var roiimage = new ImageData (roi.width, roi.height);
     var roidata = roiimage.data;        // detach from DOM for potentially faster access?
     var datai = 0;                // RGBA tuple index
-    for (var y = roi.y; y < roi.y + roi.height; y++) {
+//    for (var y = roi.y; y < roi.y + roi.height; y++) {
+    for (var y = roi.y + roi.height -1; y >= roi.y; y--) {
         for (var x = roi.x; x < roi.x + roi.width; x++) {
         var p = this.image[y*this.width + x];
         var gray = stretch_f (p);

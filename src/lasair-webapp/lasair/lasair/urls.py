@@ -32,7 +32,7 @@ urlpatterns = [
     path('conesearch/',             views.conesearch,           name='conesearch'),
     path('coverage/',               views.coverage,             name='coverage'),
     path('status/',                 views.status,               name='status'),
-    path('streamlog/<slug:topic>/', views.streamlog,            name='streamlog'),
+    path('streams/<slug:topic>/',   views.streams,              name='streams'),
     path('fitsview/<filename>/'   , views.fitsview,             name='fitsview'),
 
     path('cand/<int:candid>/',      candidates.cand,            name='cand'),

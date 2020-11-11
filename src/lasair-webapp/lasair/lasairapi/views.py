@@ -2,7 +2,7 @@ from django.shortcuts import get_object_or_404, render
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import status
-from .serializers import ConeSerializer, StreamlogSerializer, QuerySerializer 
+from .serializers import ConeSerializer, StreamsSerializer, QuerySerializer 
 from .serializers import LightcurvesSerializer, SherlockQuerySerializer, SherlockObjectSerializer
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
@@ -23,7 +23,7 @@ class ConeView(APIView):
             return Response(message, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-class StreamlogView(APIView):
+class StreamsView(APIView):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
 
@@ -31,7 +31,7 @@ class StreamlogView(APIView):
         return Response({"Error": "GET is not implemented for this service."})
 
     def post(self, request, format=None):
-        serializer = StreamlogSerializer(data=request.data, context={'request': request})
+        serializer = StreamsSerializer(data=request.data, context={'request': request})
         if serializer.is_valid():
             message = serializer.save()
             return Response(message, status=status.HTTP_200_OK)

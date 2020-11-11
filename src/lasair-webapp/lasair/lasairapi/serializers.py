@@ -6,6 +6,7 @@ from django.db import IntegrityError
 import lasair.settings
 import requests
 import json
+import re
 
 CAT_ID_RA_DEC_COLS['objects'] = [['objectId', 'ramean', 'decmean'],1018]
 
@@ -27,7 +28,6 @@ class ConeSerializer(serializers.Serializer):
         dec         = self.validated_data['dec']
         radius      = self.validated_data['radius']
         requestType = self.validated_data['requestType']
-
 
         # Get the authenticated user, if it exists.
         userId = 'unknown'
@@ -69,32 +69,6 @@ class ConeSerializer(serializers.Serializer):
             else:
                 info = { "error": "Invalid request type" }
 
-        return info
-
-class StreamlogSerializer(serializers.Serializer):
-    topic = serializers.SlugField(required=True)
-    max   = serializers.IntegerField(required=False, default=1000)
-
-    def save(self):
-        topic = self.validated_data['topic']
-        max = self.validated_data['max']
-
-        # Get the authenticated user, if it exists.
-        userId = 'unknown'
-        request = self.context.get("request")
-        if request and hasattr(request, "user"):
-            userId = request.user
-
-        try:
-            data = open(lasair.settings.BLOB_STORE_ROOT + '/logs/%s' % topic, 'r').read()
-            data = json.loads(data)
-            datalist = data['digest'][:max]
-            data['digest'] = datalist
-            replyMessage = 'Success'
-        except:
-            data = {'digest':[]}
-            replyMessage = 'No alerts'
-        info = { "jsonStreamLog": data, "info": replyMessage }
         return info
 
 class SherlockObjectSerializer(serializers.Serializer):
@@ -204,6 +178,69 @@ class QuerySerializer(serializers.Serializer):
         query = {'selected':selected, 'tables':tables, 'conditions':conditions}
         info = { "query": query, "result":result, "info": message }
         return info
+
+class StreamsSerializer(serializers.Serializer):
+    topic = serializers.SlugField(required=False)
+    max   = serializers.IntegerField(required=False)
+    regex = serializers.CharField(required=False)
+
+    def save(self):
+        topic = None
+        if 'topic' in self.validated_data:
+            topic = self.validated_data['topic']
+
+        max = None
+        if 'max' in self.validated_data:
+            max = self.validated_data['max']
+
+        regex = None
+        if 'regex' in self.validated_data:
+            regex = self.validated_data['regex']
+
+        if not topic and not regex:
+            regex = '.*'
+
+        # Get the authenticated user, if it exists.
+        userId = 'unknown'
+        request = self.context.get("request")
+        if request and hasattr(request, "user"):
+            userId = request.user
+
+        if topic:
+            try:
+                data = open(lasair.settings.BLOB_STORE_ROOT + '/streams/%s' % topic, 'r').read()
+                data = json.loads(data)
+                if max: 
+                    datalist = data['digest'][:max]
+                data['digest'] = datalist
+                replyMessage = 'Success'
+            except:
+                data = {'digest':[]}
+                replyMessage = 'No alerts'
+            info = { "jsonStream": data, "info": replyMessage }
+            return info
+
+        if regex:
+            try:
+                r = re.compile(regex)
+            except:
+                replyMessage = '%s is not a regular expression' % regex
+                return { "topics": [], "info": replyMessage }
+
+            msl = connect_db()
+            cursor = msl.cursor(buffered=True, dictionary=True)
+            result = []
+            query = 'SELECT user, name FROM myqueries WHERE active>0'
+            cursor.execute(query)
+            for row in cursor: 
+                tn = query_utilities.topic_name(row['user'], row['name'])
+                if r.match(tn):
+                    result.append('%s' % tn)
+            replyMessage = 'Success for regex %s' % regex
+            info = { "topics": result, "info": replyMessage }
+            return info
+
+        return { "info": 'Must supply either topic or regex' }
 
 def get_lightcurve(objectId):
     lightcurves = objectStore(suffix = 'json',

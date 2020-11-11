@@ -47,7 +47,7 @@ def query_list(qs):
         d['streamlink'] = 'inactive'
         if q.active:
             topic = query_utilities.topic_name(q.user.id, q.name)
-            d['streamlink'] = '/streamlog/%s' % topic
+            d['streamlink'] = '/streams/%s' % topic
         list.append(d)
     return list
 
