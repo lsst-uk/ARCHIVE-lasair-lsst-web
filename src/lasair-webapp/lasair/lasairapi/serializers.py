@@ -42,7 +42,7 @@ class ConeSerializer(serializers.Serializer):
             info = { "error": replyMessage }
             return info
 
-        replyMessage = 'No object found'
+        replyMessage = 'No object found ra=%.5f dec=%.5f radius=%.2f' % (ra, dec, radius)
         info = {"info": replyMessage}
 
         # Is there an object within RADIUS arcsec of this object? - KWS - need to fix the gkhtm code!!
@@ -71,13 +71,24 @@ class ConeSerializer(serializers.Serializer):
 
         return info
 
-class SherlockObjectSerializer(serializers.Serializer):
-    objectId = serializers.SlugField(required=True)
-    lite     = serializers.BooleanField()
+class SherlockSerializer(serializers.Serializer):
+    objectIds = serializers.CharField(required=False)
+    ra        = serializers.FloatField(required=False)
+    dec       = serializers.FloatField(required=False)
+    lite      = serializers.BooleanField()
 
     def save(self):
-        objectId = self.validated_data['objectId']
-        lite     = self.validated_data['lite']
+        objectIds = ra = dec = None
+        lite = False
+        if 'objectIds' in self.validated_data:
+            objectIds = self.validated_data['objectIds']
+
+        if 'ra' in self.validated_data and 'dec' in self.validated_data:
+            ra        = self.validated_data['ra']
+            dec       = self.validated_data['dec']
+
+        if 'lite' in self.validated_data:
+            lite      = self.validated_data['lite']
 
         # Get the authenticated user, if it exists.
         userId = 'unknown'
@@ -85,48 +96,35 @@ class SherlockObjectSerializer(serializers.Serializer):
         if request and hasattr(request, "user"):
             userId = request.user
 
-        url = 'http://%s/object/%s' % (lasair.settings.SHERLOCK_SERVICE, objectId)
-        if lite:
-            url += '?lite=true'
-        r = requests.get(url)
-        try:
-            data = json.loads(r.text)
-            replyMessage = 'Success'
-        except:
-            data = ''
-            replyMessage = r.text
-        info = { "data": data, "info": replyMessage }
-        return info
+        if objectIds is not None:
+            datadict = {}
+            objects = objectIds.split(',')
+            n = 0
+            for o in objects:
+                url = 'http://%s/object/%s' % (lasair.settings.SHERLOCK_SERVICE, o.strip())
+                if lite: url += '?lite=true'
+                r = requests.get(url)
+                try:
+                    datadict[o] = json.loads(r.text)
+                    n += 1
+                except:
+                    datadict[o] = "not found"
+            replyMessage = '%d objects resolved' % n
+            return { "data": datadict, "info": replyMessage }
 
-class SherlockQuerySerializer(serializers.Serializer):
-    ra          = serializers.FloatField(required=True)
-    dec         = serializers.FloatField(required=True)
-    lite        = serializers.BooleanField()
+        if ra is not None and dec is not None:
+            url = 'http://%s/query?ra=%f&dec=%f' % (lasair.settings.SHERLOCK_SERVICE, ra, dec)
+            if lite: url += '&lite=true'
+            r = requests.get(url)
+            try:
+                data = json.loads(r.text)
+                replyMessage = 'Success'
+            except:
+                data = ''
+                replyMessage = 'r.text'
+            return { "data": data, "info": replyMessage }
 
-    def save(self):
-        ra          = self.validated_data['ra']
-        dec         = self.validated_data['dec']
-        lite        = self.validated_data['lite']
-
-        # Get the authenticated user, if it exists.
-        userId = 'unknown'
-        request = self.context.get("request")
-        if request and hasattr(request, "user"):
-            userId = request.user
-
-        url = 'http://%s/query?ra=%f&dec=%f' % (lasair.settings.SHERLOCK_SERVICE, ra, dec)
-        if lite:
-            url += '&lite=true'
-        r = requests.get(url)
-        try:
-            data = json.loads(r.text)
-            replyMessage = 'Success'
-        except:
-            data = ''
-            replyMessage = r.text
-
-        info = { "data": data, "info": replyMessage }
-        return info
+        return { "data": {}, "info": "Must supply either objectIds or ra and dec." }
 
 from utility import query_utilities
 import mysql.connector
@@ -181,7 +179,7 @@ class QuerySerializer(serializers.Serializer):
 
 class StreamsSerializer(serializers.Serializer):
     topic = serializers.SlugField(required=False)
-    max   = serializers.IntegerField(required=False)
+    limit   = serializers.IntegerField(required=False)
     regex = serializers.CharField(required=False)
 
     def save(self):
@@ -189,9 +187,9 @@ class StreamsSerializer(serializers.Serializer):
         if 'topic' in self.validated_data:
             topic = self.validated_data['topic']
 
-        max = None
-        if 'max' in self.validated_data:
-            max = self.validated_data['max']
+        limit = None
+        if 'limit' in self.validated_data:
+            limit = self.validated_data['limit']
 
         regex = None
         if 'regex' in self.validated_data:
@@ -207,15 +205,12 @@ class StreamsSerializer(serializers.Serializer):
             userId = request.user
 
         if topic:
-            try:
-                data = open(lasair.settings.BLOB_STORE_ROOT + '/streams/%s' % topic, 'r').read()
-                data = json.loads(data)
-                if max: 
-                    datalist = data['digest'][:max]
-                data['digest'] = datalist
+            if 1:
+                datafile = open(lasair.settings.BLOB_STORE_ROOT + '/streams/%s' % topic, 'r').read()
+                data = json.loads(datafile)['digest']
+                if limit: data = data[:limit]
                 replyMessage = 'Success'
-            except:
-                data = {'digest':[]}
+            else:
                 replyMessage = 'No alerts'
             info = { "jsonStream": data, "info": replyMessage }
             return info
@@ -271,12 +266,12 @@ def get_lightcurves(objectIds):
 
 from utility.objectStore import objectStore
 class LightcurvesSerializer(serializers.Serializer):
-    objectIdsTxt = serializers.CharField(max_length=16384, required=True)
+    objectIds = serializers.CharField(max_length=16384, required=True)
     def save(self):
-        objectIdsTxt = self.validated_data['objectIdsTxt']
-        objectIds = []
-        for tok in objectIdsTxt.split(','):
-            objectIds.append(tok.strip())
+        objectIds = self.validated_data['objectIds']
+        olist = []
+        for tok in objectIds.split(','):
+            olist.append(tok.strip())
 
         # Get the authenticated user, if it exists.
         userId = 'unknown'
@@ -284,7 +279,7 @@ class LightcurvesSerializer(serializers.Serializer):
         if request and hasattr(request, "user"):
             userId = request.user
 
-        lightcurves = get_lightcurves(objectIds)
+        lightcurves = get_lightcurves(olist)
         replyMessage = 'Success'
         info = { "lightcurves": lightcurves, "info": replyMessage }
         return info

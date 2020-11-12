@@ -7,9 +7,7 @@
 The Lasair API allows developers to run queries and cone-searches, 
 and to see outputs from streaming queries.
 <h4>Request and response formats</h4>
-In general, the Lasair API uses HTTP POST requests with JSON arguments and JSON responses. 
-The examples below show how to drive the API with either curl or python code.
-
+The Lasair API uses either HTTP POST. Arguments can be passed in the query string, as JSON or form encoded. Responses are JSON. The examples below show how to drive the API with either curl or python code.
 
 <h4>Authorisation</h4>
 Request authentication is via authentication tokens. 
@@ -18,9 +16,10 @@ An example of a token is:
 4b762569bb349bd8d60f1bc7da3f39dbfaefff9a
 </pre>
 This "starter" token can be used for experiments with the API.
-However, this key is throttled and restricted, and should only be used
+However, this key is throttled ans restricted, and should only be used
 for discovery and play, not serious use.
-we recommend that users request their own key by running the following script:
+
+We recommend that users request their own key by running the following script:
 <pre class="literal-block">
 curl --data 'username=u&password=p' https://lasair-iris.roe.ac.uk/api/auth-token/
 </pre>
@@ -30,16 +29,15 @@ which you can obtain <a href=/signup>here</a>.
 <h4>Methods</h4>
 Click on the method name to jump to documentation in the reference below.
 <ul>
-<li> <a href=#cone>/api/cone</a>: runs a cone search on all the objects in the Lasair database.</li>
-<li> <a href=#query>/api/query</a>: runs a SQL SELECT query on the Lasair database. </li>
-<li> <a href=#streamlog>/api/streamlog</a>: returns a record of the output from a Lasair streaming query.</li>
-<li> <a href=#lightcurves>/api/lightcurves</a>: returns simple lightcurves for a number of objects.</li>
-<li> <a href=#sherlockobject>/api/sherlock/object/</a>: returns Sherlock information about a named object</li>
-<li> <a href=#sherlockquery>/api/sherlock/query/</a>: returns Sherlock information about a position in the sky</li>
+<li> <a href=#cone>/api/cone/</a>: runs a cone search on all the objects in the Lasair database.</li>
+<li> <a href=#query>/api/query/</a>: runs a SQL SELECT query on the Lasair database. </li>
+<li> <a href=#streams>/api/streams/</a>: returns a record of the output from a Lasair streaming query.</li>
+<li> <a href=#lightcurves>/api/lightcurves/</a>: returns simple lightcurves for a number of objects.</li>
+<li> <a href=#sherlock>/api/sherlock/</a>: returns Sherlock information about a list of named objects or about a sky position.</li>
 </ul>
 
 <h2>Reference</h2>
-<a name=cone><h3>/api/cone</h3></a>
+<a name=cone><h3>/api/cone/</h3></a>
 <dl>
 
 <dt class="url-label">Description</dt> <dd>
@@ -57,6 +55,11 @@ The arguments are:<ul>
 </ul></li>
 </ul>
 </p>
+</dd>
+<dt class="url-label">GET URL Example</dt> <dd>
+<pre class="literal-block">
+https://lasair-iris.roe.ac.uk/api/cone/?&ra=80.26844&dec=3.55481&radius=60.0&requestType=all&token=4b762569bb349bd8d60f1bc7da3f39dbfaefff9a&format=json
+</pre>
 </dd>
 
 <dt class="url-label">Curl Example</dt> <dd>
@@ -92,8 +95,7 @@ status= 200
 </dl>
 </dt>
 
-
-<a name=query><h3>/api/query</h3></a>
+<a name=query><h3>/api/query/</h3></a>
 <dl>
 
 <dt class="url-label">Description</dt> <dd>
@@ -103,15 +105,23 @@ The arguments are:<ul>
 <li><code>selected</code>: (string) the list of attributes to be returned, </li>
 <li><code>tables</code>: (string) the list of tables to be joined,</li>
 <li><code>conditions</code>: (string) the "WHERE" criteria to restrict what is returned</li>
+<li><code>limit</code>: (int) (not required) the maximum number of records to return (default is 1000)</li>
+<li><code>offset</code>: (int) (not required) offset of record number (default is 0)</li>
 </ul>
 </p>
+</dd>
+
+<dt class="url-label">GET URL Example</dt> <dd>
+<pre class="literal-block">
+https://lasair-iris.roe.ac.uk/api/query/?selected=objectId%2Cgmag&tables=objects&conditions=gmag%3C12.0&token=4b762569bb349bd8d60f1bc7da3f39dbfaefff9a&format=json
+</pre>
 </dd>
 
 <dt class="url-label">Curl Example</dt> <dd>
 <p> The authorization token goes in the header of the request, and the data in the data section.  </p>
 <pre class="literal-block">
 curl --header 'Authorization: Token 4b762569bb349bd8d60f1bc7da3f39dbfaefff9a' \
---data 'selected=objectId,gmag&tables=objects&conditions=gmag&lt;12.0' \
+--data 'selected=objectId,gmag&tables=objects&conditions=gmag&lt;12.0&limit=3' \
 https://lasair-iris.roe.ac.uk/api/query/
 </pre>
 </dd>
@@ -125,7 +135,8 @@ url = 'https://lasair-iris.roe.ac.uk/api/query/'
 data = {
 'selected'  : 'objectId, gmag',
 'tables'    : 'objects',
-'conditions': 'gmag &lt; 12.0'
+'conditions': 'gmag &lt; 12.0',
+'limit'     : 3
 }
 r = requests.post(url, data, headers=headers)
 print('status=', r.status_code)
@@ -153,14 +164,6 @@ status= 200
     {
       "objectId": "ZTF18abcdajo",
       "gmag": 11.7786
-    },
-    {
-      "objectId": "ZTF18abwklfu",
-      "gmag": 11.8384
-    },
-    {
-      "objectId": "ZTF18abvkkaq",
-      "gmag": 11.843
     }
   ],
   "info": "Success"
@@ -170,39 +173,94 @@ status= 200
 </dl>
 </dt>
 
-<a name=streamlog><h3>/api/streamlog</h3></a>
-<dl>
 
+<a name=streams><h3>/api/streams/</h3></a>
+<dl>
 <dt class="url-label">Description</dt> <dd>
 <p>
 This method returns a record of the output from a Lasair streaming query. It represents an alternative
 to using a Kafka client to fetch from the Kafka server.
+</p> <p>
+If the <code>topic</code> argument is provided (with optional <code>max></code>), the contents of the stream are returned. Alternatively, if the <code>regex</code> argument is provided, a list of matching topic names will be returned. A list of all topics can be obtained with the regex <code>.*</code>.
+</p>
 The arguments are:<ul>
 <li><code>topic</code>: (stream) the topic name to be fetched</li>
-<li><code>max</code>: (int) the maximum number of records to return</li>
+<li><code>max</code>: (int) (not required) the maximum number of records to return (default 1000)</li>
+<li><code>regex</code>: (str) an expression used to select from the set of topics (regular expression)</li>
 </ul>
-</p>
 </dd>
 
-<dt class="url-label">Curl Example</dt> <dd>
-<p> The authorization token goes in the header of the request, and the data in the data section.  
-For more information about this stream, see <a href=https://lasair-iris.roe.ac.uk/query/2/>https://lasair-iris.roe.ac.uk/query/2/</a>.
-</p>
+<dt class="url-label">GET URL Example with Regex</dt> <dd>
 <pre class="literal-block">
-curl --header 'Authorization: Token 4b762569bb349bd8d60f1bc7da3f39dbfaefff9a' \
---data 'topic=2SN-likecandidates&max=3' \
-https://lasair-iris.roe.ac.uk/api/streamlog/
+https://lasair-iris.roe.ac.uk/api/streams/?regex=.%2ASN.%2A&token=4b762569bb349bd8d60f1bc7da3f39dbfaefff9a&format=json
 </pre>
 </dd>
 
-<dt class="url-label">Python Example</dt> <dd>
+<dt class="url-label">Curl Example with Regex</dt> <dd>
+<p> The authorization token goes in the header of the request, and the data in the data section.  
+</p>
+<pre class="literal-block">
+curl --header 'Authorization: Token 4b762569bb349bd8d60f1bc7da3f39dbfaefff9a' \
+--data 'regex=.*SN.*' \
+https://lasair-iris.roe.ac.uk/api/streams/
+</pre>
+<p>and the return is something like: </p>
+<pre class="literal-block">
+status= 200
+[
+  {
+    "topic":"2SN-likecandidates"
+  },
+  {
+    "topic":"2C-SNAILS"
+  }
+]
+</pre>
+</dd>
+
+<dt class="url-label">GET URL Example with Topic</dt> <dd>
+<pre class="literal-block">
+https://lasair-iris.roe.ac.uk/api/streams/?topic=2SN-likecandidates&limit=1&token=4b762569bb349bd8d60f1bc7da3f39dbfaefff9a&format=json
+</pre>
+</dd>
+
+<dt class="url-label">Curl Example with Topic</dt> <dd>
+<p> The authorization token goes in the header of the request, and the data in the data section.  
+For more information about this stream, see <a href=https://lasair-iris.roe.ac.uk/query/2/>here</a>.
+</p>
+<pre class="literal-block">
+curl --header 'Authorization: Token 4b762569bb349bd8d60f1bc7da3f39dbfaefff9a' \
+--data '2SN-likecandidates&max=1' \
+https://lasair-iris.roe.ac.uk/api/streams/
+</pre>
+<p>and the return is something like: </p>
+<pre class="literal-block">
+status= 200
+[
+  {
+    "objectId": "ZTF19abrokxg",
+    "ramean": 35.82811567,
+    "decmean": -27.79242059,
+    "mjdmin": 59134.39827550016,
+    "mjdmax": 59164.37175930012,
+    "magrmin": 18.33,
+    "rmag": 19.4124,
+    "classification": "NT",
+    "score": "Not Near PS1 star",
+    "UTC": "2020-11-11 09:08:49"
+  }
+]
+</pre>
+</dd>
+
+<dt class="url-label">Python Example with Topic</dt> <dd>
 <p> This code requires the <code>requests</code> library.
-For more information about this stream, see <a href=https://lasair-iris.roe.ac.uk/query/2/>https://lasair-iris.roe.ac.uk/query/2/</a>.
+For more information about this stream, see <a href=https://lasair-iris.roe.ac.uk/query/2/>here</a>.
 <pre class="literal-block">
 import requests,json
 headers = { 'Authorization': 'Token a8f6df0e27618012c7cfbd957e8db267b82dc8c6' }
-url = 'https://lasair-iris.roe.ac.uk/api/streamlog/'
-data = { 'topic': '2SN-likecandidates', 'max': 3 }
+url = 'https://lasair-iris.roe.ac.uk/api/streams/'
+data = { 'topic': '2SN-likecandidates', 'max': 1 }
 r = requests.post(url, data, headers=headers)
 print('status=', r.status_code)
 response = r.json()
@@ -211,53 +269,10 @@ if 'jsonStreamLog' in response:
     print(json.dumps(data, indent=2))
 print('info:', response['info'])
 </pre>
-<p>and the return is something like: </p>
-<pre class="literal-block">
-status= 200
-[
-  {
-    "objectId": "ZTF18acpsdtl",
-    "ramean": 32.203889958823524,
-    "decmean": 45.364292688235295,
-    "mjdmin": 59053.42844909988,
-    "mjdmax": 59081.42621529987,
-    "magrmin": 18.1173,
-    "rmag": 18.2281,
-    "classification": "NT",
-    "score": "Not Near PS1 star",
-    "UTC": "2020-08-20 12:36:12"
-  },
-  {
-    "objectId": "ZTF18abvfafa",
-    "ramean": 5.082597047826087,
-    "decmean": 28.26374956956522,
-    "mjdmin": 59052.451261600014,
-    "mjdmax": 59081.46531250002,
-    "magrmin": 19.4799,
-    "rmag": 19.9639,
-    "classification": "NT",
-    "score": "Not Near PS1 star",
-    "UTC": "2020-08-20 12:36:12"
-  },
-  {
-    "objectId": "ZTF18abtgidi",
-    "ramean": 41.88432473970589,
-    "decmean": 36.82709041617647,
-    "mjdmin": 59052.431504600216,
-    "mjdmax": 59081.47545140004,
-    "magrmin": 19.0019,
-    "rmag": 19.4075,
-    "classification": "NT",
-    "score": "Not Near PS1 star",
-    "UTC": "2020-08-20 12:36:12"
-  }
-]
-info: Success
-</pre>
+<p>and the return is as above with the curl example </p>
 </dd>
 
-
-<a name=lightcurves><h3>/api/lightcurves</h3></a>
+<a name=lightcurves><h3>/api/lightcurves/</h3></a>
 <dl>
 
 <dt class="url-label">Description</dt> <dd>
@@ -273,31 +288,38 @@ detections, each of which has the quantities:
 	<li><code>mjd</code>: Modified Julain Day for the detection </li>
 </ul>
 The arguments are:<ul>
-<li><code>objectIdsTxt</code>: comma-separated string of objectIds to be fetched</li>
+<li><code>objectIds</code>: (string) comma-separated string of objectIds to be fetched</li>
+<li> There is a upper limit on the number of lightcurves that can be fetched, currently 50. 
+	If you need to do serious data mining on Lasair light curves, please write to 
+	<a href="mailto:lasair-help@lists.roe.ac.uk?subject=Notebooks">contact the Lasair team</a>.
+</lihere>
 </ul>
 </p>
 </dd>
 
+<dt class="url-label">GET URL Example</dt> <dd>
+<pre class="literal-block">
+https://lasair-iris.roe.ac.uk/api/lightcurves/?objectIds=ZTF20acgrvqo%2CZTF19acylwtd%2CZTF18acmziob&token=4b762569bb349bd8d60f1bc7da3f39dbfaefff9a&format=json
+</pre>
+</dd>
+
 <dt class="url-label">Curl Example</dt> <dd>
 <p> The authorization token goes in the header of the request, and the data in the data section.  
-For more information about this stream, see <a href=https://lasair-iris.roe.ac.uk/query/2/>https://lasair-iris.roe.ac.uk/query/2/</a>.
 </p>
 <pre class="literal-block">
 curl --header 'Authorization: Token 4b762569bb349bd8d60f1bc7da3f39dbfaefff9a' \
---data 'objectIdsTxt=ZTF18abmaxrs,ZTF18abmaxud,ZTF18abmaxvv,ZTF18abmaxwc' \
+--data "objectIds=ZTF18abmaxrs,ZTF18abmaxud,ZTF18abmaxvv,ZTF18abmaxwc" \
 https://lasair-iris.roe.ac.uk/api/lightcurves/
 </pre>
 </dd>
 
 <dt class="url-label">Python Example</dt> <dd>
 <p> This code requires the <code>requests</code> library.
-For more information about this stream, see <a href=https://lasair-iris.roe.ac.uk/query/2/>https://lasair-iris.roe.ac.uk/query/2/</a>.
 <pre class="literal-block">
 import requests,json
 headers = { 'Authorization': 'Token 4b762569bb349bd8d60f1bc7da3f39dbfaefff9a' }
 url = 'https://lasair-iris.roe.ac.uk/api/lightcurves/'
-objectIdsTxt = 'ZTF18abmaxrs,ZTF18abmaxud,ZTF18abmaxvv,ZTF18abmaxwc'
-data = {'objectIdsTxt': objectIdsTxt}
+data = {'objectIds': "ZTF18abmaxrs,ZTF18abmaxud,ZTF18abmaxvv,ZTF18abmaxwc"}
 r = requests.post(url, data, headers=headers)
 print('status=', r.status_code)
 response = r.json()
@@ -310,8 +332,8 @@ print(s[:200])
 <pre class="literal-block">
 status= 200
 4 lightcurves, 50 candidates
-[
-  {
+{
+  "ZTF18abmaxrs": {
     "candid": 1342476680415015004,
     "fid": 1,
     "magpsf": 15.941200256347656,
@@ -324,39 +346,49 @@ status= 200
 </pre>
 </dd>
 
-<a name=sherlockobject><h3>/api/sherlock/object/</h3></a>
+<a name=sherlock><h3>/api/sherlock/</h3></a>
 <dl>
 
 <dt class="url-label">Description</dt> <dd>
 <p>
-This method returns Sherlock information about a named object, either the "lite" record that
-is also in the Lasair database, or the fullrecord including many possible crossmatches.
-The arguments are:<ul>
-<li><code>objectId</code>: The objectId whose information is wanted</li>
+This method returns Sherlock information for a collection of named objects, either the "lite" record that
+is also in the Lasair database, or the full record including many possible crossmatches.
+It can also return sherlock information for an arbitrary position ion the sky.
+The arguments are:
+<ul>
+<li><code>objectIds</code>: a comma-separated list of objectIds, maximum number is 10</li>
+<li><code>ra</code>: Right ascension of a point in the sky</li>
+<li><code>dec</code>: Declination of a point in the sky</li>
 <li><code>lite</code>: Set to 'true' to get the lite information only</li>
 </ul>
+You can supply either the list of <code>objectIds</code>, or the <code>ra</code> and <code>dec</code>. 
+The <code>lite</code> argument can be supplied in either case.
 </p>
 </dd>
 
-<dt class="url-label">Curl Example</dt> <dd>
-<p> The authorization token goes in the header of the request, and the data in the data section.  
-For more information about this stream, see <a href=https://lasair-iris.roe.ac.uk/query/2/>https://lasair-iris.roe.ac.uk/query/2/</a>.
-</p>
+<dt class="url-label">GET URL Example with objects</dt> <dd>
 <pre class="literal-block">
-curl --header 'Authorization: Token 4b762569bb349bd8d60f1bc7da3f39dbfaefff9a' \
---data 'objectId=ZTF17aaaaaan' \
-https://lasair-iris.roe.ac.uk/api/sherlock/object/
+https://lasair-iris.roe.ac.uk/api/sherlock/?objectIds=ZTF20acgrvqo%2CZTF19acylwtd%2CZTF18acmziob&token=4b762569bb349bd8d60f1bc7da3f39dbfaefff9a&format=json
 </pre>
 </dd>
 
-<dt class="url-label">Python Example</dt> <dd>
+<dt class="url-label">Curl Example with list of objects</dt> <dd>
+<p> The authorization token goes in the header of the request, and the data in the data section.  
+</p>
+<pre class="literal-block">
+curl --header 'Authorization: Token 4b762569bb349bd8d60f1bc7da3f39dbfaefff9a' \
+--data "objectIds:ZTF18abmaxrs,ZTF18abmaxud,ZTF18abmaxvv,ZTF18abmaxwc" \
+https://lasair-iris.roe.ac.uk/api/sherlock/
+</pre>
+</dd>
+
+<dt class="url-label">Python Example with list of objects</dt> <dd>
 <p> This code requires the <code>requests</code> library.
-For more information about this stream, see <a href=https://lasair-iris.roe.ac.uk/query/2/>https://lasair-iris.roe.ac.uk/query/2/</a>.
 <pre class="literal-block">
 import requests, json
 headers = { 'Authorization': 'Token 4b762569bb349bd8d60f1bc7da3f39dbfaefff9a' }
-url = 'https://lasair-iris.roe.ac.uk/api/sherlock/object/'
-data = {'objectId': 'ZTF17aaaaaan'}
+url = 'https://lasair-iris.roe.ac.uk/api/sherlock/'
+data = { 'objectIds': 'ZTF18abmaxrs,ZTF18abmaxud,ZTF18abmaxvv,ZTF18abmaxwc' }
 r = requests.post(url, data, headers=headers)
 print('status=', r.status_code)
 response = r.json()
@@ -367,47 +399,37 @@ print(s[:200])
 <pre class="literal-block">
 status= 200
 {
-  "data": {
+  "ZTF18abmaxrs": {
     "classifications": {
-      "ZTF17aaaaaan": [
+      "query": [
         "VS",
-        "The transient is synonymous with <em>232996070233157632</em>; a G=16.03 mag stellar source found in the GAIA/PS1
+        "The transient is synonymous with 
 </pre>
 </dd>
 
-<a name=sherlockquery><h3>/api/sherlock/query/</h3></a>
-<dl>
-
-<dt class="url-label">Description</dt> <dd>
-<p>
-This method returns Sherlock information about a position in the sky, either the "lite" record that
-is also in the Lasair database, or the full record including many possible crossmatches.
-The arguments are:<ul>
-<li><code>ra</code>: The right ascension of the point in the sky</li>
-<li><code>dec</code>: The declination of the point in the sky</li>
-<li><code>lite</code>: Set to 'true' to get the lite information only</li>
-</ul>
-</p>
+<dt class="url-label">GET URL Example with Position</dt> <dd>
+<pre class="literal-block">
+https://lasair-iris.roe.ac.uk/api/sherlock/?ra=80.26844&dec=3.55481&token=4b762569bb349bd8d60f1bc7da3f39dbfaefff9a&format=json
+</pre>
 </dd>
 
-<dt class="url-label">Curl Example</dt> <dd>
+
+<dt class="url-label">Curl Example with Position</dt> <dd>
 <p> The authorization token goes in the header of the request, and the data in the data section.  
-For more information about this stream, see <a href=https://lasair-iris.roe.ac.uk/query/2/>https://lasair-iris.roe.ac.uk/query/2/</a>.
 </p>
 <pre class="literal-block">
 curl --header 'Authorization: Token 4b762569bb349bd8d60f1bc7da3f39dbfaefff9a' \
 --data 'ra=16.851866&dec=34.53307' \
-https://lasair-iris.roe.ac.uk/api/sherlock/query/
+https://lasair-iris.roe.ac.uk/api/sherlock/
 </pre>
 </dd>
 
-<dt class="url-label">Python Example</dt> <dd>
+<dt class="url-label">Python Example with Position</dt> <dd>
 <p> This code requires the <code>requests</code> library.
-For more information about this stream, see <a href=https://lasair-iris.roe.ac.uk/query/2/>https://lasair-iris.roe.ac.uk/query/2/</a>.
 <pre class="literal-block">
 import requests, json
 headers = { 'Authorization': 'Token 4b762569bb349bd8d60f1bc7da3f39dbfaefff9a' }
-url = 'https://lasair-iris.roe.ac.uk/api/sherlock/query/'
+url = 'https://lasair-iris.roe.ac.uk/api/sherlock/'
 data = {'ra': 16.851866, 'dec':34.53307}
 r = requests.post(url, data, headers=headers)
 print('status=', r.status_code)
@@ -419,12 +441,10 @@ print(s[:200])
 <pre class="literal-block">
 status= 200
 {
-  "data": {
-    "classifications": {
-      "query": [
-        "VS",
-        "The transient is synonymous with 
+  "classifications": {
+    "query": [
+      "VS",
+      "The transient is synonymous with
 </pre>
-</dd>
 </div>
 {% endblock %}
