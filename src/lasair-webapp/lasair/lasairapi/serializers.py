@@ -212,7 +212,7 @@ class StreamsSerializer(serializers.Serializer):
                 replyMessage = 'Success'
             else:
                 replyMessage = 'No alerts'
-            info = { "jsonStream": data, "info": replyMessage }
+            info = { "data": data, "info": replyMessage }
             return info
 
         if regex:

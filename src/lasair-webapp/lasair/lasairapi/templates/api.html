@@ -181,11 +181,11 @@ status= 200
 This method returns a record of the output from a Lasair streaming query. It represents an alternative
 to using a Kafka client to fetch from the Kafka server.
 </p> <p>
-If the <code>topic</code> argument is provided (with optional <code>max></code>), the contents of the stream are returned. Alternatively, if the <code>regex</code> argument is provided, a list of matching topic names will be returned. A list of all topics can be obtained with the regex <code>.*</code>.
+If the <code>topic</code> argument is provided (with optional <code>limit></code>), the contents of the stream are returned. Alternatively, if the <code>regex</code> argument is provided, a list of matching topic names will be returned. A list of all topics can be obtained with the regex <code>.*</code>.
 </p>
 The arguments are:<ul>
 <li><code>topic</code>: (stream) the topic name to be fetched</li>
-<li><code>max</code>: (int) (not required) the maximum number of records to return (default 1000)</li>
+<li><code>limit</code>: (int) (not required) the maximum number of records to return (default 1000)</li>
 <li><code>regex</code>: (str) an expression used to select from the set of topics (regular expression)</li>
 </ul>
 </dd>
@@ -230,7 +230,7 @@ For more information about this stream, see <a href=https://lasair-iris.roe.ac.u
 </p>
 <pre class="literal-block">
 curl --header 'Authorization: Token 4b762569bb349bd8d60f1bc7da3f39dbfaefff9a' \
---data '2SN-likecandidates&max=1' \
+--data '2SN-likecandidates&limit=1' \
 https://lasair-iris.roe.ac.uk/api/streams/
 </pre>
 <p>and the return is something like: </p>
@@ -260,12 +260,12 @@ For more information about this stream, see <a href=https://lasair-iris.roe.ac.u
 import requests,json
 headers = { 'Authorization': 'Token a8f6df0e27618012c7cfbd957e8db267b82dc8c6' }
 url = 'https://lasair-iris.roe.ac.uk/api/streams/'
-data = { 'topic': '2SN-likecandidates', 'max': 1 }
+data = { 'topic': '2SN-likecandidates', 'limit': 3 }
 r = requests.post(url, data, headers=headers)
 print('status=', r.status_code)
 response = r.json()
-if 'jsonStreamLog' in response:
-    data = response['jsonStreamLog']['digest']
+if 'data' in response:
+    data = response['data']
     print(json.dumps(data, indent=2))
 print('info:', response['info'])
 </pre>
@@ -280,18 +280,18 @@ print('info:', response['info'])
 This method returns simple lightcurves for a number of objects. Each lightcurve is a sequence of
 detections, each of which has the quantities:
 <ul>
-	<li><code>candid</code>: the candidate ID for the detection</li>
-	<li><code>fid</code>: The filter ID for the detection (1 = g and 2 = r)</li>
-	<li><code>magpsf</code>: The difference magnitude</li>
-	<li><code>sigmapsf</code>: the error in the difference magnitude.</li>
-	<li><code>isdiffpos</code>:set to 't' if positive difference magnitude, 'f' for negative</li>
-	<li><code>mjd</code>: Modified Julain Day for the detection </li>
+  <li><code>candid</code>: the candidate ID for the detection</li>
+  <li><code>fid</code>: The filter ID for the detection (1 = g and 2 = r)</li>
+  <li><code>magpsf</code>: The difference magnitude</li>
+  <li><code>sigmapsf</code>: the error in the difference magnitude.</li>
+  <li><code>isdiffpos</code>:set to 't' if positive difference magnitude, 'f' for negative</li>
+  <li><code>mjd</code>: Modified Julain Day for the detection </li>
 </ul>
 The arguments are:<ul>
 <li><code>objectIds</code>: (string) comma-separated string of objectIds to be fetched</li>
 <li> There is a upper limit on the number of lightcurves that can be fetched, currently 50. 
-	If you need to do serious data mining on Lasair light curves, please write to 
-	<a href="mailto:lasair-help@lists.roe.ac.uk?subject=Notebooks">contact the Lasair team</a>.
+  If you need to do serious data mining on Lasair light curves, please write to 
+  <a href="mailto:lasair-help@lists.roe.ac.uk?subject=Notebooks">contact the Lasair team</a>.
 </lihere>
 </ul>
 </p>
@@ -308,7 +308,7 @@ https://lasair-iris.roe.ac.uk/api/lightcurves/?objectIds=ZTF20acgrvqo%2CZTF19acy
 </p>
 <pre class="literal-block">
 curl --header 'Authorization: Token 4b762569bb349bd8d60f1bc7da3f39dbfaefff9a' \
---data "objectIds=ZTF18abmaxrs,ZTF18abmaxud,ZTF18abmaxvv,ZTF18abmaxwc" \
+--data "objectIds=ZTF20acgrvqo,ZTF19acylwtd,ZTF18acmziob" \
 https://lasair-iris.roe.ac.uk/api/lightcurves/
 </pre>
 </dd>
@@ -319,29 +319,25 @@ https://lasair-iris.roe.ac.uk/api/lightcurves/
 import requests,json
 headers = { 'Authorization': 'Token 4b762569bb349bd8d60f1bc7da3f39dbfaefff9a' }
 url = 'https://lasair-iris.roe.ac.uk/api/lightcurves/'
-data = {'objectIds': "ZTF18abmaxrs,ZTF18abmaxud,ZTF18abmaxvv,ZTF18abmaxwc"}
+data = {'objectIds': "ZTF20acgrvqo,ZTF19acylwtd,ZTF18acmziob"}
 r = requests.post(url, data, headers=headers)
 print('status=', r.status_code)
 response = r.json()
 lightcurves = response['lightcurves']
-print('4 lightcurves, %d candidates' % lightcurves['ncand'])
-s = json.dumps(lightcurves['data']['ZTF18abmaxrs'], indent=2)
+s = json.dumps(lightcurves, indent=2)
 print(s[:200])
 </pre>
 <p>and the return is something like: </p>
 <pre class="literal-block">
-status= 200
-4 lightcurves, 50 candidates
 {
-  "ZTF18abmaxrs": {
-    "candid": 1342476680415015004,
-    "fid": 1,
-    "magpsf": 15.941200256347656,
-    "sigmapsf": 0.04821600019931793,
-    "isdiffpos": "t",
-    "mjd": 59096.476689800154
-  },
-  {
+  "ncand": 57,
+  "data": {
+    "ZTF20acgrvqo": [
+      {
+        "candid": 1382500555715015007,
+        "fid": 2,
+        "magpsf": 16.765600204467773,
+        "sigmapsf": 0.03850499913096428,
 ... snip ...
 </pre>
 </dd>
@@ -377,7 +373,7 @@ https://lasair-iris.roe.ac.uk/api/sherlock/?objectIds=ZTF20acgrvqo%2CZTF19acylwt
 </p>
 <pre class="literal-block">
 curl --header 'Authorization: Token 4b762569bb349bd8d60f1bc7da3f39dbfaefff9a' \
---data "objectIds:ZTF18abmaxrs,ZTF18abmaxud,ZTF18abmaxvv,ZTF18abmaxwc" \
+--data "objectIds:ZTF20acgrvqo,ZTF19acylwtd,ZTF18acmziob&lite=True" \
 https://lasair-iris.roe.ac.uk/api/sherlock/
 </pre>
 </dd>
@@ -388,7 +384,7 @@ https://lasair-iris.roe.ac.uk/api/sherlock/
 import requests, json
 headers = { 'Authorization': 'Token 4b762569bb349bd8d60f1bc7da3f39dbfaefff9a' }
 url = 'https://lasair-iris.roe.ac.uk/api/sherlock/'
-data = { 'objectIds': 'ZTF18abmaxrs,ZTF18abmaxud,ZTF18abmaxvv,ZTF18abmaxwc' }
+data = { 'objectIds': 'ZTF20acgrvqo,ZTF19acylwtd,ZTF18acmziob', 'lite':True }
 r = requests.post(url, data, headers=headers)
 print('status=', r.status_code)
 response = r.json()
@@ -397,13 +393,19 @@ print(s[:200])
 </pre>
 <p>and the return is something like: </p>
 <pre class="literal-block">
-status= 200
 {
-  "ZTF18abmaxrs": {
-    "classifications": {
-      "query": [
-        "VS",
-        "The transient is synonymous with 
+  "data": {
+    "ZTF20acgrvqo": {
+      "classifications": {
+        "ZTF20acgrvqo": ["NT", "The transient is synonymous with <em>05250691-2114471</em>; a J=14.10 mag stellar source found in the 2MASS/PS1 catalogues. It's located 0.8\" from the stellar source core."]
+      },
+      "crossmatches": [{
+        "transient_object_id": "ZTF20acgrvqo",
+        "association_type": "NT",
+        "catalogue_table_name": "2MASS/PS1",
+        "catalogue_object_id": "05250691-2114471",
+        "catalogue_object_type": "star",
+...snip...
 </pre>
 </dd>
 
