@@ -33,7 +33,8 @@ Click on the method name to jump to documentation in the reference below.
 <li> <a href=#query>/api/query/</a>: runs a SQL SELECT query on the Lasair database. </li>
 <li> <a href=#streams>/api/streams/</a>: returns a record of the output from a Lasair streaming query.</li>
 <li> <a href=#lightcurves>/api/lightcurves/</a>: returns simple lightcurves for a number of objects.</li>
-<li> <a href=#sherlock>/api/sherlock/</a>: returns Sherlock information about a list of named objects or about a sky position.</li>
+<li> <a href=#sherlockobjects>/api/sherlock/objects/</a>: returns Sherlock information about a list of named objects.</li>
+<li> <a href=#sherlockposition>/api/sherlock/position/</a>: returns Sherlock information about a sky position.</li>
 </ul>
 
 <h2>Reference</h2>
@@ -174,19 +175,21 @@ status= 200
 </dt>
 
 
-<a name=streams><h3>/api/streams/</h3></a>
+<a name=streams><h3>/api/streams/&lt;topic&gt;/ and /api/streams/</h3></a>
 <dl>
 <dt class="url-label">Description</dt> <dd>
 <p>
 This method returns a record of the output from a Lasair streaming query. It represents an alternative
 to using a Kafka client to fetch from the Kafka server.
 </p> <p>
-If the <code>topic</code> argument is provided (with optional <code>limit></code>), the contents of the stream are returned. Alternatively, if the <code>regex</code> argument is provided, a list of matching topic names will be returned. A list of all topics can be obtained with the regex <code>.*</code>.
+If the <code>topic</code> URL is provided (with optional <code>limit></code>), the contents 
+of the stream are returned.  Alternatively, if the topic is not provided, a 
+<code>regex</code> argument may be provided, and a list of matching topic names will be returned. 
+A list of all topics can be obtained with the regex <code>.*</code> or by omitting the <code>regex</code>.
 </p>
 The arguments are:<ul>
-<li><code>topic</code>: (stream) the topic name to be fetched</li>
 <li><code>limit</code>: (int) (not required) the maximum number of records to return (default 1000)</li>
-<li><code>regex</code>: (str) an expression used to select from the set of topics (regular expression)</li>
+<li><code>regex</code>: (str) (not required) an expression used to select from the set of topics (regular expression)</li>
 </ul>
 </dd>
 
@@ -220,7 +223,7 @@ status= 200
 
 <dt class="url-label">GET URL Example with Topic</dt> <dd>
 <pre class="literal-block">
-https://lasair-iris.roe.ac.uk/api/streams/?topic=2SN-likecandidates&limit=1&token=4b762569bb349bd8d60f1bc7da3f39dbfaefff9a&format=json
+https://lasair-iris.roe.ac.uk/api/streams/2SN-likecandidates/?limit=1&token=4b762569bb349bd8d60f1bc7da3f39dbfaefff9a&format=json
 </pre>
 </dd>
 
@@ -255,12 +258,11 @@ status= 200
 
 <dt class="url-label">Python Example with Topic</dt> <dd>
 <p> This code requires the <code>requests</code> library.
-For more information about this stream, see <a href=https://lasair-iris.roe.ac.uk/query/2/>here</a>.
 <pre class="literal-block">
 import requests,json
 headers = { 'Authorization': 'Token a8f6df0e27618012c7cfbd957e8db267b82dc8c6' }
-url = 'https://lasair-iris.roe.ac.uk/api/streams/'
-data = { 'topic': '2SN-likecandidates', 'limit': 3 }
+url = 'https://lasair-iris.roe.ac.uk/api/streams/2SN-likecandidates/'
+data = { 'limit': 3 }
 r = requests.post(url, data, headers=headers)
 print('status=', r.status_code)
 response = r.json()
@@ -342,29 +344,23 @@ print(s[:200])
 </pre>
 </dd>
 
-<a name=sherlock><h3>/api/sherlock/</h3></a>
+<a name=sherlockobjects><h3>/api/sherlock/objects/</h3></a>
 <dl>
 
 <dt class="url-label">Description</dt> <dd>
 <p>
 This method returns Sherlock information for a collection of named objects, either the "lite" record that
 is also in the Lasair database, or the full record including many possible crossmatches.
-It can also return sherlock information for an arbitrary position ion the sky.
 The arguments are:
 <ul>
 <li><code>objectIds</code>: a comma-separated list of objectIds, maximum number is 10</li>
-<li><code>ra</code>: Right ascension of a point in the sky</li>
-<li><code>dec</code>: Declination of a point in the sky</li>
 <li><code>lite</code>: Set to 'true' to get the lite information only</li>
 </ul>
-You can supply either the list of <code>objectIds</code>, or the <code>ra</code> and <code>dec</code>. 
-The <code>lite</code> argument can be supplied in either case.
-</p>
 </dd>
 
 <dt class="url-label">GET URL Example with objects</dt> <dd>
 <pre class="literal-block">
-https://lasair-iris.roe.ac.uk/api/sherlock/?objectIds=ZTF20acgrvqo%2CZTF19acylwtd%2CZTF18acmziob&token=4b762569bb349bd8d60f1bc7da3f39dbfaefff9a&format=json
+https://lasair-iris.roe.ac.uk/api/sherlock/objects/?objectIds=ZTF20acgrvqo%2CZTF19acylwtd%2CZTF18acmziob&token=4b762569bb349bd8d60f1bc7da3f39dbfaefff9a&format=json
 </pre>
 </dd>
 
@@ -374,7 +370,7 @@ https://lasair-iris.roe.ac.uk/api/sherlock/?objectIds=ZTF20acgrvqo%2CZTF19acylwt
 <pre class="literal-block">
 curl --header 'Authorization: Token 4b762569bb349bd8d60f1bc7da3f39dbfaefff9a' \
 --data "objectIds:ZTF20acgrvqo,ZTF19acylwtd,ZTF18acmziob&lite=True" \
-https://lasair-iris.roe.ac.uk/api/sherlock/
+https://lasair-iris.roe.ac.uk/api/sherlock/objects/
 </pre>
 </dd>
 
@@ -383,7 +379,7 @@ https://lasair-iris.roe.ac.uk/api/sherlock/
 <pre class="literal-block">
 import requests, json
 headers = { 'Authorization': 'Token 4b762569bb349bd8d60f1bc7da3f39dbfaefff9a' }
-url = 'https://lasair-iris.roe.ac.uk/api/sherlock/'
+url = 'https://lasair-iris.roe.ac.uk/api/sherlock/objects/'
 data = { 'objectIds': 'ZTF20acgrvqo,ZTF19acylwtd,ZTF18acmziob', 'lite':True }
 r = requests.post(url, data, headers=headers)
 print('status=', r.status_code)
@@ -409,29 +405,43 @@ print(s[:200])
 </pre>
 </dd>
 
-<dt class="url-label">GET URL Example with Position</dt> <dd>
+<a name=sherlockposition><h3>/api/sherlock/objects/position/</h3></a>
+<dl>
+
+<dt class="url-label">Description</dt> <dd>
+<p>
+This method returns Sherlock information for an arbitrary position ion the sky, either the "lite" record that
+is also in the Lasair database, or the full record including many possible crossmatches.
+The arguments are:
+<ul>
+<li><code>ra</code>: Right ascension of a point in the sky in degrees</li>
+<li><code>dec</code>: Declination of a point in the sky in degrees</li>
+<li><code>lite</code>: Set to 'true' to get the lite information only</li>
+</ul>
+</dd>
+
+<dt class="url-label">GET URL Example</dt> <dd>
 <pre class="literal-block">
-https://lasair-iris.roe.ac.uk/api/sherlock/?ra=80.26844&dec=3.55481&token=4b762569bb349bd8d60f1bc7da3f39dbfaefff9a&format=json
+https://lasair-iris.roe.ac.uk/api/sherlock/position/?ra=80.26844&dec=3.55481&token=4b762569bb349bd8d60f1bc7da3f39dbfaefff9a&format=json
 </pre>
 </dd>
 
-
-<dt class="url-label">Curl Example with Position</dt> <dd>
+<dt class="url-label">Curl Example</dt> <dd>
 <p> The authorization token goes in the header of the request, and the data in the data section.  
 </p>
 <pre class="literal-block">
 curl --header 'Authorization: Token 4b762569bb349bd8d60f1bc7da3f39dbfaefff9a' \
 --data 'ra=16.851866&dec=34.53307' \
-https://lasair-iris.roe.ac.uk/api/sherlock/
+https://lasair-iris.roe.ac.uk/api/sherlock/position/
 </pre>
 </dd>
 
-<dt class="url-label">Python Example with Position</dt> <dd>
+<dt class="url-label">Python Example</dt> <dd>
 <p> This code requires the <code>requests</code> library.
 <pre class="literal-block">
 import requests, json
 headers = { 'Authorization': 'Token 4b762569bb349bd8d60f1bc7da3f39dbfaefff9a' }
-url = 'https://lasair-iris.roe.ac.uk/api/sherlock/'
+url = 'https://lasair-iris.roe.ac.uk/api/sherlock/position/'
 data = {'ra': 16.851866, 'dec':34.53307}
 r = requests.post(url, data, headers=headers)
 print('status=', r.status_code)

@@ -71,21 +71,14 @@ class ConeSerializer(serializers.Serializer):
 
         return info
 
-class SherlockSerializer(serializers.Serializer):
-    objectIds = serializers.CharField(required=False)
-    ra        = serializers.FloatField(required=False)
-    dec       = serializers.FloatField(required=False)
+class SherlockObjectsSerializer(serializers.Serializer):
+    objectIds = serializers.CharField(required=True)
     lite      = serializers.BooleanField()
 
     def save(self):
-        objectIds = ra = dec = None
+        objectIds = None
         lite = False
-        if 'objectIds' in self.validated_data:
-            objectIds = self.validated_data['objectIds']
-
-        if 'ra' in self.validated_data and 'dec' in self.validated_data:
-            ra        = self.validated_data['ra']
-            dec       = self.validated_data['dec']
+        objectIds = self.validated_data['objectIds']
 
         if 'lite' in self.validated_data:
             lite      = self.validated_data['lite']
@@ -96,35 +89,49 @@ class SherlockSerializer(serializers.Serializer):
         if request and hasattr(request, "user"):
             userId = request.user
 
-        if objectIds is not None:
-            datadict = {}
-            objects = objectIds.split(',')
-            n = 0
-            for o in objects:
-                url = 'http://%s/object/%s' % (lasair.settings.SHERLOCK_SERVICE, o.strip())
-                if lite: url += '?lite=true'
-                r = requests.get(url)
-                try:
-                    datadict[o] = json.loads(r.text)
-                    n += 1
-                except:
-                    datadict[o] = "not found"
-            replyMessage = '%d objects resolved' % n
-            return { "data": datadict, "info": replyMessage }
-
-        if ra is not None and dec is not None:
-            url = 'http://%s/query?ra=%f&dec=%f' % (lasair.settings.SHERLOCK_SERVICE, ra, dec)
-            if lite: url += '&lite=true'
+        datadict = {}
+        objects = objectIds.split(',')
+        n = 0
+        for o in objects:
+            url = 'http://%s/object/%s' % (lasair.settings.SHERLOCK_SERVICE, o.strip())
+            if lite: url += '?lite=true'
             r = requests.get(url)
             try:
-                data = json.loads(r.text)
-                replyMessage = 'Success'
+                datadict[o] = json.loads(r.text)
+                n += 1
             except:
-                data = ''
-                replyMessage = 'r.text'
-            return { "data": data, "info": replyMessage }
+                datadict[o] = "not found"
+        replyMessage = '%d objects resolved' % n
+        return { "data": datadict, "info": replyMessage }
 
-        return { "data": {}, "info": "Must supply either objectIds or ra and dec." }
+class SherlockPositionSerializer(serializers.Serializer):
+    ra        = serializers.FloatField(required=True)
+    dec       = serializers.FloatField(required=True)
+    lite      = serializers.BooleanField()
+
+    def save(self):
+        lite = False
+        ra        = self.validated_data['ra']
+        dec       = self.validated_data['dec']
+        if 'lite' in self.validated_data:
+            lite      = self.validated_data['lite']
+
+        # Get the authenticated user, if it exists.
+        userId = 'unknown'
+        request = self.context.get("request")
+        if request and hasattr(request, "user"):
+            userId = request.user
+
+        url = 'http://%s/query?ra=%f&dec=%f' % (lasair.settings.SHERLOCK_SERVICE, ra, dec)
+        if lite: url += '&lite=true'
+        r = requests.get(url)
+        try:
+            data = json.loads(r.text)
+            replyMessage = 'Success'
+        except:
+            data = ''
+            replyMessage = 'r.text'
+        return { "data": data, "info": replyMessage }
 
 from utility import query_utilities
 import mysql.connector

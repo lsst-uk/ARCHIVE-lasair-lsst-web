@@ -3,7 +3,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import status
 from .serializers import ConeSerializer, StreamsSerializer, QuerySerializer 
-from .serializers import LightcurvesSerializer, SherlockSerializer
+from .serializers import LightcurvesSerializer, SherlockObjectsSerializer, SherlockPositionSerializer
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 from .query_auth import QueryAuthentication
@@ -30,14 +30,20 @@ class StreamsView(APIView):
     authentication_classes = [TokenAuthentication, QueryAuthentication]
     permission_classes = [IsAuthenticated]
 
-    def get(self, request):
-        serializer = StreamsSerializer(data=request.GET, context={'request': request})
+    def get(self, request, topic=None):
+        data=request.GET.copy()
+        if topic: 
+            data['topic'] = topic
+        serializer = StreamsSerializer(data=data, context={'request': request})
         if serializer.is_valid():
             message = serializer.save()
             return Response(message, status=status.HTTP_200_OK)
 
-    def post(self, request, format=None):
-        serializer = StreamsSerializer(data=request.data, context={'request': request})
+    def post(self, request, format=None, topic=None):
+        data=request.data.copy()
+        if topic: 
+            data['topic'] = topic
+        serializer = StreamsSerializer(data=data, context={'request': request})
         if serializer.is_valid():
             message = serializer.save()
             return Response(message, status=status.HTTP_200_OK)
@@ -76,18 +82,34 @@ class LightcurvesView(APIView):
             message = serializer.save()
             return Response(message, status=status.HTTP_200_OK)
 
-class SherlockView(APIView):
+class SherlockObjectsView(APIView):
     authentication_classes = [TokenAuthentication, QueryAuthentication]
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        serializer = SherlockSerializer(data=request.GET, context={'request': request})
+        serializer = SherlockObjectsSerializer(data=request.GET, context={'request': request})
         if serializer.is_valid():
             message = serializer.save()
             return Response(message, status=status.HTTP_200_OK)
 
     def post(self, request, format=None):
-        serializer = SherlockQuerySerializer(data=request.data, context={'request': request})
+        serializer = SherlockObjectsSerializer(data=request.data, context={'request': request})
+        if serializer.is_valid():
+            message = serializer.save()
+            return Response(message, status=status.HTTP_200_OK)
+
+class SherlockPositionView(APIView):
+    authentication_classes = [TokenAuthentication, QueryAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        serializer = SherlockPositionSerializer(data=request.GET, context={'request': request})
+        if serializer.is_valid():
+            message = serializer.save()
+            return Response(message, status=status.HTTP_200_OK)
+
+    def post(self, request, format=None):
+        serializer = SherlockPositionSerializer(data=request.data, context={'request': request})
         if serializer.is_valid():
             message = serializer.save()
             return Response(message, status=status.HTTP_200_OK)
