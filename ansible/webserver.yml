@@ -68,6 +68,12 @@
           executable: pip3 
           name: astropy
 
+    - name: install fastavro
+      pip:
+          executable: pip3
+          name: fastavro
+      become: yes
+
     - name: install mod-wsgi
       pip: 
           executable: pip3 

@@ -99,8 +99,12 @@ Best crossmatch is {{ data.sherlock.catalogue_object_type }}{% endif %}
 <table class="table"><tr><td>
   <div id="fits_div" style='width:317px; height:317px; '>
 </td></tr><tr><td>
-  <small>This image shows the transient at its brightest. To inspect the target, reference, and difference
-  images in detail, click on the links in the candidates table below.</small>
+  <small>This image is the most recent. 
+Click on these links to inspect the 
+<a href="/fitsview/{{ data.objectId }}_cutoutScience/" target=_blank>science</a>,
+<a href="/fitsview/{{ data.objectId }}_cutoutTemplate/" target=_blank>ref</a>, and
+<a href="/fitsview/{{ data.objectId }}_cutoutDifference/" target=_blank>diff</a>
+images in detail.</small>
 </td></tr></table
 </div>
 </div>
@@ -148,10 +152,7 @@ You must be signed in to post comments.
         <th>UTC</th>
         <th>Filter</th>
         <th>magpsf</th>
-        <th>diffpos</th>
-        <th>drb</th>
-        <th>candidate</th>
-        <th>Image</th>
+        <th>status</th>
         </tr></thead>
                 <tbody>
         {% for cand in data.candidates %}
@@ -162,16 +163,16 @@ You must be signed in to post comments.
             <td>{% if not cand.candid %}<font color="gray" size=-2>{% endif %}{% if cand.fid == 1 %}g{% else %}r{% endif %}{% if not cand.candid %}</font>{% endif %}</td>
             <td>{% if not cand.candid %}<font color="gray" size=-2>{% endif %}{{ cand.magpsf|floatformat:3 }} {% if cand.candid %}&plusmn; {{ cand.sigmapsf|floatformat:3 }}{% endif %}{% if not cand.candid %}</font>{% endif %}</td>
 
-            <td> {% if cand.candid %}{{ cand.isdiffpos }}{% endif %}</td>
-            <td> {{ cand.drb|floatformat:2 }}</td>
-
-
-            <td> {% if not cand.candid %}<font color="gray" size=-2>non-detection</font>{% else %}<a href="/cand/{{ cand.candid }}/">lc</a>{% endif %}</td>
+            <td> {% if cand.candid %}{{ cand.isdiffpos }}
+             {% else %}<font color="gray" size=-2>non-detection</font>
+		    {% endif %}</td>
+<!--	
 	    <td>{% if cand.candid > 0 %}
-		    <a href=/fitsview/{{ cand.fits.sci }}/ target=_blank><small>target</small></a> 
-		    <a href=/fitsview/{{cand.fits.ref }}/ target=_blank><small>ref</small></a>
-		    <a href=/fitsview/{{ cand.fits.diff }}/ target=_blank><small>diff</small></a>
+		    <a href=/fitsview/sci/{{ data.objectId }}/ target=_blank><small>target</small></a> 
+		    <a href=/fitsview/ref/{{ data.objectId }}/ target=_blank><small>ref</small></a>
+		    <a href=/fitsview/diff/{{ data.objectId }}/ target=_blank><small>diff</small></a>
                 {% endif %}</td>
+-->
             </tr>
 
         {% endfor %}
@@ -226,7 +227,7 @@ $(document).ready(function()
     aladin.addCatalog(hipsCats['gdr2']);
 */
     console.log('starting fitsview');
-    var fits_url = '/fits/{{ data.objectData.brightest_fits }}';
+    var fits_url = '/fits/{{ data.objectId }}_cutoutScience';
     var fits = new FITS (gebi ("fits_div"), 0);
     start_fitsview(fits, fits_url);
 

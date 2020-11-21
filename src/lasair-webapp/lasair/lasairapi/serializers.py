@@ -7,6 +7,7 @@ import lasair.settings
 import requests
 import json
 import re
+import fastavro
 
 CAT_ID_RA_DEC_COLS['objects'] = [['objectId', 'ramean', 'decmean'],1018]
 
@@ -232,12 +233,13 @@ class StreamsSerializer(serializers.Serializer):
             msl = connect_db()
             cursor = msl.cursor(buffered=True, dictionary=True)
             result = []
-            query = 'SELECT user, name FROM myqueries WHERE active>0'
+            query = 'SELECT mq_id, user, name FROM myqueries WHERE active>0'
             cursor.execute(query)
             for row in cursor: 
                 tn = query_utilities.topic_name(row['user'], row['name'])
                 if r.match(tn):
-                    result.append('%s' % tn)
+                    td = {'topic':tn, 'more_info':'https://lasair-iris.roe.ac.uk/query/%d/' % row['mq_id']}
+                    result.append(td)
             replyMessage = 'Success for regex %s' % regex
             info = { "topics": result, "info": replyMessage }
             return info
@@ -245,11 +247,21 @@ class StreamsSerializer(serializers.Serializer):
         return { "info": 'Must supply either topic or regex' }
 
 def get_lightcurve(objectId):
-    lightcurves = objectStore(suffix = 'json',
-        fileroot=lasair.settings.BLOB_STORE_ROOT + '/lightcurve/')
+    avro = objectStore(suffix = 'avro',
+        fileroot=lasair.settings.BLOB_STORE_ROOT + '/avro')
 
-    alertjson = lightcurves.getObject(objectId)
-    alert = json.loads(alertjson)
+    try:
+        avro_fp = avro.getFileObject(objectId)
+    except:
+        message = 'objectId %s does not exist'%objectId
+        data = {'objectId':objectId, 'message':message}
+        return data
+
+    alert = {}
+    for record in fastavro.reader(avro_fp):
+        for k,v in record.items():
+            if k not in ['cutoutDifference', 'cutoutTemplate', 'cutoutScience']:
+                alert[k] = v
     candidates = []
     candlist = alert['prv_candidates'] + [alert['candidate']]
     candidates = []

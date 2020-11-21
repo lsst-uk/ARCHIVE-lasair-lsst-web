@@ -15,6 +15,7 @@ import json
 from utility.mag import dc_mag
 from utility.objectStore import objectStore
 import time
+import fastavro
 
 # 2020-08-03 KWS Added cassandra connectivity
 if lasair.settings.CASSANDRA is not None:
@@ -210,28 +211,30 @@ def obj(request, objectId):
 
 
 
-        lightcurves = objectStore(suffix = 'json',
-            fileroot=lasair.settings.BLOB_STORE_ROOT + '/lightcurve')
+        avro = objectStore(suffix = 'avro',
+            fileroot=lasair.settings.BLOB_STORE_ROOT + '/avro')
 
         try:
-            alertjson = lightcurves.getObject(objectId)
+            avro_fp = avro.getFileObject(objectId)
         except:
             message = 'objectId %s does not exist'%objectId
             data = {'objectId':objectId, 'message':message}
             return data
 
-        alert = json.loads(alertjson)
+        alert = {}
+        for record in fastavro.reader(avro_fp):
+            for k,v in record.items():
+                if k not in ['cutoutDifference', 'cutoutTemplate', 'cutoutScience']:
+                    alert[k] = v
+
+
+#        alert = json.loads(alertjson)
         candidates = []
  
         count_isdiffpos = count_real_candidates = 0
 
-        fits = objectStore(suffix = 'fits.gz',
-            fileroot=lasair.settings.BLOB_STORE_ROOT + '/fits')
-
         candlist = alert['prv_candidates'] + [alert['candidate']]
         candidates = []
-        brightest_fits = ''
-        brightest_mag = 1000
         for cand in candlist:
             row = {}
             candid = cand['candid']
@@ -251,30 +254,6 @@ def obj(request, objectId):
                 count_isdiffpos += 1
             if not candid:
                 row['magpsf'] = cand['diffmaglim']
-
-# examples of image file name
-# candid1189406621015015005_pid1189406621015_targ_sci
-# candid1189406621015015005_ref
-# candid1189406621015015005_pid1189406621015_targ_scimref
-
-            if candid:
-                candidtxt = '%d' % candid
-                pid = candidtxt[:13]
-                file_sci     = 'candid%s_pid%s_targ_sci' % (candidtxt, pid)
-                file_ref     = 'candid%s_ref' % (candidtxt)
-
-                if cand['isdiffpos'] == 'f':
-                    file_diff = 'candid%s_pid%s_targ_refmsci' % (candidtxt, pid)
-                else:
-                    file_diff = 'candid%s_pid%s_targ_scimref' % (candidtxt, pid)
-
-                row['fits'] = {
-                    'sci' :file_sci, 'ref' :file_ref, 'diff':file_diff
-                }
-                if row['magpsf'] < brightest_mag:
-                    brightest_mag = row['magpsf']
-                    # display brightest diff mag on object page
-                    objectData['brightest_fits']  = file_sci
 
             candidates.append(row)
 
