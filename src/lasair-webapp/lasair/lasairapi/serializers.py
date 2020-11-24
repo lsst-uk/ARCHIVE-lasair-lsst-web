@@ -44,7 +44,7 @@ class ConeSerializer(serializers.Serializer):
             return info
 
         replyMessage = 'No object found ra=%.5f dec=%.5f radius=%.2f' % (ra, dec, radius)
-        info = {"info": replyMessage}
+        info = {"error": replyMessage}
 
         # Is there an object within RADIUS arcsec of this object? - KWS - need to fix the gkhtm code!!
         message, results = coneSearchHTM(ra, dec, radius, 'objects', queryType = QUICK, conn = connection, django = True, prefix='htm', suffix = '')
@@ -57,16 +57,13 @@ class ConeSerializer(serializers.Serializer):
             if requestType == "nearest":
                 obj = results[0][1]['objectId']
                 separation = results[0][0]
-                replyMessage = 'Success'
-                info = { "object": obj, "info": replyMessage, "separation": separation }
+                info = { "object": obj, "separation": separation }
             elif requestType == "all":
-                replyMessage = 'Success'
                 for row in results:
                     objectList.append({"object": row[1]["objectId"], "separation": row[0]})
-                info = { "objects": objectList, "info": replyMessage }
+                info = objectList
             elif requestType == "count":
-                replyMessage = 'Success'
-                info = { "objectCount": len(results), "info": replyMessage }
+                info = len(results)
             else:
                 info = { "error": "Invalid request type" }
 
@@ -102,8 +99,7 @@ class SherlockObjectsSerializer(serializers.Serializer):
                 n += 1
             except:
                 datadict[o] = "not found"
-        replyMessage = '%d objects resolved' % n
-        return { "data": datadict, "info": replyMessage }
+        return datadict
 
 class SherlockPositionSerializer(serializers.Serializer):
     ra        = serializers.FloatField(required=True)
@@ -126,13 +122,10 @@ class SherlockPositionSerializer(serializers.Serializer):
         url = 'http://%s/query?ra=%f&dec=%f' % (lasair.settings.SHERLOCK_SERVICE, ra, dec)
         if lite: url += '&lite=true'
         r = requests.get(url)
-        try:
-            data = json.loads(r.text)
-            replyMessage = 'Success'
-        except:
-            data = ''
-            replyMessage = 'r.text'
-        return { "data": data, "info": replyMessage }
+        if r.status_code != 200:
+            return {"error":  r.text}
+        else:
+            return json.loads(r.text)
 
 from utility import query_utilities
 import mysql.connector
@@ -172,18 +165,14 @@ class QuerySerializer(serializers.Serializer):
         sqlquery_real = query_utilities.make_query(selected, tables, conditions, page, perpage, limitseconds)
         msl = connect_db()
         cursor = msl.cursor(buffered=True, dictionary=True)
-
         result = []
         try:
             cursor.execute(sqlquery_real)
             for row in cursor: result.append(row)
-            message = 'Success for user %s' % userId
+            return result
         except Exception as e:
-            message = 'Your query:<br/><b>' + sqlquery_real + '</b><br/>returned the error<br/><i>' + str(e) + '</i>'
-
-        query = {'selected':selected, 'tables':tables, 'conditions':conditions}
-        info = { "query": query, "result":result, "info": message }
-        return info
+            error = 'Your query:<br/><b>' + sqlquery_real + '</b><br/>returned the error<br/><i>' + str(e) + '</i>'
+            return {"error":error}
 
 class StreamsSerializer(serializers.Serializer):
     topic = serializers.SlugField(required=False)
@@ -217,11 +206,9 @@ class StreamsSerializer(serializers.Serializer):
                 datafile = open(lasair.settings.BLOB_STORE_ROOT + '/streams/%s' % topic, 'r').read()
                 data = json.loads(datafile)['digest']
                 if limit: data = data[:limit]
-                replyMessage = 'Success'
+                return data
             else:
-                replyMessage = 'No alerts'
-            info = { "data": data, "info": replyMessage }
-            return info
+                return []
 
         if regex:
             try:
@@ -240,11 +227,10 @@ class StreamsSerializer(serializers.Serializer):
                 if r.match(tn):
                     td = {'topic':tn, 'more_info':'https://lasair-iris.roe.ac.uk/query/%d/' % row['mq_id']}
                     result.append(td)
-            replyMessage = 'Success for regex %s' % regex
-            info = { "topics": result, "info": replyMessage }
+            info = result
             return info
 
-        return { "info": 'Must supply either topic or regex' }
+        return { "error": 'Must supply either topic or regex' }
 
 def get_lightcurve(objectId):
     avro = objectStore(suffix = 'avro',
@@ -254,8 +240,7 @@ def get_lightcurve(objectId):
         avro_fp = avro.getFileObject(objectId)
     except:
         message = 'objectId %s does not exist'%objectId
-        data = {'objectId':objectId, 'message':message}
-        return data
+        return {"error":message}
 
     alert = {}
     for record in fastavro.reader(avro_fp):
@@ -278,10 +263,8 @@ def get_lightcurves(objectIds):
     ncand = 0
     lightcurves = {}
     for objectId in objectIds:
-        lightcurve = get_lightcurve(objectId)
-        ncand += len(lightcurve)
-        lightcurves[objectId] = lightcurve
-    return {'ncand':ncand, 'data':lightcurves}
+        lightcurves[objectId] = get_lightcurve(objectId)
+    return lightcurves
 
 from utility.objectStore import objectStore
 class LightcurvesSerializer(serializers.Serializer):
@@ -299,6 +282,4 @@ class LightcurvesSerializer(serializers.Serializer):
             userId = request.user
 
         lightcurves = get_lightcurves(olist)
-        replyMessage = 'Success'
-        info = { "lightcurves": lightcurves, "info": replyMessage }
-        return info
+        return lightcurves

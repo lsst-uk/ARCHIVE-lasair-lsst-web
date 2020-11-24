@@ -8,6 +8,10 @@ from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 from .query_auth import QueryAuthentication
 
+def retcode(message):
+    if 'error' in message: return status.HTTP_400_BAD_REQUEST
+    else:                  return status.HTTP_200_OK
+
 class ConeView(APIView):
     authentication_classes = [TokenAuthentication, QueryAuthentication]
     permission_classes = [IsAuthenticated]
@@ -16,14 +20,14 @@ class ConeView(APIView):
         serializer = ConeSerializer(data=request.GET, context={'request': request})
         if serializer.is_valid():
             message = serializer.save()
-            return Response(message, status=status.HTTP_200_OK)
+            return Response(message, status=retcode(message))
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def post(self, request, format=None):
         serializer = ConeSerializer(data=request.data, context={'request': request})
         if serializer.is_valid():
             message = serializer.save()
-            return Response(message, status=status.HTTP_200_OK)
+            return Response(message, status=retcode(message))
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class StreamsView(APIView):
@@ -37,7 +41,8 @@ class StreamsView(APIView):
         serializer = StreamsSerializer(data=data, context={'request': request})
         if serializer.is_valid():
             message = serializer.save()
-            return Response(message, status=status.HTTP_200_OK)
+            return Response(message, status=retcode(message))
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def post(self, request, format=None, topic=None):
         data=request.data.copy()
@@ -46,7 +51,7 @@ class StreamsView(APIView):
         serializer = StreamsSerializer(data=data, context={'request': request})
         if serializer.is_valid():
             message = serializer.save()
-            return Response(message, status=status.HTTP_200_OK)
+            return Response(message, status=retcode(message))
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class QueryView(APIView):
@@ -57,13 +62,14 @@ class QueryView(APIView):
         serializer = QuerySerializer(data=request.GET, context={'request': request})
         if serializer.is_valid():
             message = serializer.save()
-            return Response(message, status=status.HTTP_200_OK)
+            return Response(message, status=retcode(message))
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def post(self, request, format=None):
         serializer = QuerySerializer(data=request.data, context={'request': request})
         if serializer.is_valid():
             message = serializer.save()
-            return Response(message, status=status.HTTP_200_OK)
+            return Response(message, status=retcode(message))
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class LightcurvesView(APIView):
@@ -74,13 +80,15 @@ class LightcurvesView(APIView):
         serializer = LightcurvesSerializer(data=request.GET, context={'request': request})
         if serializer.is_valid():
             message = serializer.save()
-            return Response(message, status=status.HTTP_200_OK)
+            return Response(message, status=retcode(message))
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def post(self, request, format=None):
         serializer = LightcurvesSerializer(data=request.data, context={'request': request})
         if serializer.is_valid():
             message = serializer.save()
-            return Response(message, status=status.HTTP_200_OK)
+            return Response(message, status=retcode(message))
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class SherlockObjectsView(APIView):
     authentication_classes = [TokenAuthentication, QueryAuthentication]
@@ -90,13 +98,15 @@ class SherlockObjectsView(APIView):
         serializer = SherlockObjectsSerializer(data=request.GET, context={'request': request})
         if serializer.is_valid():
             message = serializer.save()
-            return Response(message, status=status.HTTP_200_OK)
+            return Response(message, status=retcode(message))
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def post(self, request, format=None):
         serializer = SherlockObjectsSerializer(data=request.data, context={'request': request})
         if serializer.is_valid():
             message = serializer.save()
-            return Response(message, status=status.HTTP_200_OK)
+            return Response(message, status=retcode(message))
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class SherlockPositionView(APIView):
     authentication_classes = [TokenAuthentication, QueryAuthentication]
@@ -106,10 +116,12 @@ class SherlockPositionView(APIView):
         serializer = SherlockPositionSerializer(data=request.GET, context={'request': request})
         if serializer.is_valid():
             message = serializer.save()
-            return Response(message, status=status.HTTP_200_OK)
+            return Response(message, status=retcode(message))
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def post(self, request, format=None):
         serializer = SherlockPositionSerializer(data=request.data, context={'request': request})
         if serializer.is_valid():
             message = serializer.save()
-            return Response(message, status=status.HTTP_200_OK)
+            return Response(message, status=retcode(message))
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

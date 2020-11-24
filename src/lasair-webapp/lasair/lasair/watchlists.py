@@ -96,6 +96,7 @@ def watchlists_home(request):
             if request.user == watchlist.user:
                 watchlist.delete()
                 message = 'Watchlist %s deleted successfully' % watchlist.name
+            WatchlistHits.objects.filter(wl_id=wl_id).delete()
 
 # public watchlists belong to the anonymous user
     other_watchlists = Watchlists.objects.filter(public=1)

@@ -3,14 +3,16 @@
 {% block content %}
 <div class="container">
 
-<h1>Lasair API</h1>
-The Lasair API allows developers to run queries and cone-searches, 
-and to see outputs from streaming queries.
+<h1>Lasair and Sherlock API</h1>
+The Lasair-Sherlock API allows developers to run queries and cone-searches, 
+to see outputs from streaming queries, and to query the Sherlock sky-context system.
 <h4>Request and response formats</h4>
-The Lasair API uses either HTTP POST. Arguments can be passed in the query string, as JSON or form encoded. Responses are JSON. The examples below show how to drive the API with either curl or python code.
+The Lasair uses either HTTP GET or POST. Arguments can be passed in the query string, as JSON or form encoded. Responses are JSON. 
+The examples below show how to drive the API with either GET URL, POST curl or python.
 
 <h4>Authorisation</h4>
-Request authentication is via authentication tokens. 
+Request authentication is via authentication tokens. For GET queries, the token can go in 
+the parameter string, and for POST queries, the token goes in the headers.
 An example of a token is:
 <pre class="literal-block">
 4b762569bb349bd8d60f1bc7da3f39dbfaefff9a
@@ -59,7 +61,7 @@ The arguments are:<ul>
 </dd>
 <dt class="url-label">GET URL Example</dt> <dd>
 <pre class="literal-block">
-https://lasair-iris.roe.ac.uk/api/cone/?&ra=80.26844&dec=3.55481&radius=60.0&requestType=all&token=4b762569bb349bd8d60f1bc7da3f39dbfaefff9a&format=json
+https://lasair-iris.roe.ac.uk/api/cone/?&ra=194.494&dec=48.851&radius=240.0&requestType=all&token=4b762569bb349bd8d60f1bc7da3f39dbfaefff9a&format=json
 </pre>
 </dd>
 
@@ -67,7 +69,7 @@ https://lasair-iris.roe.ac.uk/api/cone/?&ra=80.26844&dec=3.55481&radius=60.0&req
 <p> The authorization token goes in the header of the request, and the data in the data section.  </p>
 <pre class="literal-block">
 curl --header 'Authorization: Token 4b762569bb349bd8d60f1bc7da3f39dbfaefff9a' \
---data 'ra=194.494&dec=48.851&radius=60.0&requestType=all' \
+--data 'ra=194.494&dec=48.851&radius=240.0&requestType=all' \
 https://lasair-iris.roe.ac.uk/api/cone/
 </pre>
 </dd>
@@ -78,19 +80,21 @@ https://lasair-iris.roe.ac.uk/api/cone/
 import requests, json
 headers = { 'Authorization': 'Token 4b762569bb349bd8d60f1bc7da3f39dbfaefff9a' }
 url = 'https://lasair-iris.roe.ac.uk/api/cone/'
-data = {'ra': '194.494', 'dec': '48.851', 'radius': '60', 'requestType':'all' }
+data = {'ra': '194.494', 'dec': '48.851', 'radius': '240', 'requestType':'all' }
 r = requests.post(url, data, headers=headers)
 print('status=', r.status_code)
 response = r.json()
 print(response)
 </pre>
-<p>and the return is something like: </p>
+<p>and the return has object identifiers, and their separations in arcseconds, something like: </p>
 <pre class="literal-block">
 status= 200
-{'objects': [
-    {'object': 'ZTF17aaajmtw', 'separation': 2.5271898373111465}
-], 
-'info': 'Success'}
+[
+    {
+        "object": "ZTF17aaajmtw",
+        "separation": 2.393511865261539
+    }
+]
 </pre>
 </dd>
 </dl>
@@ -101,7 +105,9 @@ status= 200
 
 <dt class="url-label">Description</dt> <dd>
 <p>
-This method runs a query on the Lasair database.
+This method runs a query on the Lasair database.  There is an 
+<a href=/query>interactive query builder</a>, and a 
+<a href=/schema>schema description</a>.
 The arguments are:<ul>
 <li><code>selected</code>: (string) the list of attributes to be returned, </li>
 <li><code>tables</code>: (string) the list of tables to be joined,</li>
@@ -147,28 +153,16 @@ print(json.dumps(response,  indent=2))
 <p>and the return is something like: </p>
 <pre class="literal-block">
 status= 200
-{
-  "query": {
-    "selected": "objectId, gmag",
-    "tables": "objects",
-    "conditions": "gmag &lt; 12.0"
+[
+  {
+    "objectId": "ZTF17aaagaie",
+    "gmag": 11.4319
   },
-  "result": [
-    {
-      "objectId": "ZTF18abszdyo",
-      "gmag": 11.5082
-    },
-    {
-      "objectId": "ZTF18abmogqt",
-      "gmag": 11.5527
-    },
-    {
-      "objectId": "ZTF18abcdajo",
-      "gmag": 11.7786
-    }
-  ],
-  "info": "Success"
-}
+  {
+    "objectId": "ZTF18aaadvxy",
+    "gmag": 11.8582
+  },
+.... ]
 </pre>
 </dd>
 </dl>
@@ -182,7 +176,7 @@ status= 200
 This method returns a record of the output from a Lasair streaming query. It represents an alternative
 to using a Kafka client to fetch from the Kafka server.
 </p> <p>
-If the <code>topic</code> URL is provided (with optional <code>limit></code>), the contents 
+If the <code>topic</code> URL is provided (with optional <code>limit</code>), the contents 
 of the stream are returned.  Alternatively, if the topic is not provided, a 
 <code>regex</code> argument may be provided, and a list of matching topic names will be returned. 
 A list of all topics can be obtained with the regex <code>.*</code> or by omitting the <code>regex</code>.
@@ -207,17 +201,15 @@ curl --header 'Authorization: Token 4b762569bb349bd8d60f1bc7da3f39dbfaefff9a' \
 --data 'regex=.*SN.*' \
 https://lasair-iris.roe.ac.uk/api/streams/
 </pre>
-<p>and the return is something like: </p>
+<p>and the return is a list of topic names, and a URL to get more information: </p>
 <pre class="literal-block">
 status= 200
 [
   {
-    "topic":"2SN-likecandidates"
+    "topic": "2SN-likecandidates",
+    "more_info": "https://lasair-iris.roe.ac.uk/query/2/"
   },
-  {
-    "topic":"2C-SNAILS"
-  }
-]
+... ]
 </pre>
 </dd>
 
@@ -332,14 +324,23 @@ print(s[:200])
 <p>and the return is something like: </p>
 <pre class="literal-block">
 {
-  "ncand": 57,
-  "data": {
-    "ZTF20acgrvqo": [
-      {
-        "candid": 1382500555715015007,
-        "fid": 2,
-        "magpsf": 16.765600204467773,
-        "sigmapsf": 0.03850499913096428,
+  "ZTF20acpwljl": [
+    {
+      "candid": 1411435461415015019,
+      "fid": 2,
+      "magpsf": 19.739900588989258,
+      "sigmapsf": 0.16019299626350403,
+      "isdiffpos": "t",
+      "mjd": 59165.43546300009
+    },
+    {
+      "candid": 1411436860315015015,
+      "fid": 2,
+      "magpsf": 19.987899780273438,
+      "sigmapsf": 0.18143899738788605,
+      "isdiffpos": "t",
+      "mjd": 59165.43686340004
+    },
 ... snip ...
 </pre>
 </dd>
@@ -360,7 +361,7 @@ The arguments are:
 
 <dt class="url-label">GET URL Example with objects</dt> <dd>
 <pre class="literal-block">
-https://lasair-iris.roe.ac.uk/api/sherlock/objects/?objectIds=ZTF20acgrvqo%2CZTF19acylwtd%2CZTF18acmziob&token=4b762569bb349bd8d60f1bc7da3f39dbfaefff9a&format=json
+https://lasair-iris.roe.ac.uk/api/sherlock/objects/?objectIds=ZTF20acpwljl%2CZTF20acqqbkl%2CZTF20acplggt&token=4b762569bb349bd8d60f1bc7da3f39dbfaefff9a&format=json
 </pre>
 </dd>
 
@@ -369,7 +370,7 @@ https://lasair-iris.roe.ac.uk/api/sherlock/objects/?objectIds=ZTF20acgrvqo%2CZTF
 </p>
 <pre class="literal-block">
 curl --header 'Authorization: Token 4b762569bb349bd8d60f1bc7da3f39dbfaefff9a' \
---data "objectIds:ZTF20acgrvqo,ZTF19acylwtd,ZTF18acmziob&lite=True" \
+--data "objectIds:ZTF20acpwljl,ZTF20acqqbkl,ZTF20acplggt&lite=True" \
 https://lasair-iris.roe.ac.uk/api/sherlock/objects/
 </pre>
 </dd>
@@ -380,7 +381,7 @@ https://lasair-iris.roe.ac.uk/api/sherlock/objects/
 import requests, json
 headers = { 'Authorization': 'Token 4b762569bb349bd8d60f1bc7da3f39dbfaefff9a' }
 url = 'https://lasair-iris.roe.ac.uk/api/sherlock/objects/'
-data = { 'objectIds': 'ZTF20acgrvqo,ZTF19acylwtd,ZTF18acmziob', 'lite':True }
+data = { 'objectIds': 'ZTF20acpwljl,ZTF20acqqbkl,ZTF20acplggt', 'lite':True }
 r = requests.post(url, data, headers=headers)
 print('status=', r.status_code)
 response = r.json()
@@ -390,17 +391,21 @@ print(s[:200])
 <p>and the return is something like: </p>
 <pre class="literal-block">
 {
-  "data": {
-    "ZTF20acgrvqo": {
-      "classifications": {
-        "ZTF20acgrvqo": ["NT", "The transient is synonymous with <em>05250691-2114471</em>; a J=14.10 mag stellar source found in the 2MASS/PS1 catalogues. It's located 0.8\" from the stellar source core."]
-      },
-      "crossmatches": [{
-        "transient_object_id": "ZTF20acgrvqo",
-        "association_type": "NT",
-        "catalogue_table_name": "2MASS/PS1",
-        "catalogue_object_id": "05250691-2114471",
-        "catalogue_object_type": "star",
+    "ZTF20acpwljl": {
+        "classifications": {
+            "ZTF20acpwljl": [
+                "SN",
+                "The transient is possibly associated with &lt;em&gt;&lt;a href=\"http://skyserver.sdss.org/dr12/en/tools/explore/Summary.aspx?id=1237673709862061782\"&gt;SDSS J081931-060114.9&lt;/a&gt;&lt;/em&gt;; a J=17.01 mag galaxy found in the SDSS/2MASS/PS1 catalogues. It's located 1.09\" N, 1.11\" W from the galaxy centre."
+            ]
+        },
+        "crossmatches": [
+            {
+                "catalogue_object_id": "1237673709862061782",
+                "J": 17.007,
+                "JErr": 0.215,
+                "H": 15.974,
+                "HErr": 0.179,
+                "K": 15.389,
 ...snip...
 </pre>
 </dd>
@@ -410,7 +415,7 @@ print(s[:200])
 
 <dt class="url-label">Description</dt> <dd>
 <p>
-This method returns Sherlock information for an arbitrary position ion the sky, either the "lite" record that
+This method returns Sherlock information for an arbitrary position in the sky, either the "lite" record that
 is also in the Lasair database, or the full record including many possible crossmatches.
 The arguments are:
 <ul>
@@ -422,7 +427,7 @@ The arguments are:
 
 <dt class="url-label">GET URL Example</dt> <dd>
 <pre class="literal-block">
-https://lasair-iris.roe.ac.uk/api/sherlock/position/?ra=80.26844&dec=3.55481&token=4b762569bb349bd8d60f1bc7da3f39dbfaefff9a&format=json
+https://lasair-iris.roe.ac.uk/api/sherlock/position/?ra=16.851866&dec=34.53307&token=4b762569bb349bd8d60f1bc7da3f39dbfaefff9a&format=json
 </pre>
 </dd>
 
