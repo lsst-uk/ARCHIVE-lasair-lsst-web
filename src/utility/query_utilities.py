@@ -1,14 +1,14 @@
-# how to make a query from selects, tables, and conditions. Plus pages. Plus time constraints.
+# how to make a query from selects, tables, and conditions. Plus limit/offset. Plus time constraints.
 
-def make_query(selected, tables, conditions, page, perpage, limitseconds = 300):
+def make_query(selected, tables, conditions, limit, offset, limitseconds = 300):
     """make_query.
 
     Args:
         selected:
         tables:
         conditions:
-        page:
-        perpage:
+        limit:
+        offset:
     """
 # select some quantitites from some tables
     sqlquery_real  = 'SELECT /*+ MAX_EXECUTION_TIME(%d) */ ' % (1000*limitseconds)
@@ -63,7 +63,7 @@ def make_query(selected, tables, conditions, page, perpage, limitseconds = 300):
         if len(join_new_conditions.strip()) > 0:
             sqlquery_real += ' WHERE ' + join_new_conditions
 
-    sqlquery_real += ' LIMIT %d OFFSET %d' % (perpage, page*perpage)
+    sqlquery_real += ' LIMIT %d OFFSET %d' % (limit, offset)
     return sqlquery_real
 
 def topic_name(userid, name):

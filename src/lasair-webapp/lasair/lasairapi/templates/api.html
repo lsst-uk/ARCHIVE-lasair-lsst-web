@@ -26,7 +26,21 @@ We recommend that users request their own key by running the following script:
 curl --data 'username=u&password=p' https://lasair-iris.roe.ac.uk/api/auth-token/
 </pre>
 where <code>u</code> and <code>p</code> are replaced with username and password for your Lasair account,
-which you can obtain <a href=/signup>here</a>.
+which you can obtain <a href=/signup>here</a>. Each key can only do a certain number of requests 
+before the server responds with status code 429 and will not do more until some time has passed.
+If this is a problem for you, please 
+<a href="mailto:lasair-help@lists.roe.ac.uk?subject=throttling problem">Email Lasair-help</a>.
+
+<h4>Return Codes</h4>
+It is important to check the <a href=https://en.wikipedia.org/wiki/List_of_HTTP_status_codes>HTTP return code</a> 
+from the service, since it provides valuable information in case the result is not what you expect.
+<ul>
+<li>200 OK: the request is satisfied and all is well</li>
+<li>400 Bad Request: something wrong with the request</li>
+<li>401 Unauthorized: something wrong with the authorization token</li>
+<li>429 Too Many Requests: the Lasair API is throttled and you have exceeded that (see above)</li>
+<li>500 Internal Server Error: should not happen, please report this</li>
+</ul>
 
 <h4>Methods</h4>
 Click on the method name to jump to documentation in the reference below.
@@ -82,9 +96,13 @@ headers = { 'Authorization': 'Token 4b762569bb349bd8d60f1bc7da3f39dbfaefff9a' }
 url = 'https://lasair-iris.roe.ac.uk/api/cone/'
 data = {'ra': '194.494', 'dec': '48.851', 'radius': '240', 'requestType':'all' }
 r = requests.post(url, data, headers=headers)
-print('status=', r.status_code)
-response = r.json()
-print(response)
+if r.status_code == 200:
+    response = r.json()
+    s = json.dumps(response, indent=2)
+    print(s)
+else: 
+    print(r.status_code)
+    print(r.text)
 </pre>
 <p>and the return has object identifiers, and their separations in arcseconds, something like: </p>
 <pre class="literal-block">
@@ -146,9 +164,13 @@ data = {
 'limit'     : 3
 }
 r = requests.post(url, data, headers=headers)
-print('status=', r.status_code)
-response = r.json()
-print(json.dumps(response,  indent=2))
+if r.status_code == 200:
+    response = r.json()
+    s = json.dumps(response, indent=2)
+    print(s)
+else: 
+    print(r.status_code)
+    print(r.text)
 </pre>
 <p>and the return is something like: </p>
 <pre class="literal-block">
@@ -258,10 +280,13 @@ data = { 'limit': 3 }
 r = requests.post(url, data, headers=headers)
 print('status=', r.status_code)
 response = r.json()
-if 'data' in response:
-    data = response['data']
-    print(json.dumps(data, indent=2))
-print('info:', response['info'])
+if r.status_code == 200:
+    response = r.json()
+    s = json.dumps(response, indent=2)
+    print(s)
+else:
+    print(r.status_code)
+    print(r.text)
 </pre>
 <p>and the return is as above with the curl example </p>
 </dd>
@@ -315,11 +340,13 @@ headers = { 'Authorization': 'Token 4b762569bb349bd8d60f1bc7da3f39dbfaefff9a' }
 url = 'https://lasair-iris.roe.ac.uk/api/lightcurves/'
 data = {'objectIds': "ZTF20acgrvqo,ZTF19acylwtd,ZTF18acmziob"}
 r = requests.post(url, data, headers=headers)
-print('status=', r.status_code)
-response = r.json()
-lightcurves = response['lightcurves']
-s = json.dumps(lightcurves, indent=2)
-print(s[:200])
+if r.status_code == 200:
+    response = r.json()
+    s = json.dumps(response, indent=2)
+    print(s)
+else:
+    print(r.status_code)
+    print(r.text)
 </pre>
 <p>and the return is something like: </p>
 <pre class="literal-block">
@@ -361,7 +388,7 @@ The arguments are:
 
 <dt class="url-label">GET URL Example with objects</dt> <dd>
 <pre class="literal-block">
-https://lasair-iris.roe.ac.uk/api/sherlock/objects/?objectIds=ZTF20acpwljl%2CZTF20acqqbkl%2CZTF20acplggt&token=4b762569bb349bd8d60f1bc7da3f39dbfaefff9a&format=json
+https://lasair-iris.roe.ac.uk/api/sherlock/objects/?objectIds=ZTF20acpwljl%2CZTF20acqqbkl%2CZTF20acplggt&token=4b762569bb349bd8d60f1bc7da3f39dbfaefff9a&lite=true&format=json
 </pre>
 </dd>
 
@@ -370,7 +397,7 @@ https://lasair-iris.roe.ac.uk/api/sherlock/objects/?objectIds=ZTF20acpwljl%2CZTF
 </p>
 <pre class="literal-block">
 curl --header 'Authorization: Token 4b762569bb349bd8d60f1bc7da3f39dbfaefff9a' \
---data "objectIds:ZTF20acpwljl,ZTF20acqqbkl,ZTF20acplggt&lite=True" \
+--data "objectIds=ZTF20acpwljl,ZTF20acqqbkl,ZTF20acplggt&lite=True" \
 https://lasair-iris.roe.ac.uk/api/sherlock/objects/
 </pre>
 </dd>
@@ -383,10 +410,13 @@ headers = { 'Authorization': 'Token 4b762569bb349bd8d60f1bc7da3f39dbfaefff9a' }
 url = 'https://lasair-iris.roe.ac.uk/api/sherlock/objects/'
 data = { 'objectIds': 'ZTF20acpwljl,ZTF20acqqbkl,ZTF20acplggt', 'lite':True }
 r = requests.post(url, data, headers=headers)
-print('status=', r.status_code)
-response = r.json()
-s = json.dumps(response, indent=2)
-print(s[:200])
+if r.status_code == 200:
+    response = r.json()
+    s = json.dumps(response, indent=2)
+    print(s)
+else:
+    print(r.status_code)
+    print(r.text)
 </pre>
 <p>and the return is something like: </p>
 <pre class="literal-block">
@@ -410,13 +440,18 @@ print(s[:200])
 </pre>
 </dd>
 
-<a name=sherlockposition><h3>/api/sherlock/objects/position/</h3></a>
+<a name=sherlockposition><h3>/api/sherlock/position/</h3></a>
 <dl>
 
 <dt class="url-label">Description</dt> <dd>
 <p>
 This method returns Sherlock information for an arbitrary position in the sky, either the "lite" record that
 is also in the Lasair database, or the full record including many possible crossmatches.
+It is meant as an illustration of what Sherlock can do. If you would like to use Sherlock for high volume work,
+please
+<a href="mailto:lasair-help@lists.roe.ac.uk?subject=sherlock">Email Lasair-help</a>.
+
+
 The arguments are:
 <ul>
 <li><code>ra</code>: Right ascension of a point in the sky in degrees</li>
@@ -449,10 +484,13 @@ headers = { 'Authorization': 'Token 4b762569bb349bd8d60f1bc7da3f39dbfaefff9a' }
 url = 'https://lasair-iris.roe.ac.uk/api/sherlock/position/'
 data = {'ra': 16.851866, 'dec':34.53307}
 r = requests.post(url, data, headers=headers)
-print('status=', r.status_code)
-response = r.json()
-s = json.dumps(response, indent=2)
-print(s[:200])
+if r.status_code == 200:
+    response = r.json()
+    s = json.dumps(response, indent=2)
+    print(s)
+else:
+    print(r.status_code)
+    print(r.text)
 </pre>
 <p>and the return is something like: </p>
 <pre class="literal-block">

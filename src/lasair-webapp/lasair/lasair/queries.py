@@ -280,10 +280,12 @@ def runquery(request):
     if 'json' in request.POST and request.POST['json'] == 'on':
         json_checked = True
 
+    limit = perpage
+    offset = page*perpage
     ps = page    *perpage
     pe = (page+1)*perpage
 
-    sqlquery_real = query_utilities.make_query(selected, tables, conditions, page, perpage)
+    sqlquery_real = query_utilities.make_query(selected, tables, conditions, limit, offset)
     message += sqlquery_real
 
 # lets keep a record of all the queries the people try to execute

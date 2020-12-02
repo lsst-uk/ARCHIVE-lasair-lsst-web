@@ -8,6 +8,15 @@ import requests
 import json
 import re
 import fastavro
+import datetime
+
+def record_user(userId, service):
+    f = open('/home/ubuntu/lasair-lsst-web/src/lasair-webapp/lasair/static/api_users.txt', 'a')
+    now_number = datetime.datetime.utcnow()
+    utc = now_number.strftime("%Y-%m-%d %H:%M:%S")
+    s = '%s, %s, %s\n' % (utc, userId, service)
+    f.write(s)
+    f.close()
 
 CAT_ID_RA_DEC_COLS['objects'] = [['objectId', 'ramean', 'decmean'],1018]
 
@@ -35,8 +44,7 @@ class ConeSerializer(serializers.Serializer):
         request = self.context.get("request")
         if request and hasattr(request, "user"):
             userId = request.user
-
-        print (userId)
+            record_user(userId, 'cone')
 
         if radius > 1000:
             replyMessage = "Max radius is 1000 arcsec."
@@ -86,20 +94,16 @@ class SherlockObjectsSerializer(serializers.Serializer):
         request = self.context.get("request")
         if request and hasattr(request, "user"):
             userId = request.user
+            record_user(userId, 'sherlockobjects')
 
         datadict = {}
-        objects = objectIds.split(',')
-        n = 0
-        for o in objects:
-            url = 'http://%s/object/%s' % (lasair.settings.SHERLOCK_SERVICE, o.strip())
-            if lite: url += '?lite=true'
-            r = requests.get(url)
-            try:
-                datadict[o] = json.loads(r.text)
-                n += 1
-            except:
-                datadict[o] = "not found"
-        return datadict
+        url = 'http://%s/object/%s' % (lasair.settings.SHERLOCK_SERVICE, objectIds)
+        if lite: url += '?lite=true'
+        r = requests.get(url)
+        if r.status_code == 200:
+            return r.json()
+        else: 
+            return {"error": r.text}
 
 class SherlockPositionSerializer(serializers.Serializer):
     ra        = serializers.FloatField(required=True)
@@ -118,6 +122,9 @@ class SherlockPositionSerializer(serializers.Serializer):
         request = self.context.get("request")
         if request and hasattr(request, "user"):
             userId = request.user
+            record_user(userId, 'sherlockposition')
+# can also send multiples, but not yet implemented
+# http://192.41.108.29/query?ra=115.811388,97.486925&dec=-25.76404,-26.975506
 
         url = 'http://%s/query?ra=%f&dec=%f' % (lasair.settings.SHERLOCK_SERVICE, ra, dec)
         if lite: url += '&lite=true'
@@ -142,27 +149,47 @@ class QuerySerializer(serializers.Serializer):
     selected   = serializers.CharField(max_length=1024, required=True)
     tables     = serializers.CharField(max_length=1024, required=True)
     conditions = serializers.CharField(max_length=1024, required=True)
+    limit      = serializers.IntegerField(max_value=1000, required=False)
+    offset     = serializers.IntegerField(required=False)
 
     def save(self):
         selected   = self.validated_data['selected']
         tables     = self.validated_data['tables']
         conditions = self.validated_data['conditions']
+        limit = None
+        if 'limit' in self.validated_data:
+            limit      = self.validated_data['limit']
+        offset = None
+        if 'offset' in self.validated_data:
+            offset     = self.validated_data['offset']
 
         # Get the authenticated user, if it exists.
         userId = 'unknown'
         request = self.context.get("request")
         if request and hasattr(request, "user"):
             userId = request.user
+            record_user(userId, 'query')
 
         page = 0
         if userId == 'dummy':
-            perpage = 1000
+            maxlimit = 1000
             limitseconds = 300
         else:
-            perpage = 10000
+            maxlimit = 10000
             limitseconds = 3000
 
-        sqlquery_real = query_utilities.make_query(selected, tables, conditions, page, perpage, limitseconds)
+        if limit == None: limit = 1000
+        else:             limit = int(limit)
+        limit = min(maxlimit, limit)
+
+        if offset == None: offset = 0
+        else:              offset = int(offset)
+
+        if 'limit' in conditions.lower():
+            error = 'Do not put LIMIT in your SQL, use the query parameter instead'
+            return {"error":error}
+
+        sqlquery_real = query_utilities.make_query(selected, tables, conditions, limit, offset, limitseconds)
         msl = connect_db()
         cursor = msl.cursor(buffered=True, dictionary=True)
         result = []
@@ -200,6 +227,7 @@ class StreamsSerializer(serializers.Serializer):
         request = self.context.get("request")
         if request and hasattr(request, "user"):
             userId = request.user
+            record_user(userId, 'streams')
 
         if topic:
             if 1:
@@ -280,6 +308,7 @@ class LightcurvesSerializer(serializers.Serializer):
         request = self.context.get("request")
         if request and hasattr(request, "user"):
             userId = request.user
+            record_user(userId, 'lightcurves')
 
         lightcurves = get_lightcurves(olist)
         return lightcurves

@@ -30,7 +30,6 @@ urlpatterns = [
     path('sherlock',    TemplateView.as_view(template_name='sherlock.html')),
     path('lasairlsst',  TemplateView.as_view(template_name='lasairlsst.html')),
     path('conesearch/',             views.conesearch,           name='conesearch'),
-    path('coverage/',               views.coverage,             name='coverage'),
     path('status/',                 views.status,               name='status'),
     path('streams/<slug:topic>/',   views.streams,              name='streams'),
     path('fitsview/<slug:filename>/'   , views.fitsview,             name='fitsview'),
@@ -66,8 +65,7 @@ urlpatterns = [
     path('release',  TemplateView.as_view(template_name='release.html')),
     path('contact',  TemplateView.as_view(template_name='contact.html')),
     path('fits/<slug:objectId_cutoutType>/',  services.fits,     name='fits'),
-    path('coverageAjax/<int:nid1>/<int:nid2>/',\
-                                     services.coverageAjax,     name='coverageAjax'),
+
     path('accounts/', include('django.contrib.auth.urls')),
     path('signup/',                  views.signup,              name='signup'),
     path('admin/',                   admin.site.urls),
