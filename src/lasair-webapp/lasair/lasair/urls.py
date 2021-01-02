@@ -62,6 +62,7 @@ urlpatterns = [
 
     path('schema',   TemplateView.as_view(template_name='schema.html')),
     path('jupyter',  TemplateView.as_view(template_name='jupyter.html')),
+    path('jupyter2',  TemplateView.as_view(template_name='jupyter2.html')),
     path('release',  TemplateView.as_view(template_name='release.html')),
     path('contact',  TemplateView.as_view(template_name='contact.html')),
     path('fits/<slug:objectId_cutoutType>/',  services.fits,     name='fits'),
