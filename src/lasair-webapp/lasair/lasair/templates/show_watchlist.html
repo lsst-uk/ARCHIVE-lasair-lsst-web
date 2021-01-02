@@ -58,9 +58,10 @@ To see the original input data, click <a href=/watchlist/{{ watchlist.wl_id }}/t
 <th>Radius</th>
 <th>objectId</th>
 <th>candidates</th>
+<!--
 <th>g-mag diff</th>
 <th>r-mag diff</th>
-<th>Sherlock class</th>
+<th>Sherlock class</th> -->
 </tr>
 {% for c in conelist %}
 <tr>
@@ -71,9 +72,9 @@ To see the original input data, click <a href=/watchlist/{{ watchlist.wl_id }}/t
 {% if c.ncand %}
   <td><a href=/object/{{ c.objectId }}/>{{ c.objectId }}</a></td>
   <td>{{ c.ncand }}</td>
-  <td>{{ c.gdiff|floatformat:1 }}</td>
+<!--  <td>{{ c.gdiff|floatformat:1 }}</td>
   <td>{{ c.rdiff|floatformat:1 }}</td>
-  <td>{{ c.sherlock_classification }}</td>
+  <td>{{ c.sherlock_classification }}</td> -->
 {% endif %}
 </tr>
 {% endfor %}

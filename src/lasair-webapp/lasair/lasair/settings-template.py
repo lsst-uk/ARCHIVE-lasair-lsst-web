@@ -8,7 +8,7 @@ EMAIL_HOST = 'localhost'
 #EMAIL_HOST = 'smtp.roe.ac.uk'
 EMAIL_PORT = 25 
 
-LASAIR_ROOT = '/home/roy/'
+LASAIR_ROOT = '/home/ubuntu/'
 
 # Database
 # https://docs.djangoproject.com/en/2.0/ref/settings/#databases
@@ -17,8 +17,8 @@ WEB_DOMAIN     = 'lasair-iris'
 READONLY_USER  = ''
 READONLY_PASS  = ''
 
-READWRITE_USER = 'f'
-READWRITE_PASS = '7'
+READWRITE_USER = ''
+READWRITE_PASS = ''
 
 DB_HOST        = ''
 
@@ -33,6 +33,9 @@ CITIZEN_SCIENCE_USERID = 0
 CITIZEN_SCIENCE_KEY    = ''
 
 BLOB_STORE_ROOT = '/blah/blah'
+SYSTEM_STATUS   = '/mnt/cephfs/roy/system_status.json'
+
+SHERLOCK_SERVICE = '192.41.108.29'
 ################################################################
 import os
 
@@ -69,16 +72,26 @@ MIDDLEWARE = [
 ]
 
 # 2020-07-07 KWS Added token authentication class
+# 2021-01-02 RDW Put in three classes of API user
+
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.TokenAuthentication',
     ],
     'DEFAULT_THROTTLE_CLASSES': (
         'rest_framework.throttling.UserRateThrottle',
-     ),
-     'DEFAULT_THROTTLE_RATES': {
-         'user': '10/hour',
-     },
+        'lasairapi.throttle.UserClassRateThrottle'
+    ),
+    'DEFAULT_THROTTLE_RATES': { 'user': '1000000/hour', },
+
+    # this is for the 'dummy' user key in the api dox
+    'ANON_THROTTLE_RATES'   : { 'user': '10/hour', },
+
+    # for somebody who has made their own token
+    'USER_THROTTLE_RATES'   : { 'user': '100/hour', },
+
+    # for somebody with a token in the 'powerapi' group
+    'POWER_THROTTLE_RATES'  : { 'user': '10000/hour', },
 }
 
 ROOT_URLCONF = 'lasair.urls'
@@ -86,7 +99,7 @@ ROOT_URLCONF = 'lasair.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': ['./templates',],
+        'DIRS': ['./templates', '../lasairapi/templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -102,6 +115,15 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'lasair.wsgi.application'
 
+CASSANDRA = None
+#CASSANDRA = {
+#    'default': {
+#        'KEYSPACE': CASSANDRA_KEYSPACE,
+#        'USER':     CASSANDRA_USER,
+#        'PASSWORD': CASSANDRA_PASS,
+#        'HOSTS':    CASSANDRA_HOSTS,
+#    }
+#}
 
 DATABASES = {
     'default': {
@@ -112,16 +134,6 @@ DATABASES = {
         'HOST':     DB_HOST, 
     }
 }
-
-CASSANDRA = {
-    'default': {
-        'KEYSPACE': CASSANDRA_KEYSPACE,
-        'USER':     CASSANDRA_USER,
-        'PASSWORD': CASSANDRA_PASS,
-        'HOSTS':    CASSANDRA_HOSTS,
-    }
-}
-
 
 # Redirect to home URL after login (Default redirects to /accounts/profile/)
 LOGIN_REDIRECT_URL = '/'

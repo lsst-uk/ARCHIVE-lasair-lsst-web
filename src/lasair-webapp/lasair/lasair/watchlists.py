@@ -188,15 +188,23 @@ def show_watchlist(request, wl_id):
     for row in cursor:
         number_cones = row[0]
 
+#    query = """
+#SELECT 
+#c.ra, c.decl, c.name, c.radius, o.objectId, o.ncand, h.arcsec,
+#o.gmag-o.maggmean AS gdiff, o.rmag-o.magrmean AS rdiff, s.classification
+#FROM watchlist_cones AS c 
+#LEFT JOIN watchlist_hits           AS h ON c.cone_id = h.cone_id 
+#LEFT JOIN objects                  AS o on h.objectId = o.objectId 
+#LEFT JOIN sherlock_classifications AS s on o.objectId = s.objectId
+#WHERE c.wl_id=%d ORDER BY o.ncand DESC LIMIT 100
+#"""
     query = """
 SELECT 
-c.ra, c.decl, c.name, c.radius, o.objectId, o.ncand, h.arcsec,
-o.gmag-o.maggmean AS gdiff, o.rmag-o.magrmean AS rdiff, s.classification
+c.ra, c.decl, c.name, c.radius, o.objectId, o.ncand, h.arcsec
 FROM watchlist_cones AS c 
 LEFT JOIN watchlist_hits           AS h ON c.cone_id = h.cone_id 
 LEFT JOIN objects                  AS o on h.objectId = o.objectId 
-LEFT JOIN sherlock_classifications AS s on o.objectId = s.objectId
-WHERE c.wl_id=%d ORDER BY o.ncand DESC LIMIT 1000
+WHERE c.wl_id=%d ORDER BY o.ncand DESC LIMIT 100
 """
     cursor.execute(query % wl_id)
     cones = cursor.fetchall()
@@ -212,9 +220,9 @@ WHERE c.wl_id=%d ORDER BY o.ncand DESC LIMIT 1000
             d['objectId'] = c[4]
             d['ncand']    = c[5]
             d['arcsec']   = c[6]
-            d['gdiff']    = c[7]
-            d['rdiff']    = c[8]
-            d['sherlock_classification'] = c[9]
+#            d['gdiff']    = c[7]
+#            d['rdiff']    = c[8]
+#            d['sherlock_classification'] = c[9]
         conelist.append(d)
 
     def first(d):

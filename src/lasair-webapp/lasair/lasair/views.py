@@ -64,7 +64,10 @@ def status(request):
     web_domain = lasair.settings.WEB_DOMAIN
     jsonstr = open(lasair.settings.SYSTEM_STATUS).read()
     status = json.loads(jsonstr)
-    return render(request, 'status.html', {'web_domain': web_domain, 'status':status, 'message':message})
+    nid  = date_nid.nid_now()
+    date = date_nid.nid_to_date(nid)
+    return render(request, 'status.html', 
+            {'web_domain': web_domain, 'status':status, 'date':date, 'message':message})
 
 def index(request):
     """index.

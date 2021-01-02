@@ -7,59 +7,33 @@
 <div class="row">
 	<div class="col-sm">
 <p>
-Below are some Jupyter notebooks that use the ZTF candidate catalog.
-If you have a login, use the server that can connect to the ZTF database at
-<a href=https://jupyter.lsst.ac.uk/>https://jupyter.lsst.ac.uk</a>. 
-Logging in is via a user's institutional
-credentials, rather than having to remember yet another username/password combination.
-Access is on a limited basis, since Lasair is a technology
-prototype, not a production system; to make a request, 
-follow <a href=https://lsst-uk.atlassian.net/wiki/spaces/HOME/pages/696090625/Lasair+User+Documentation+for+Jupyter+Notebooks+Service>the procedure listed here to get an account</a>, then
-write to
-<a href=mailto:lasair-help@lists.roe.ac.uk>lasair-help@lists.roe.ac.uk</a>
-saying what you would like to do with the Jupyter access to Lasair.
-</p><p>
-There are a few notebooks listed below. These and many others can be downloaded
-with the command<br/>&nbsp;&nbsp;<b>git clone https://github.com/lsst-uk/jupyter_notebooks</b>
+Below are some Jupyter notebooks that use Lasair API.
+Full information about the api can be found at 
+<b><a href=/api>https://lasair-iris.roe.ac.uk/api</a></b>
+You will need the "requests" package to run these (pip install requests).
+
+There are a few notebooks listed below.
 </p>
 <ul>
-<li>Fetching data from many sources: Transient Name Server, PanSTARRS images, Open Astronomy catalogs.
-(<a href="{% static 'jupyter/DataFromManySources.html' %}">HTML</a>,
-<a href="{% static 'jupyter/DataFromManySources.ipynb' %}">ipynb</a>)
+<li>Fetching lightcurves and plotting them
+(<a href="{% static 'jupyter/BrightSNe.html' %}">HTML</a>,
+<a href="{% static 'jupyter/BrightSNe.ipynb' %}">ipynb</a>)
 </li>
-<li>Find transients in a host galaxy much more luminous than the host
-(<a href="{% static 'jupyter/LuminousTransients.html' %}">HTML</a>,
-<a href="{% static 'jupyter/LuminousTransients.ipynb' %}">ipynb</a>)
+<li>Finding objects in a sky rectangle with specific detection times
+(<a href="{% static 'jupyter/DonutHole.html' %}">HTML</a>,
+<a href="{% static 'jupyter/DonutHole.ipynb' %}">ipynb</a>)
 </li>
-<li>Outbursts with Exponential Moving Averages: Synthetic signal
-(<a href="{% static 'jupyter/EMA_detect_step.html' %}">HTML</a>,
-<a href="{% static 'jupyter/EMA_detect_step.ipynb' %}">ipynb</a>)
+<li>Objects near a PanStarrs galaxy  and recently active
+(<a href="{% static 'jupyter/InterestingObjects.html' %}">HTML</a>,
+<a href="{% static 'jupyter/InterestingObjects.ipynb' %}">ipynb</a>)
 </li>
-<li>Outbursts with Exponential Moving Averages: from ZTF data
-(<a href="{% static 'jupyter/EMA_ztf_outbursts.html' %}">HTML</a>,
-<a href="{% static 'jupyter/EMA_ztf_outbursts.ipynb' %}">ipynb</a>)
-</li>
-<li>Plotting the path of a Kuiper belt object Makemake
-(<a href="{% static 'jupyter/MakemakeInZTF.html' %}">HTML</a>,
-<a href="{% static 'jupyter/MakemakeInZTF.ipynb' %}">ipynb</a>)
-</li>
-<li>Light curves of frequently-observed minor planets
-(<a href="{% static 'jupyter/MinorPlanetLightcurves.html' %}">HTML</a>,
-<a href="{% static 'jupyter/MinorPlanetLightcurves.ipynb' %}">ipynb</a>)
-</li>
-<li>Display an object in Jupyter that replicates the web page for the object
-(<a href="{% static 'jupyter/DisplayObject.html' %}">HTML</a>,
-<a href="{% static 'jupyter/DisplayObject.ipynb' %}">ipynb</a>)
-</li>
-<li>Plotting sky coverage on Mollweide projection
-(<a href="{% static 'jupyter/Coverage.html' %}">HTML</a>,
-<a href="{% static 'jupyter/Coverage.ipynb' %}">ipynb</a>)
-</li>
-<li>Star/galaxy separation analysis
-(<a href="{% static 'jupyter/PS1StarGalaxy.html' %}">HTML</a>,
-<a href="{% static 'jupyter/PS1StarGalaxy.ipynb' %}">ipynb</a>)
+<li>Fetching objects that are in a watchlist
+(<a href="{% static 'jupyter/watchlist.html' %}">HTML</a>,
+<a href="{% static 'jupyter/watchlist.ipynb' %}">ipynb</a>)
 </li>
 </ul>	
+There is another set of Jupyter notebooks that run directly on the Lasair database:
+<a href=/jupyter2>more information here</a>.
 Please <a href="mailto:lasair-help@lists.roe.ac.uk?subject=Notebooks">Contact us</a> 
 with any notebooks that you would like to share.
 	</div>

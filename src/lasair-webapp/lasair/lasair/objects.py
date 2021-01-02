@@ -159,6 +159,16 @@ def obj(request, objectId):
         sherlock = row
     #message += str(sherlock)   #%%%%%%%
 
+    TNS = {}
+    query = 'SELECT tns_name, tns_prefix, disc_mag, type, z, host_name, associated_groups '
+    query += 'FROM crossmatch_tns JOIN watchlist_hits ON crossmatch_tns.tns_name = watchlist_hits.name '
+    query += 'WHERE watchlist_hits.wl_id=141 AND watchlist_hits.objectId="%s"' % objectId
+
+    cursor.execute(query)
+    for row in cursor:
+        for k,v in row.items():
+            if v: TNS[k] = v
+    #message += str(TNS)   #%%%%%%%
 
     now = mjd_now()
     objectData['now_mjd'] = '%.2f' % now
@@ -233,7 +243,11 @@ def obj(request, objectId):
  
         count_isdiffpos = count_real_candidates = 0
 
-        candlist = alert['prv_candidates'] + [alert['candidate']]
+        if 'prv_candidates' in alert and alert['prv_candidates']:
+            candlist = alert['prv_candidates'] + [alert['candidate']]
+        else:
+            candlist = [alert['candidate']]
+ 
         candidates = []
         for cand in candlist:
             row = {}
@@ -286,6 +300,6 @@ def obj(request, objectId):
 
     data = {'objectId':objectId, 'objectData': objectData, 'candidates': candidates, 
         'count_isdiffpos': count_isdiffpos, 'count_real_candidates':count_real_candidates,
-        'sherlock': sherlock, 'message':message,
+        'sherlock': sherlock, 'TNS':TNS, 'message':message,
         'comments':comments}
     return data
