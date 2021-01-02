@@ -31,7 +31,7 @@ class UserClassRateThrottle(UserRateThrottle):
         # throttle duration
         while self.history and self.history[-1] <= self.now - self.duration:
             self.history.pop()
-#        logit('%d > %d ' % (len(self.history), self.num_requests))
+        logit('%d of %d api calls for ...' % (len(self.history), self.num_requests))
         if len(self.history) >= self.num_requests:
             return self.throttle_failure()
         return self.throttle_success()
@@ -61,7 +61,7 @@ class UserClassRateThrottle(UserRateThrottle):
             raise ImproperlyConfigured(msg)
 
         if request:
-            if request.user == 'dummy':
+            if str(request.user) == 'dummy':
                 user_type = "ANON_THROTTLE_RATES"
             else:
                 user_type = "USER_THROTTLE_RATES"
@@ -69,11 +69,11 @@ class UserClassRateThrottle(UserRateThrottle):
             for g in request.user.groups.all():
                 if g.name == 'powerapi':
                     user_type = "POWER_THROTTLE_RATES"
+#            logit('%s %s' % (str(request.user), user_type))
         else:
             user_type = "DEFAULT_THROTTLE_RATES"
 
         throttle_rates = lasair.settings.REST_FRAMEWORK[user_type]
-#        logit( user_type)
 
         try:
             return throttle_rates[self.scope]
