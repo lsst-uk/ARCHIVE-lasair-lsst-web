@@ -8,9 +8,23 @@ The Lasair-Sherlock API allows developers to run queries and cone-searches,
 to see outputs from streaming queries, and to query the Sherlock sky-context system.
 <h4>Request and response formats</h4>
 The Lasair uses either HTTP GET or POST. Arguments can be passed in the query string, as JSON or form encoded. Responses are JSON. 
-The examples below show how to drive the API with either GET URL, POST curl or python.
+The examples below show how to drive the API with either GET URL, POST curl or python with the 'requests' package.
 
-<h4>Authorisation</h4>
+<h4>Throttling of API Usage</h4>
+The Lasair API counts numbers of calls on a per-user basis, and restricts the number that can be executed in any hour time period. There are also restrictions on the number of rows that can be returned by the 'query' method. The token shown below is just to show you how the API services work, it is not intended for real work. To use the API with less throttling, please get your own token from your Lasair account, as explained below "Get Your Token". If you would like to use the system for serious work, please 
+<a href="mailto:lasair-help@lists.roe.ac.uk?subject=throttling problem">Email Lasair-help</a>, explain what you are doing, and you will be put into the "Power Users" category. The limits for these three categories of user are:
+<ul>
+<li>Anonymous token (shown below): 10 API calls per hour, maximum 1000 rows from query.</li>
+<li>User token (see 'Get Your Token') below: 100 API calls per hour, maximum 10,000 rows from query.</li>
+<li>Power user token (on request): 10,000 API calls per hour, maximum 1,000,000 rows from query.</li>
+</ul>
+
+<b>Note: WE ASK YOU TO PLEASE NOT SHARE THESE TOKENS. </b>
+If you share code that uses the Lasair API, please put the token in a separate, imported file or environment variable, that you do not share, and is not put in github.
+<p>
+
+
+<a name=auth_token><h5>Authorisation Token</h5></a>
 Request authentication is via authentication tokens. For GET queries, the token can go in 
 the parameter string, and for POST queries, the token goes in the headers.
 An example of a token is:
@@ -18,7 +32,7 @@ An example of a token is:
 4b762569bb349bd8d60f1bc7da3f39dbfaefff9a
 </pre>
 This "starter" token can be used for experiments with the API.
-However, this key is throttled ans restricted, and should only be used
+However, this key is throttled and restricted, and should only be used
 for discovery and play, not serious use.
 
 <a name=auth_token><h5>Get Your Token</h5></a>
@@ -28,9 +42,7 @@ curl --data 'username=u&password=p' https://lasair-iris.roe.ac.uk/api/auth-token
 </pre>
 where <code>u</code> and <code>p</code> are replaced with username and password for your Lasair account,
 which you can obtain <a href=/signup>here</a>. Each key can only do a certain number of requests 
-before the server responds with status code 429 and will not do more until some time has passed.
-If this is a problem for you, please 
-<a href="mailto:lasair-help@lists.roe.ac.uk?subject=throttling problem">Email Lasair-help</a>.
+before the server responds with status code 429 and will not do more until an hour has passed.
 
 <h4>Return Codes</h4>
 It is important to check the <a href=https://en.wikipedia.org/wiki/List_of_HTTP_status_codes>HTTP return code</a> 

@@ -149,7 +149,7 @@ class QuerySerializer(serializers.Serializer):
     selected   = serializers.CharField(max_length=1024, required=True)
     tables     = serializers.CharField(max_length=1024, required=True)
     conditions = serializers.CharField(max_length=1024, required=True)
-    limit      = serializers.IntegerField(max_value=1000, required=False)
+    limit      = serializers.IntegerField(max_value=1000000, required=False)
     offset     = serializers.IntegerField(required=False)
 
     def save(self):
@@ -166,17 +166,18 @@ class QuerySerializer(serializers.Serializer):
         # Get the authenticated user, if it exists.
         userId = 'unknown'
         request = self.context.get("request")
+        maxlimit = 1000
         if request and hasattr(request, "user"):
             userId = request.user
+            if str(userId) != 'dummy':
+                maxlimit = 10000
+            for g in request.user.groups.all():
+                if g.name == 'powerapi':
+                    maxlimit = 1000000
             record_user(userId, 'query')
 
         page = 0
-        if userId == 'dummy':
-            maxlimit = 1000
-            limitseconds = 300
-        else:
-            maxlimit = 10000
-            limitseconds = 3000
+        limitseconds = 300
 
         if limit == None: limit = 1000
         else:             limit = int(limit)
