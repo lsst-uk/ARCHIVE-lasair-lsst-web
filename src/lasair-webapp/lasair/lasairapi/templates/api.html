@@ -6,9 +6,13 @@
 <h1>Lasair and Sherlock API</h1>
 The Lasair-Sherlock API allows developers to run queries and cone-searches, 
 to see outputs from streaming queries, and to query the Sherlock sky-context system.
-<h4>Request and response formats</h4>
-The Lasair uses either HTTP GET or POST. Arguments can be passed in the query string, as JSON or form encoded. Responses are JSON. 
+<h4>Ways to use the API</h4>
+The Lasair API uses either HTTP GET or POST. Arguments can be passed in the query string, as JSON or form encoded. Responses are JSON. 
+There is a throttling system in the backend: if you use the authprisation token shown below, it will only accept 10 requests in an hour.
+<p>
 The examples below show how to drive the API with either GET URL, POST curl or python with the 'requests' package.
+The URL should be pasted into a web browser. The curl script pasted into a terminal window, and the python code
+copied into a file and executed as a python program.
 
 <h4>Throttling of API Usage</h4>
 The Lasair API counts numbers of calls on a per-user basis, and restricts the number that can be executed in any hour time period. There are also restrictions on the number of rows that can be returned by the 'query' method. The token shown below is just to show you how the API services work, it is not intended for real work. To use the API with less throttling, please get your own token from your Lasair account, as explained below "Get Your Token". If you would like to use the system for serious work, please 
@@ -38,7 +42,7 @@ for discovery and play, not serious use.
 <a name=auth_token><h5>Get Your Token</h5></a>
 We recommend that users request their own key by running the following script:
 <pre class="literal-block">
-curl --data 'username=u&password=p' https://lasair-iris.roe.ac.uk/api/auth-token/
+curl --data "username=u&password=p" https://lasair-iris.roe.ac.uk/api/auth-token/
 </pre>
 where <code>u</code> and <code>p</code> are replaced with username and password for your Lasair account,
 which you can obtain <a href=/signup>here</a>. Each key can only do a certain number of requests 
@@ -95,8 +99,8 @@ https://lasair-iris.roe.ac.uk/api/cone/?&ra=194.494&dec=48.851&radius=240.0&requ
 <dt class="url-label">Curl Example</dt> <dd>
 <p> The authorization token goes in the header of the request, and the data in the data section.  </p>
 <pre class="literal-block">
-curl --header 'Authorization: Token 4b762569bb349bd8d60f1bc7da3f39dbfaefff9a' \
---data 'ra=194.494&dec=48.851&radius=240.0&requestType=all' \
+curl --header "Authorization: Token 4b762569bb349bd8d60f1bc7da3f39dbfaefff9a" \
+--data "ra=194.494&dec=48.851&radius=240.0&requestType=all" \
 https://lasair-iris.roe.ac.uk/api/cone/
 </pre>
 </dd>
@@ -158,8 +162,8 @@ https://lasair-iris.roe.ac.uk/api/query/?selected=objectId%2Cgmag&tables=objects
 <dt class="url-label">Curl Example</dt> <dd>
 <p> The authorization token goes in the header of the request, and the data in the data section.  </p>
 <pre class="literal-block">
-curl --header 'Authorization: Token 4b762569bb349bd8d60f1bc7da3f39dbfaefff9a' \
---data 'selected=objectId,gmag&tables=objects&conditions=gmag&lt;12.0&limit=3' \
+curl --header "Authorization: Token 4b762569bb349bd8d60f1bc7da3f39dbfaefff9a" \
+--data "selected=objectId,gmag&tables=objects&conditions=gmag&lt;12.0&limit=3" \
 https://lasair-iris.roe.ac.uk/api/query/
 </pre>
 </dd>
@@ -232,8 +236,8 @@ https://lasair-iris.roe.ac.uk/api/streams/?regex=.%2ASN.%2A&token=4b762569bb349b
 <p> The authorization token goes in the header of the request, and the data in the data section.  
 </p>
 <pre class="literal-block">
-curl --header 'Authorization: Token 4b762569bb349bd8d60f1bc7da3f39dbfaefff9a' \
---data 'regex=.*SN.*' \
+curl --header "Authorization: Token 4b762569bb349bd8d60f1bc7da3f39dbfaefff9a" \
+--data "regex=.*SN.*" \
 https://lasair-iris.roe.ac.uk/api/streams/
 </pre>
 <p>and the return is a list of topic names, and a URL to get more information: </p>
@@ -259,8 +263,8 @@ https://lasair-iris.roe.ac.uk/api/streams/2SN-likecandidates/?limit=1&token=4b76
 For more information about this stream, see <a href=https://lasair-iris.roe.ac.uk/query/2/>here</a>.
 </p>
 <pre class="literal-block">
-curl --header 'Authorization: Token 4b762569bb349bd8d60f1bc7da3f39dbfaefff9a' \
---data '2SN-likecandidates&limit=1' \
+curl --header "Authorization: Token 4b762569bb349bd8d60f1bc7da3f39dbfaefff9a" \
+--data "2SN-likecandidates&limit=1" \
 https://lasair-iris.roe.ac.uk/api/streams/
 </pre>
 <p>and the return is something like: </p>
@@ -339,7 +343,7 @@ https://lasair-iris.roe.ac.uk/api/lightcurves/?objectIds=ZTF20acgrvqo%2CZTF19acy
 <p> The authorization token goes in the header of the request, and the data in the data section.  
 </p>
 <pre class="literal-block">
-curl --header 'Authorization: Token 4b762569bb349bd8d60f1bc7da3f39dbfaefff9a' \
+curl --header "Authorization: Token 4b762569bb349bd8d60f1bc7da3f39dbfaefff9a" \
 --data "objectIds=ZTF20acgrvqo,ZTF19acylwtd,ZTF18acmziob" \
 https://lasair-iris.roe.ac.uk/api/lightcurves/
 </pre>
@@ -409,7 +413,7 @@ https://lasair-iris.roe.ac.uk/api/sherlock/objects/?objectIds=ZTF20acpwljl%2CZTF
 <p> The authorization token goes in the header of the request, and the data in the data section.  
 </p>
 <pre class="literal-block">
-curl --header 'Authorization: Token 4b762569bb349bd8d60f1bc7da3f39dbfaefff9a' \
+curl --header "Authorization: Token 4b762569bb349bd8d60f1bc7da3f39dbfaefff9a" \
 --data "objectIds=ZTF20acpwljl,ZTF20acqqbkl,ZTF20acplggt&lite=True" \
 https://lasair-iris.roe.ac.uk/api/sherlock/objects/
 </pre>
@@ -483,8 +487,8 @@ https://lasair-iris.roe.ac.uk/api/sherlock/position/?ra=16.851866&dec=34.53307&t
 <p> The authorization token goes in the header of the request, and the data in the data section.  
 </p>
 <pre class="literal-block">
-curl --header 'Authorization: Token 4b762569bb349bd8d60f1bc7da3f39dbfaefff9a' \
---data 'ra=16.851866&dec=34.53307' \
+curl --header "Authorization: Token 4b762569bb349bd8d60f1bc7da3f39dbfaefff9a" \
+--data "ra=16.851866&dec=34.53307" \
 https://lasair-iris.roe.ac.uk/api/sherlock/position/
 </pre>
 </dd>

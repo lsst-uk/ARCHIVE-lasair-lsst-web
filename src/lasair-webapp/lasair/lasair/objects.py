@@ -142,6 +142,9 @@ def obj(request, objectId):
         objectData['ec_lon'] = ec_lon
         objectData['ec_lat'] = ec_lat
 
+        now = mjd_now()
+        objectData['now_mjd'] = '%.2f' % now
+
 #        query = 'SELECT catalogue_object_id, catalogue_table_name, catalogue_object_type, separationArcsec, '
 #        query += '_r AS r, _g AS g, photoZ, rank '
 #        query += 'FROM sherlock_crossmatches where objectId="%s"' % objectId
@@ -170,8 +173,6 @@ def obj(request, objectId):
             if v: TNS[k] = v
     #message += str(TNS)   #%%%%%%%
 
-    now = mjd_now()
-    objectData['now_mjd'] = '%.2f' % now
 
     if lasair.settings.CASSANDRA is not None:
 

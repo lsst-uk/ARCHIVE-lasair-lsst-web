@@ -33,11 +33,10 @@
 
 
 
-Watchlist has {{ number_cones }} sources under watch, with {{ count }} shown below..
+Watchlist has {{ number_cones }} sources under watch, with {{ count }} shown below.
+There have been {{ number_hits }} matches with ZTF objects.
 To see the original input data, click <a href=/watchlist/{{ watchlist.wl_id }}/txt/>here</a>.
-<hr/>
 {{ message }}
-<hr/>
 {% if is_owner and number_count < 10000 %}
 <table cellpadding=10><tr>
 <td><form method="POST"  action="/watchlist/{{ watchlist.wl_id }}/">
@@ -54,9 +53,10 @@ To see the original input data, click <a href=/watchlist/{{ watchlist.wl_id }}/t
 <tr>
 <th>RA</th>
 <th>Dec</th>
-<th>Object</th>
+<th>Name</th>
 <th>Radius</th>
 <th>objectId</th>
+<th>Age (days)</th>
 <th>candidates</th>
 <!--
 <th>g-mag diff</th>
@@ -71,10 +71,8 @@ To see the original input data, click <a href=/watchlist/{{ watchlist.wl_id }}/t
 <td>{{ c.radius }}</td>
 {% if c.ncand %}
   <td><a href=/object/{{ c.objectId }}/>{{ c.objectId }}</a></td>
-  <td>{{ c.ncand }}</td>
-<!--  <td>{{ c.gdiff|floatformat:1 }}</td>
-  <td>{{ c.rdiff|floatformat:1 }}</td>
-  <td>{{ c.sherlock_classification }}</td> -->
+<td>{{ c.age|floatformat:4 }}</td>
+<td>{{ c.ncand }}</td>
 {% endif %}
 </tr>
 {% endfor %}

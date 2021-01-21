@@ -198,55 +198,70 @@ def show_watchlist(request, wl_id):
 #LEFT JOIN sherlock_classifications AS s on o.objectId = s.objectId
 #WHERE c.wl_id=%d ORDER BY o.ncand DESC LIMIT 100
 #"""
-    query = """
-SELECT 
-c.ra, c.decl, c.name, c.radius, o.objectId, o.ncand, h.arcsec
-FROM watchlist_cones AS c 
-LEFT JOIN watchlist_hits           AS h ON c.cone_id = h.cone_id 
-LEFT JOIN objects                  AS o on h.objectId = o.objectId 
-WHERE c.wl_id=%d ORDER BY o.ncand DESC LIMIT 100
-"""
-    cursor.execute(query % wl_id)
-    cones = cursor.fetchall()
-    conelist = []
-    found = 0
+#    query = """
+#SELECT 
+#c.ra, c.decl, c.name, c.radius, o.objectId, o.ncand, h.arcsec
+#FROM watchlist_cones AS c 
+#LEFT JOIN watchlist_hits           AS h ON c.cone_id = h.cone_id 
+#LEFT JOIN objects                  AS o on h.objectId = o.objectId 
+#WHERE c.wl_id=%d ORDER BY o.ncand DESC LIMIT 100
+#"""
 
+
+    query_hit = """
+SELECT 
+c.ra, c.decl, c.name, c.radius, c.cone_id, o.objectId, o.ncand, jdnow()-o.jdmax, h.arcsec
+FROM watchlist_cones AS c 
+NATURAL JOIN watchlist_hits as h
+NATURAL JOIN objects AS o
+WHERE c.wl_id=%d ORDER BY o.jdmax DESC
+"""
+    query_nohit = """
+SELECT 
+c.ra, c.decl, c.name, c.radius, c.cone_id
+FROM watchlist_cones AS c 
+WHERE c.wl_id=%d LIMIT 100
+"""
+    cursor.execute(query_hit % wl_id)
+    hits = cursor.fetchall()
+    conelist = []
+    coneIdList = []
+    number_hits = len(hits)
+    number_in_list = 0
+
+    for c in hits:
+        d = {'ra'  :c[0], 'decl' :c[1], 'name':c[2]}
+        if c[3]: d['radius'] = c[3]
+        else:    d['radius'] = watchlist.radius
+        coneId = c[4]
+        d['objectId'] = c[5]
+        d['ncand']    = c[6]
+        d['age']      = c[7]
+        d['arcsec']   = c[8]
+        coneIdList.append(coneId)
+        conelist.append(d)
+        number_in_list += 1
+        if number_in_list >= 100: break
+
+    cursor.execute(query_nohit % wl_id)
+    cones = cursor.fetchall()
     for c in cones:
         d = {'ra'  :c[0], 'decl' :c[1], 'name':c[2]}
         if c[3]: d['radius'] = c[3]
         else:    d['radius'] = watchlist.radius
-        if c[4]:   # objectId, means a hit
-            found += 1
-            d['objectId'] = c[4]
-            d['ncand']    = c[5]
-            d['arcsec']   = c[6]
-#            d['gdiff']    = c[7]
-#            d['rdiff']    = c[8]
-#            d['sherlock_classification'] = c[9]
-        conelist.append(d)
-
-    def first(d):
-        """first.
-
-        Args:
-            d:
-        """
-        if 'objectId' in d: 
-            if 'ncand' in d:
-                return '%04d%s' % (d['ncand'], d['objectId'])
-            else:
-                return '0000%s' % d['objectId']
-        else:
-            return '000000000'
-
-    conelist.sort(reverse=True, key=first)
+        coneId = c[4]
+        if coneId not in coneIdList:
+            number_in_list += 1
+            if number_in_list >= 100: break
+            conelist.append(d)
 
     count = len(conelist)
     
     return render(request, 'show_watchlist.html',{
         'watchlist':watchlist, 
         'conelist' :conelist, 
-        'count'    :count, 
+        'count'    : len(conelist), 
         'number_cones': number_cones,
+        'number_hits' : number_hits,
         'is_owner' :is_owner,
         'message'  :message})

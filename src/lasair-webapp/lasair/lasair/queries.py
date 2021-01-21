@@ -1,3 +1,4 @@
+import os
 from django.shortcuts import render, get_object_or_404, redirect
 from django.template.context_processors import csrf
 from django.http import HttpResponse
@@ -100,6 +101,12 @@ def show_myquery(request, mq_id):
     """
     return handle_myquery(request, mq_id)
 
+def delete_stream_file(request, query_name):
+    topic = query_utilities.topic_name(request.user.id, query_name)
+    filename = '/mnt/cephfs/roy/streams/%s' % topic
+    if os.path.exists(filename):
+        os.remove(filename)
+
 def handle_myquery(request, mq_id=None):
     """handle_myquery.
 
@@ -173,6 +180,7 @@ def handle_myquery(request, mq_id=None):
         # Delete the given query
         if 'delete' in request.POST:
             myquery.delete()
+            delete_stream_file(request, myquery.name)
             return redirect('/querylist/')
 
         # Copy the given query
@@ -207,6 +215,7 @@ def handle_myquery(request, mq_id=None):
                     myquery.public  = 1 # if set to 1 or 2 leave it as it is
             else:
                 myquery.public  = 0
+            delete_stream_file(request, myquery.name)
             message += 'Query updated: %s' % myquery.name
 
         myquery.save()
