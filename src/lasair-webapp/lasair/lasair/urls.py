@@ -65,7 +65,7 @@ urlpatterns = [
     path('jupyter2',  TemplateView.as_view(template_name='jupyter2.html')),
     path('release',  TemplateView.as_view(template_name='release.html')),
     path('contact',  TemplateView.as_view(template_name='contact.html')),
-    path('fits/<slug:objectId_cutoutType>/',  services.fits,     name='fits'),
+    path('fits/<slug:candid_cutoutType>/',  services.fits,     name='fits'),
 
     path('accounts/', include('django.contrib.auth.urls')),
     path('signup/',                  views.signup,              name='signup'),

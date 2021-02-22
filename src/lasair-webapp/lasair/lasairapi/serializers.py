@@ -262,30 +262,40 @@ class StreamsSerializer(serializers.Serializer):
         return { "error": 'Must supply either topic or regex' }
 
 def get_lightcurve(objectId):
-    avro = objectStore(suffix = 'avro',
-        fileroot=lasair.settings.BLOB_STORE_ROOT + '/avro')
 
-    try:
-        avro_fp = avro.getFileObject(objectId)
-    except:
+    json_store = objectStore(suffix = 'json',
+        fileroot=lasair.settings.BLOB_STORE_ROOT + '/objectjson')
+
+    json_object = json_store.getObject(objectId)
+    if not json_object or len(json_object) == 0:
         message = 'objectId %s does not exist'%objectId
         return {"error":message}
+    candidates = json.loads(json_object)
 
-    alert = {}
-    for record in fastavro.reader(avro_fp):
-        for k,v in record.items():
-            if k not in ['cutoutDifference', 'cutoutTemplate', 'cutoutScience']:
-                alert[k] = v
-    candidates = []
-    candlist = alert['prv_candidates'] + [alert['candidate']]
-    candidates = []
-    for cand in candlist:
-        row = {}
-        for key in ['candid', 'fid', 'magpsf', 'sigmapsf', 'isdiffpos']:
-            if key in cand: row[key] = cand[key]
-        row['mjd'] = mjd = float(cand['jd']) - 2400000.5
-        if cand['candid']:
-            candidates.append(row)
+#    avro = objectStore(suffix = 'avro',
+#        fileroot=lasair.settings.BLOB_STORE_ROOT + '/avro')
+
+#    try:
+#        avro_fp = avro.getFileObject(objectId)
+#    except:
+#        message = 'objectId %s does not exist'%objectId
+#        return {"error":message}
+
+#    alert = {}
+#    for record in fastavro.reader(avro_fp):
+#        for k,v in record.items():
+#            if k not in ['cutoutDifference', 'cutoutTemplate', 'cutoutScience']:
+#                alert[k] = v
+#    candidates = []
+#    candlist = alert['prv_candidates'] + [alert['candidate']]
+#    candidates = []
+#    for cand in candlist:
+#        row = {}
+#        for key in ['candid', 'fid', 'magpsf', 'sigmapsf', 'isdiffpos']:
+#            if key in cand: row[key] = cand[key]
+#        row['mjd'] = mjd = float(cand['jd']) - 2400000.5
+#        if cand['candid']:
+#            candidates.append(row)
     return candidates
 
 def get_lightcurves(objectIds):

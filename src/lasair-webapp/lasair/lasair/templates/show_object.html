@@ -119,9 +119,9 @@ Best crossmatch is {{ data.sherlock.catalogue_object_type }}{% endif %}
 </td></tr><tr><td>
   <small>This image is the most recent. 
 Click on these links to inspect the 
-<a href="/fitsview/{{ data.objectId }}_cutoutScience/" target=_blank>science</a>,
-<a href="/fitsview/{{ data.objectId }}_cutoutTemplate/" target=_blank>ref</a>, and
-<a href="/fitsview/{{ data.objectId }}_cutoutDifference/" target=_blank>diff</a>
+<a href="/fitsview/{{ data.candidates.0.candid }}_cutoutScience/" target=_blank>science</a>,
+<a href="/fitsview/{{ data.candidates.0.candid }}_cutoutTemplate/" target=_blank>ref</a>, and
+<a href="/fitsview/{{ data.candidates.0.candid }}_cutoutDifference/" target=_blank>diff</a>
 images in detail.</small>
 </td></tr></table
 </div>
@@ -171,6 +171,7 @@ You must be signed in to post comments.
         <th>Filter</th>
         <th>magpsf</th>
         <th>status</th>
+        <th>images</th>
         </tr></thead>
                 <tbody>
         {% for cand in data.candidates %}
@@ -184,13 +185,13 @@ You must be signed in to post comments.
             <td> {% if cand.candid %}{{ cand.isdiffpos }}
              {% else %}<font color="gray" size=-2>non-detection</font>
 		    {% endif %}</td>
-<!--	
+
 	    <td>{% if cand.candid > 0 %}
-		    <a href=/fitsview/sci/{{ data.objectId }}/ target=_blank><small>target</small></a> 
-		    <a href=/fitsview/ref/{{ data.objectId }}/ target=_blank><small>ref</small></a>
-		    <a href=/fitsview/diff/{{ data.objectId }}/ target=_blank><small>diff</small></a>
+		    <a href=/fitsview/{{ cand.candid }}_cutoutScience/ target=_blank><small>target</small></a> 
+		    <a href=/fitsview/{{ cand.candid }}_cutoutTemplate/ target=_blank><small>ref</small></a>
+		    <a href=/fitsview/{{ cand.candid }}_cutoutDifference/ target=_blank><small>diff</small></a>
                 {% endif %}</td>
--->
+
             </tr>
 
         {% endfor %}
@@ -244,8 +245,9 @@ $(document).ready(function()
     aladin.addCatalog(hipsCats['ps1']);
     aladin.addCatalog(hipsCats['gdr2']);
 */
+    var fits_url = '/fits/{{ data.candidates.0.candid }}_cutoutScience';
     console.log('starting fitsview');
-    var fits_url = '/fits/{{ data.objectId }}_cutoutScience';
+    console.log(fits_url)
     var fits = new FITS (gebi ("fits_div"), 0);
     start_fitsview(fits, fits_url);
 

@@ -15,7 +15,7 @@ import json
 from utility.mag import dc_mag
 from utility.objectStore import objectStore
 import time
-import fastavro
+#import fastavro
 
 # 2020-08-03 KWS Added cassandra connectivity
 if lasair.settings.CASSANDRA is not None:
@@ -84,6 +84,10 @@ def objhtml(request, objectId):
         objectId:
     """
     data = obj(request, objectId)
+    if not data:
+        return render(request, 'error.html', 
+                {'message': 'Object %s not in database' % objectId})
+
     data2 = data.copy()
     if 'comments' in data2:
         data2.pop('comments')
@@ -101,7 +105,8 @@ def objjson(request, objectId):
         objectId:
     """
     data = obj(request, objectId)
-    if 'comments' in data:
+
+    if data and 'comments' in data:
         data.pop('comments')
     return HttpResponse(json.dumps(data, indent=2), content_type="application/json")
 
@@ -129,6 +134,8 @@ def obj(request, objectId):
                  'mine': (c.user == request.user)})
         message += ' and %d comments' % len(comments)
         message += str(comments)
+    else:
+        return None
 
 #    crossmatches = []
     if objectData:
@@ -222,24 +229,17 @@ def obj(request, objectId):
 
 
 
-        avro = objectStore(suffix = 'avro',
-            fileroot=lasair.settings.BLOB_STORE_ROOT + '/avro')
+        json_store = objectStore(suffix = 'json',
+            fileroot=lasair.settings.BLOB_STORE_ROOT + '/objectjson')
 
-        try:
-            avro_fp = avro.getFileObject(objectId)
-        except:
+        json_object = json_store.getObject(objectId)
+
+        if not json_object:
             message = 'objectId %s does not exist'%objectId
             data = {'objectId':objectId, 'message':message}
             return data
 
-        alert = {}
-        for record in fastavro.reader(avro_fp):
-            for k,v in record.items():
-                if k not in ['cutoutDifference', 'cutoutTemplate', 'cutoutScience']:
-                    alert[k] = v
-
-
-#        alert = json.loads(alertjson)
+        alert = json.loads(json_object)
         candidates = []
  
         count_isdiffpos = count_real_candidates = 0
@@ -252,6 +252,9 @@ def obj(request, objectId):
         candidates = []
         for cand in candlist:
             row = {}
+            if not 'candid' in cand or not cand['candid']:   # nondetections
+                continue
+
             candid = cand['candid']
             for key in ['candid', 'jd', 'ra', 'dec', 'fid', 'nid', 'magpsf', 'sigmapsf', 'isdiffpos', 
                     'ssdistnr', 'ssnamenr', 'drb']:
@@ -262,9 +265,10 @@ def obj(request, objectId):
             date = datetime.strptime("1858/11/17", "%Y/%m/%d")
             date += timedelta(mjd)
             row['utc'] = date.strftime("%Y-%m-%d %H:%M:%S")
-            ssnamenr = cand['ssnamenr']
-            if ssnamenr == 'null':
-                ssnamenr = None
+            if 'ssnamenr' in cand:
+                ssnamenr = cand['ssnamenr']
+                if ssnamenr == 'null':
+                    ssnamenr = None
             if candid and cand['isdiffpos'] == 'f':
                 count_isdiffpos += 1
             if not candid:
@@ -282,25 +286,16 @@ def obj(request, objectId):
         if row['ssdistnr'] > 0 and row['ssdistnr'] < 10:
             objectData['MPCname'] = ssnamenr
 
-    #message += 'Got %d candidates' % len(candlist)
-
-
-#    query = 'SELECT jd-2400000.5 as mjd, fid, diffmaglim '
-#    query += 'FROM noncandidates WHERE objectId = "%s"' % objectId
-#    cursor.execute(query)
-#    for cand in candlist:
-#        mjd = float(row['mjd'])
-#        date = datetime.strptime("1858/11/17", "%Y/%m/%d")
-#        date += timedelta(mjd)
-#        row['utc'] = date.strftime("%Y-%m-%d %H:%M:%S")
-#        row['magpsf'] = row['diffmaglim']
-#        candidates.append(row)
     message += 'Got %d candidates and noncandidates' % len(candidates)
 
     candidates.sort(key= lambda c: c['mjd'], reverse=True)
 
-    data = {'objectId':objectId, 'objectData': objectData, 'candidates': candidates, 
-        'count_isdiffpos': count_isdiffpos, 'count_real_candidates':count_real_candidates,
-        'sherlock': sherlock, 'TNS':TNS, 'message':message,
-        'comments':comments}
+    data = {'objectId':objectId, 
+            'objectData': objectData, 
+            'candidates': candidates, 
+            'count_isdiffpos': count_isdiffpos, 
+            'count_real_candidates':count_real_candidates,
+            'sherlock': sherlock, 
+            'TNS':TNS, 'message':message,
+            'comments':comments}
     return data
