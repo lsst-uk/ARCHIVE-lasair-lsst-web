@@ -73,10 +73,13 @@ Description<br/>
 <textarea name="description" rows=4 cols=80>{{ myquery.description }}</textarea><br/>
 
 Public: <input type="checkbox" name="public" {% if myquery.public > 0 %}checked{% endif %}><br/>
-Active:<br/>
-&nbsp;&nbsp;&nbsp;<input type="radio" name="active" value="0" {% if myquery.active == 0 %}checked{% endif %}> Inactive <br/>
+Streaming:<br/>
+&nbsp;&nbsp;&nbsp;<input type="radio" name="active" value="0" {% if myquery.active == 0 %}checked{% endif %}> Not streaming <br/>
 &nbsp;&nbsp;&nbsp;<input type="radio" name="active" value="1" {% if myquery.active == 1 %}checked{% endif %}> Email to {{ email }} (max once a day) and log <br/>
 &nbsp;&nbsp;&nbsp;<input type="radio" name="active" value="2" {% if myquery.active == 2 %}checked{% endif %}> Kafka and log <br/>
+<font size=-1>A 'Streaming' query will run real time as alerts come in. 
+Results can be sent, also in real time, via email or Kafka.
+</font>
 
 <hr/>
 {% include "query_builder.html" %}
