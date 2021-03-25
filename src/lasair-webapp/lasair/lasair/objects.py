@@ -83,34 +83,29 @@ def objhtml(request, objectId):
         request:
         objectId:
     """
-    data = obj(request, objectId)
+    data = obj(objectId)
     if not data:
         return render(request, 'error.html', 
                 {'message': 'Object %s not in database' % objectId})
 
     data2 = data.copy()
-    if 'comments' in data2:
-        data2.pop('comments')
     if 'sherlock' in data2:
         data2.pop('sherlock')
     return render(request, 'show_object.html',
         {'data':data, 'json_data':json.dumps(data2),
         'authenticated': request.user.is_authenticated})
 
-def objjson(request, objectId):
+def objjson(objectId):
     """objjson.
 
     Args:
         request:
         objectId:
     """
-    data = obj(request, objectId)
+    data = obj(objectId)
+    return data
 
-    if data and 'comments' in data:
-        data.pop('comments')
-    return HttpResponse(json.dumps(data, indent=2), content_type="application/json")
-
-def obj(request, objectId):
+def obj(objectId):
     """Show a specific object, with all its candidates"""
     objectData = None
     message = ''
@@ -122,20 +117,20 @@ def obj(request, objectId):
     for row in cursor:
         objectData = row
 
-    comments = []
-    if objectData:
-        qcomments = Comments.objects.filter(objectid=objectId).order_by('-time')
-        for c in qcomments: 
-            comments.append(
-                {'name':c.user.first_name+' '+c.user.last_name,
-                 'content': c.content,
-                 'time': c.time,
-                 'comment_id': c.comment_id,
-                 'mine': (c.user == request.user)})
-        message += ' and %d comments' % len(comments)
-        message += str(comments)
-    else:
-        return None
+#    comments = []
+#    if objectData:
+#        qcomments = Comments.objects.filter(objectid=objectId).order_by('-time')
+#        for c in qcomments: 
+#            comments.append(
+#                {'name':c.user.first_name+' '+c.user.last_name,
+#                 'content': c.content,
+#                 'time': c.time,
+#                 'comment_id': c.comment_id,
+#                 'mine': (c.user == request_user)})
+#        message += ' and %d comments' % len(comments)
+#        message += str(comments)
+#    else:
+#        return None
 
 #    crossmatches = []
     if objectData:
@@ -297,5 +292,5 @@ def obj(request, objectId):
             'count_real_candidates':count_real_candidates,
             'sherlock': sherlock, 
             'TNS':TNS, 'message':message,
-            'comments':comments}
+            }
     return data

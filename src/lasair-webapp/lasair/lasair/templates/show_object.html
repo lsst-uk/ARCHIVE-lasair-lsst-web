@@ -56,7 +56,7 @@ Moving object, MPC name is <a href="#" onclick="document.forms[1].submit();">{{ 
 <li>{{ data.annotation|safe }}{% endif %}</li>
 {% endif %}
 
-<li>Information on this webpage also&nbsp; <a href="/object/{{ data.objectId }}/json/">available as JSON.</a></li>
+<!--<li>Information on this webpage also&nbsp; <a href="/object/{{ data.objectId }}/json/">available as JSON.</a></li> -->
 
 <form method="post" name="ZTFDR1" action="https://irsa.ipac.caltech.edu/cgi-bin/Gator/nph-query" enctype="multipart/form-data">
 <input type="hidden" name="objstr" value="{{ data.objectData.ramean|floatformat:6 }} {{ data.objectData.decmean|floatformat:6 }}" />

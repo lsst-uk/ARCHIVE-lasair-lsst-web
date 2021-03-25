@@ -65,6 +65,7 @@ Click on the method name to jump to documentation in the reference below.
 <li> <a href=#cone>/api/cone/</a>: runs a cone search on all the objects in the Lasair database.</li>
 <li> <a href=#query>/api/query/</a>: runs a SQL SELECT query on the Lasair database. </li>
 <li> <a href=#streams>/api/streams/</a>: returns a record of the output from a Lasair streaming query.</li>
+<li> <a href=#object>/api/object/</a>: returns a machine-readable version of the object web page.</li>
 <li> <a href=#lightcurves>/api/lightcurves/</a>: returns simple lightcurves for a number of objects.</li>
 <li> <a href=#sherlockobjects>/api/sherlock/objects/</a>: returns Sherlock information about a list of named objects.</li>
 <li> <a href=#sherlockposition>/api/sherlock/position/</a>: returns Sherlock information about a sky position.</li>
@@ -307,6 +308,68 @@ else:
 </pre>
 <p>and the return is as above with the curl example </p>
 </dd>
+
+<a name=object><h3>/api/object/</h3></a>
+<dl>
+
+<dt class="url-label">Description</dt> <dd>
+<p>
+This method returns a machine-readable version of the information on an object
+page of the web server. 
+The arguments are:<ul>
+<li><code>objectId</code>: (string) the objectId of the object, </li>
+</ul>
+</p>
+</dd>
+
+<dt class="url-label">GET URL Example</dt> <dd>
+<pre class="literal-block">
+https://lasair-iris.roe.ac.uk/api/object/?objectId=ZTF18abdphvf&token=4b762569bb349bd8d60f1bc7da3f39dbfaefff9a&format=json
+</pre>
+</dd>
+
+<dt class="url-label">Curl Example</dt> <dd>
+<p> The authorization token goes in the header of the request, and the data in the data section.  </p>
+<pre class="literal-block">
+curl --header "Authorization: Token 4b762569bb349bd8d60f1bc7da3f39dbfaefff9a" \
+--data "objectId=ZTF18abdphvf" \
+https://lasair-iris.roe.ac.uk/api/object/
+</pre>
+</dd>
+
+<dt class="url-label">Python Example</dt> <dd>
+<p> This code requires the <code>requests</code> library.
+<pre class="literal-block">
+import requests, json
+headers = { 'Authorization': 'Token 4b762569bb349bd8d60f1bc7da3f39dbfaefff9a' }
+url = 'https://lasair-iris.roe.ac.uk/api/object/'
+data = {
+'objectId'  : 'ZTF18abdphvf',
+}
+r = requests.post(url, data, headers=headers)
+if r.status_code == 200:
+    response = r.json()
+    s = json.dumps(response, indent=2)
+    print(s)
+else: 
+    print(r.status_code)
+    print(r.text)
+</pre>
+<p>and the return is something like: </p>
+<pre class="literal-block">
+status= 200
+{"objectId":"ZTF18abdphvf",
+"objectData":{
+    "ncand":8,
+    "ramean":293.54591006249996,
+    "decmean":49.429229975,
+    "glonmean":81.77021010499132,
+    "glatmean":13.829346704017533,
+.... }
+</pre>
+</dd>
+</dl>
+</dt>
 
 <a name=lightcurves><h3>/api/lightcurves/</h3></a>
 <dl>

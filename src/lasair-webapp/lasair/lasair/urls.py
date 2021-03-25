@@ -37,7 +37,7 @@ urlpatterns = [
     path('cand/<int:candid>/',      candidates.cand,            name='cand'),
 
     path('object/<slug:objectId>/',      objects.objhtml,       name='objhtml'),
-    path('object/<slug:objectId>/json/', objects.objjson,       name='objjson'),
+#    path('object/<slug:objectId>/json/', objects.objjson,       name='objjson'),
 
     path('area/',                   areas.areas_home,           name='areas_home'),
     path('area/<int:ar_id>/',       areas.show_area,            name='show_area'),

@@ -77,6 +77,22 @@ class ConeSerializer(serializers.Serializer):
 
         return info
 
+from lasair.objects import objjson
+class ObjectSerializer(serializers.Serializer):
+    objectId = serializers.CharField(required=True)
+
+    def save(self):
+        objectId = self.validated_data['objectId']
+
+        # Get the authenticated user, if it exists.
+        userId = 'unknown'
+        request = self.context.get("request")
+        if request and hasattr(request, "user"):
+            userId = request.user
+            record_user(userId, 'object')
+
+        return objjson(objectId)
+
 class SherlockObjectsSerializer(serializers.Serializer):
     objectIds = serializers.CharField(required=True)
     lite      = serializers.BooleanField()
@@ -146,9 +162,9 @@ def connect_db():
     return msl
 
 class QuerySerializer(serializers.Serializer):
-    selected   = serializers.CharField(max_length=1024, required=True)
+    selected   = serializers.CharField(max_length=4096, required=True)
     tables     = serializers.CharField(max_length=1024, required=True)
-    conditions = serializers.CharField(max_length=1024, required=True)
+    conditions = serializers.CharField(max_length=4096, required=True)
     limit      = serializers.IntegerField(max_value=1000000, required=False)
     offset     = serializers.IntegerField(required=False)
 
@@ -262,7 +278,6 @@ class StreamsSerializer(serializers.Serializer):
         return { "error": 'Must supply either topic or regex' }
 
 def get_lightcurve(objectId):
-
     json_store = objectStore(suffix = 'json',
         fileroot=lasair.settings.BLOB_STORE_ROOT + '/objectjson')
 
@@ -271,31 +286,6 @@ def get_lightcurve(objectId):
         message = 'objectId %s does not exist'%objectId
         return {"error":message}
     candidates = json.loads(json_object)
-
-#    avro = objectStore(suffix = 'avro',
-#        fileroot=lasair.settings.BLOB_STORE_ROOT + '/avro')
-
-#    try:
-#        avro_fp = avro.getFileObject(objectId)
-#    except:
-#        message = 'objectId %s does not exist'%objectId
-#        return {"error":message}
-
-#    alert = {}
-#    for record in fastavro.reader(avro_fp):
-#        for k,v in record.items():
-#            if k not in ['cutoutDifference', 'cutoutTemplate', 'cutoutScience']:
-#                alert[k] = v
-#    candidates = []
-#    candlist = alert['prv_candidates'] + [alert['candidate']]
-#    candidates = []
-#    for cand in candlist:
-#        row = {}
-#        for key in ['candid', 'fid', 'magpsf', 'sigmapsf', 'isdiffpos']:
-#            if key in cand: row[key] = cand[key]
-#        row['mjd'] = mjd = float(cand['jd']) - 2400000.5
-#        if cand['candid']:
-#            candidates.append(row)
     return candidates
 
 def get_lightcurves(objectIds):
