@@ -10,7 +10,7 @@ to see outputs from streaming queries, and to query the Sherlock sky-context sys
 The Lasair API uses either HTTP GET or POST. Arguments can be passed in the query string, as JSON or form encoded. Responses are JSON. 
 There is a throttling system in the backend: if you use the authprisation token shown below, it will only accept 10 requests in an hour.
 <p>
-The examples below show how to drive the API with either GET URL, POST curl or python with the 'requests' package.
+The examples below show how to drive the API with either GET URL, POST curl or python with the 'lasair' package.
 The URL should be pasted into a web browser. The curl script pasted into a terminal window, and the python code
 copied into a file and executed as a python program.
 
@@ -48,24 +48,13 @@ where <code>u</code> and <code>p</code> are replaced with username and password 
 which you can obtain <a href=/signup>here</a>. Each key can only do a certain number of requests 
 before the server responds with status code 429 and will not do more until an hour has passed.
 
-<h4>Return Codes</h4>
-It is important to check the <a href=https://en.wikipedia.org/wiki/List_of_HTTP_status_codes>HTTP return code</a> 
-from the service, since it provides valuable information in case the result is not what you expect.
-<ul>
-<li>200 OK: the request is satisfied and all is well</li>
-<li>400 Bad Request: something wrong with the request</li>
-<li>401 Unauthorized: something wrong with the authorization token</li>
-<li>429 Too Many Requests: the Lasair API is throttled and you have exceeded that (see above)</li>
-<li>500 Internal Server Error: should not happen, please report this</li>
-</ul>
-
 <h4>Methods</h4>
 Click on the method name to jump to documentation in the reference below.
 <ul>
 <li> <a href=#cone>/api/cone/</a>: runs a cone search on all the objects in the Lasair database.</li>
 <li> <a href=#query>/api/query/</a>: runs a SQL SELECT query on the Lasair database. </li>
 <li> <a href=#streams>/api/streams/</a>: returns a record of the output from a Lasair streaming query.</li>
-<li> <a href=#object>/api/object/</a>: returns a machine-readable version of the object web page.</li>
+<li> <a href=#objects>/api/objects/</a>: returns a machine-readable version of the object web page.</li>
 <li> <a href=#lightcurves>/api/lightcurves/</a>: returns simple lightcurves for a number of objects.</li>
 <li> <a href=#sherlockobjects>/api/sherlock/objects/</a>: returns Sherlock information about a list of named objects.</li>
 <li> <a href=#sherlockposition>/api/sherlock/position/</a>: returns Sherlock information about a sky position.</li>
@@ -107,24 +96,16 @@ https://lasair-iris.roe.ac.uk/api/cone/
 </dd>
 
 <dt class="url-label">Python Example</dt> <dd>
-<p> This code requires the <code>requests</code> library.
+<p> This code requires the <code>lasair</code> library.
 <pre class="literal-block">
-import requests, json
-headers = { 'Authorization': 'Token 4b762569bb349bd8d60f1bc7da3f39dbfaefff9a' }
-url = 'https://lasair-iris.roe.ac.uk/api/cone/'
-data = {'ra': '194.494', 'dec': '48.851', 'radius': '240', 'requestType':'all' }
-r = requests.post(url, data, headers=headers)
-if r.status_code == 200:
-    response = r.json()
-    s = json.dumps(response, indent=2)
-    print(s)
-else: 
-    print(r.status_code)
-    print(r.text)
+import lasair
+token = '4b762569bb349bd8d60f1bc7da3f39dbfaefff9a'
+L = lasair.lasair(token)
+c = L.cone(ra, dec, radius=240.0, requestType='all')
+print(c)
 </pre>
 <p>and the return has object identifiers, and their separations in arcseconds, something like: </p>
 <pre class="literal-block">
-status= 200
 [
     {
         "object": "ZTF17aaajmtw",
@@ -170,25 +151,16 @@ https://lasair-iris.roe.ac.uk/api/query/
 </dd>
 
 <dt class="url-label">Python Example</dt> <dd>
-<p> This code requires the <code>requests</code> library.
+<p> This code requires the <code>lasair</code> library.
 <pre class="literal-block">
-import requests, json
-headers = { 'Authorization': 'Token 4b762569bb349bd8d60f1bc7da3f39dbfaefff9a' }
-url = 'https://lasair-iris.roe.ac.uk/api/query/'
-data = {
-'selected'  : 'objectId, gmag',
-'tables'    : 'objects',
-'conditions': 'gmag &lt; 12.0',
-'limit'     : 3
-}
-r = requests.post(url, data, headers=headers)
-if r.status_code == 200:
-    response = r.json()
-    s = json.dumps(response, indent=2)
-    print(s)
-else: 
-    print(r.status_code)
-    print(r.text)
+import lasair
+token = '4b762569bb349bd8d60f1bc7da3f39dbfaefff9a'
+L = lasair.lasair(token)
+selected    = 'objectId, gmag'
+tables      = 'objects'
+conditions  = 'gmag &lt; 12.0'
+c = L.query(selected, tables, conditions, limit=10)
+print(c)
 </pre>
 <p>and the return is something like: </p>
 <pre class="literal-block">
@@ -289,42 +261,33 @@ status= 200
 </dd>
 
 <dt class="url-label">Python Example with Topic</dt> <dd>
-<p> This code requires the <code>requests</code> library.
+<p> This code requires the <code>lasair</code> library.
 <pre class="literal-block">
-import requests,json
-headers = { 'Authorization': 'Token a8f6df0e27618012c7cfbd957e8db267b82dc8c6' }
-url = 'https://lasair-iris.roe.ac.uk/api/streams/2SN-likecandidates/'
-data = { 'limit': 3 }
-r = requests.post(url, data, headers=headers)
-print('status=', r.status_code)
-response = r.json()
-if r.status_code == 200:
-    response = r.json()
-    s = json.dumps(response, indent=2)
-    print(s)
-else:
-    print(r.status_code)
-    print(r.text)
+import lasair
+token = '4b762569bb349bd8d60f1bc7da3f39dbfaefff9a'
+L = lasair.lasair(token)
+print(L.streams_topics())
+c = L.streams('2SN-likecandidates', limit=10)
 </pre>
 <p>and the return is as above with the curl example </p>
 </dd>
 
-<a name=object><h3>/api/object/</h3></a>
+<a name=objects><h3>/api/objects/</h3></a>
 <dl>
 
 <dt class="url-label">Description</dt> <dd>
 <p>
-This method returns a machine-readable version of the information on an object
-page of the web server. 
+This method returns a machine-readable version of the information on a list of objects,
+which replicates the information on the object page of the web server. 
 The arguments are:<ul>
-<li><code>objectId</code>: (string) the objectId of the object, </li>
+<li><code>objectIds</code>: a list of objectIds for which data is wanted </li>
 </ul>
 </p>
 </dd>
 
 <dt class="url-label">GET URL Example</dt> <dd>
 <pre class="literal-block">
-https://lasair-iris.roe.ac.uk/api/object/?objectId=ZTF18abdphvf&token=4b762569bb349bd8d60f1bc7da3f39dbfaefff9a&format=json
+https://lasair-iris.roe.ac.uk/api/objects/?objectIds=ZTF18abdphvf,ZTF21aapzzgf&token=4b762569bb349bd8d60f1bc7da3f39dbfaefff9a&format=json
 </pre>
 </dd>
 
@@ -332,32 +295,24 @@ https://lasair-iris.roe.ac.uk/api/object/?objectId=ZTF18abdphvf&token=4b762569bb
 <p> The authorization token goes in the header of the request, and the data in the data section.  </p>
 <pre class="literal-block">
 curl --header "Authorization: Token 4b762569bb349bd8d60f1bc7da3f39dbfaefff9a" \
---data "objectId=ZTF18abdphvf" \
-https://lasair-iris.roe.ac.uk/api/object/
+--data "objectIds=ZTF18abdphvf,ZTF21aapzzgf" \
+https://lasair-iris.roe.ac.uk/api/objects/
 </pre>
 </dd>
 
 <dt class="url-label">Python Example</dt> <dd>
-<p> This code requires the <code>requests</code> library.
+<p> This code requires the <code>lasair</code> library.
 <pre class="literal-block">
-import requests, json
-headers = { 'Authorization': 'Token 4b762569bb349bd8d60f1bc7da3f39dbfaefff9a' }
-url = 'https://lasair-iris.roe.ac.uk/api/object/'
-data = {
-'objectId'  : 'ZTF18abdphvf',
-}
-r = requests.post(url, data, headers=headers)
-if r.status_code == 200:
-    response = r.json()
-    s = json.dumps(response, indent=2)
-    print(s)
-else: 
-    print(r.status_code)
-    print(r.text)
+import lasair
+token = '4b762569bb349bd8d60f1bc7da3f39dbfaefff9a'
+L = lasair.lasair(token)
+c = L.objects(objectIds)
+print(c)
 </pre>
 <p>and the return is something like: </p>
 <pre class="literal-block">
 status= 200
+[
 {"objectId":"ZTF18abdphvf",
 "objectData":{
     "ncand":8,
@@ -366,6 +321,7 @@ status= 200
     "glonmean":81.77021010499132,
     "glatmean":13.829346704017533,
 .... }
+]
 </pre>
 </dd>
 </dl>
@@ -413,25 +369,19 @@ https://lasair-iris.roe.ac.uk/api/lightcurves/
 </dd>
 
 <dt class="url-label">Python Example</dt> <dd>
-<p> This code requires the <code>requests</code> library.
+<p> This code requires the <code>lasair</code> library.
 <pre class="literal-block">
-import requests,json
-headers = { 'Authorization': 'Token 4b762569bb349bd8d60f1bc7da3f39dbfaefff9a' }
-url = 'https://lasair-iris.roe.ac.uk/api/lightcurves/'
-data = {'objectIds': "ZTF20acgrvqo,ZTF19acylwtd,ZTF18acmziob"}
-r = requests.post(url, data, headers=headers)
-if r.status_code == 200:
-    response = r.json()
-    s = json.dumps(response, indent=2)
-    print(s)
-else:
-    print(r.status_code)
-    print(r.text)
+import lasair
+token = '4b762569bb349bd8d60f1bc7da3f39dbfaefff9a'
+L = lasair.lasair(token)
+c = L.lightcurves(['ZTF20acgrvqo','ZTF19acylwtd','ZTF18acmziob'])
+print(c)
 </pre>
 <p>and the return is something like: </p>
 <pre class="literal-block">
 {
-  "ZTF20acpwljl": [
+  "objectId": "ZTF20acpwljl",
+  "candidates":[
     {
       "candid": 1411435461415015019,
       "fid": 2,
@@ -448,6 +398,7 @@ else:
       "isdiffpos": "t",
       "mjd": 59165.43686340004
     },
+    ]
 ... snip ...
 </pre>
 </dd>
@@ -483,20 +434,13 @@ https://lasair-iris.roe.ac.uk/api/sherlock/objects/
 </dd>
 
 <dt class="url-label">Python Example with list of objects</dt> <dd>
-<p> This code requires the <code>requests</code> library.
+<p> This code requires the <code>lasair</code> library.
 <pre class="literal-block">
-import requests, json
-headers = { 'Authorization': 'Token 4b762569bb349bd8d60f1bc7da3f39dbfaefff9a' }
-url = 'https://lasair-iris.roe.ac.uk/api/sherlock/objects/'
-data = { 'objectIds': 'ZTF20acpwljl,ZTF20acqqbkl,ZTF20acplggt', 'lite':True }
-r = requests.post(url, data, headers=headers)
-if r.status_code == 200:
-    response = r.json()
-    s = json.dumps(response, indent=2)
-    print(s)
-else:
-    print(r.status_code)
-    print(r.text)
+import lasair
+token = '4b762569bb349bd8d60f1bc7da3f39dbfaefff9a'
+L = lasair.lasair(token)
+c = L.sherlock_objects(['ZTF20acgrvqo','ZTF19acylwtd','ZTF18acmziob'])
+print(c)
 </pre>
 <p>and the return is something like: </p>
 <pre class="literal-block">
@@ -557,20 +501,13 @@ https://lasair-iris.roe.ac.uk/api/sherlock/position/
 </dd>
 
 <dt class="url-label">Python Example</dt> <dd>
-<p> This code requires the <code>requests</code> library.
+<p> This code requires the <code>lasair</code> library.
 <pre class="literal-block">
-import requests, json
-headers = { 'Authorization': 'Token 4b762569bb349bd8d60f1bc7da3f39dbfaefff9a' }
-url = 'https://lasair-iris.roe.ac.uk/api/sherlock/position/'
-data = {'ra': 16.851866, 'dec':34.53307}
-r = requests.post(url, data, headers=headers)
-if r.status_code == 200:
-    response = r.json()
-    s = json.dumps(response, indent=2)
-    print(s)
-else:
-    print(r.status_code)
-    print(r.text)
+import lasair
+token = '4b762569bb349bd8d60f1bc7da3f39dbfaefff9a'
+L = lasair.lasair(token)
+c = L.sherlock_position(['ZTF20acgrvqo','ZTF19acylwtd','ZTF18acmziob'])
+print(c)
 </pre>
 <p>and the return is something like: </p>
 <pre class="literal-block">

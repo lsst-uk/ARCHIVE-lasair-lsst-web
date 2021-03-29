@@ -10,7 +10,7 @@ urlpatterns = [
     path('api/streams/',               views.StreamsView.as_view()),
     path('api/streams/<slug:topic>/',  views.StreamsView.as_view()),
     path('api/query/',                 views.QueryView.as_view()),
-    path('api/object/',                views.ObjectView.as_view()),
+    path('api/objects/',               views.ObjectsView.as_view()),
     path('api/lightcurves/',           views.LightcurvesView.as_view()),
     path('api/sherlock/objects/',      views.SherlockObjectsView.as_view()),
     path('api/sherlock/position/',     views.SherlockPositionView.as_view()),

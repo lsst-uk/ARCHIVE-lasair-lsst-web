@@ -71,18 +71,23 @@ class ConeSerializer(serializers.Serializer):
                     objectList.append({"object": row[1]["objectId"], "separation": row[0]})
                 info = objectList
             elif requestType == "count":
-                info = len(results)
+                info = {'count': len(results)}
             else:
                 info = { "error": "Invalid request type" }
 
         return info
 
 from lasair.objects import objjson
-class ObjectSerializer(serializers.Serializer):
-    objectId = serializers.CharField(required=True)
+class ObjectsSerializer(serializers.Serializer):
+    objectIds = serializers.CharField(required=True)
 
     def save(self):
-        objectId = self.validated_data['objectId']
+        objectIds = self.validated_data['objectIds']
+
+        olist = []
+        for tok in objectIds.split(','):
+            olist.append(tok.strip())
+        olist = olist[:10] # restrict to 10
 
         # Get the authenticated user, if it exists.
         userId = 'unknown'
@@ -91,7 +96,10 @@ class ObjectSerializer(serializers.Serializer):
             userId = request.user
             record_user(userId, 'object')
 
-        return objjson(objectId)
+        result = []  
+        for objectId in olist:
+            result.append(objjson(objectId))
+        return result
 
 class SherlockObjectsSerializer(serializers.Serializer):
     objectIds = serializers.CharField(required=True)
@@ -290,9 +298,9 @@ def get_lightcurve(objectId):
 
 def get_lightcurves(objectIds):
     ncand = 0
-    lightcurves = {}
+    lightcurves = []
     for objectId in objectIds:
-        lightcurves[objectId] = get_lightcurve(objectId)
+        lightcurves.append(get_lightcurve(objectId))
     return lightcurves
 
 from utility.objectStore import objectStore

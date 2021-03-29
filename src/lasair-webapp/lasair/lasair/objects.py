@@ -239,16 +239,17 @@ def obj(objectId):
  
         count_isdiffpos = count_real_candidates = 0
 
-        if 'prv_candidates' in alert and alert['prv_candidates']:
-            candlist = alert['prv_candidates'] + [alert['candidate']]
-        else:
-            candlist = [alert['candidate']]
+#        if 'prv_candidates' in alert and alert['prv_candidates']:
+#            candlist = alert['prv_candidates'] + [alert['candidate']]
+#        else:
+#            candlist = [alert['candidate']]
+        candlist = alert['candidates']
  
         candidates = []
         for cand in candlist:
             row = {}
-            if not 'candid' in cand or not cand['candid']:   # nondetections
-                continue
+#            if not 'candid' in cand or not cand['candid']:   # nondetections
+#                continue
 
             candid = cand['candid']
             for key in ['candid', 'jd', 'ra', 'dec', 'fid', 'nid', 'magpsf', 'sigmapsf', 'isdiffpos', 

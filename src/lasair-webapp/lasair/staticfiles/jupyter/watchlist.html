@@ -13131,7 +13131,7 @@ div#notebook {
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[34]:</div>
+<div class="prompt input_prompt">In&nbsp;[1]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">selected</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
@@ -13156,7 +13156,7 @@ div#notebook {
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[35]:</div>
+<div class="prompt input_prompt">In&nbsp;[2]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">conditions</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
@@ -13180,11 +13180,16 @@ div#notebook {
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[36]:</div>
+<div class="prompt input_prompt">In&nbsp;[3]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">requests</span><span class="o">,</span> <span class="nn">json</span>
-<span class="n">headers</span> <span class="o">=</span> <span class="p">{</span> <span class="s1">&#39;Authorization&#39;</span><span class="p">:</span> <span class="s1">&#39;Token 4b762569bb349bd8d60f1bc7da3f39dbfaefff9a&#39;</span> <span class="p">}</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">lasair</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">settings</span>
+    <span class="n">token</span> <span class="o">=</span> <span class="n">settings</span><span class="o">.</span><span class="n">token</span>
+<span class="k">except</span><span class="p">:</span>
+    <span class="n">token</span> <span class="o">=</span> <span class="s1">&#39;4b762569bb349bd8d60f1bc7da3f39dbfaefff9a&#39;</span>
+<span class="n">L</span> <span class="o">=</span> <span class="n">lasair</span><span class="o">.</span><span class="n">lasair</span><span class="p">(</span><span class="n">token</span><span class="p">)</span>
 </pre></div>
 
     </div>
@@ -13202,22 +13207,14 @@ div#notebook {
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[37]:</div>
+<div class="prompt input_prompt">In&nbsp;[4]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">url</span> <span class="o">=</span> <span class="s1">&#39;https://lasair-iris.roe.ac.uk/api/query/&#39;</span>
-<span class="n">data</span> <span class="o">=</span> <span class="p">{</span>
-<span class="s1">&#39;selected&#39;</span>  <span class="p">:</span> <span class="n">selected</span><span class="p">,</span>
-<span class="s1">&#39;tables&#39;</span>    <span class="p">:</span> <span class="s1">&#39;objects, watchlist:139&#39;</span><span class="p">,</span>
-<span class="s1">&#39;conditions&#39;</span><span class="p">:</span> <span class="n">conditions</span>
-<span class="p">}</span>
-
-<span class="n">r</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">)</span> 
-<span class="k">if</span> <span class="n">r</span><span class="o">.</span><span class="n">status_code</span> <span class="o">!=</span> <span class="mi">200</span><span class="p">:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Oops, status code is&#39;</span><span class="p">,</span> <span class="n">r</span><span class="o">.</span><span class="n">status_code</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
-    <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">()</span>
-<span class="n">objDict</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">rows</span> <span class="o">=</span> <span class="n">L</span><span class="o">.</span><span class="n">query</span><span class="p">(</span>
+    <span class="n">selected</span><span class="p">,</span> 
+    <span class="s1">&#39;objects, sherlock_classifications&#39;</span><span class="p">,</span> 
+    <span class="n">conditions</span><span class="p">,</span> 
+    <span class="n">limit</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
 </pre></div>
 
     </div>
@@ -13235,13 +13232,13 @@ div#notebook {
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[38]:</div>
+<div class="prompt input_prompt">In&nbsp;[5]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">objDict</span><span class="p">),</span> <span class="s1">&#39;objects found&#39;</span><span class="p">)</span>
-<span class="k">for</span> <span class="n">obj</span> <span class="ow">in</span> <span class="n">objDict</span><span class="p">:</span>
-    <span class="n">obj_url</span> <span class="o">=</span> <span class="s1">&#39;https://lasair-iris.roe.ac.uk/object/</span><span class="si">%s</span><span class="s1">/&#39;</span> <span class="o">%</span> <span class="n">obj</span><span class="p">[</span><span class="s1">&#39;objectId&#39;</span><span class="p">]</span>
-    <span class="nb">print</span><span class="p">(</span><span class="n">obj_url</span><span class="p">,</span> <span class="n">obj</span><span class="p">[</span><span class="s1">&#39;dmdt_g&#39;</span><span class="p">],</span> <span class="n">obj</span><span class="p">[</span><span class="s1">&#39;dmdt_r&#39;</span><span class="p">])</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">rows</span><span class="p">),</span> <span class="s1">&#39;objects found&#39;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">rows</span><span class="p">:</span>
+    <span class="n">obj_url</span> <span class="o">=</span> <span class="s1">&#39;https://lasair-iris.roe.ac.uk/object/</span><span class="si">%s</span><span class="s1">/&#39;</span> <span class="o">%</span> <span class="n">row</span><span class="p">[</span><span class="s1">&#39;objectId&#39;</span><span class="p">]</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">obj_url</span><span class="p">,</span> <span class="n">row</span><span class="p">[</span><span class="s1">&#39;dmdt_g&#39;</span><span class="p">],</span> <span class="n">row</span><span class="p">[</span><span class="s1">&#39;dmdt_r&#39;</span><span class="p">])</span>
 </pre></div>
 
     </div>
@@ -13258,9 +13255,17 @@ div#notebook {
 
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>2 objects found
-https://lasair-iris.roe.ac.uk/object/ZTF18aahitda/ 0.0133882 -0.0047752
-https://lasair-iris.roe.ac.uk/object/ZTF19abymuda/ -0.115601 0.198016
+<pre>10 objects found
+https://lasair-iris.roe.ac.uk/object/ZTF17aaaaaam/ None 1.26061e-05
+https://lasair-iris.roe.ac.uk/object/ZTF17aaaaaan/ 0.0607155 0.0418418
+https://lasair-iris.roe.ac.uk/object/ZTF17aaaaaat/ 0.00970371 -0.0729393
+https://lasair-iris.roe.ac.uk/object/ZTF17aaaaabj/ 0.0235595 -0.0029411
+https://lasair-iris.roe.ac.uk/object/ZTF17aaaaabl/ -0.0763019 956.798
+https://lasair-iris.roe.ac.uk/object/ZTF17aaaaace/ 0.0406964 0.208307
+https://lasair-iris.roe.ac.uk/object/ZTF17aaaaacp/ 0.187475 -0.0546904
+https://lasair-iris.roe.ac.uk/object/ZTF17aaaaadg/ None 0.0039719
+https://lasair-iris.roe.ac.uk/object/ZTF17aaaaadx/ 0.0501922 -0.0239064
+https://lasair-iris.roe.ac.uk/object/ZTF17aaaaaee/ 0.0628115 0.616767
 </pre>
 </div>
 </div>

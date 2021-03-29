@@ -13123,11 +13123,16 @@ div#notebook {
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[15]:</div>
+<div class="prompt input_prompt">In&nbsp;[20]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">requests</span><span class="o">,</span> <span class="nn">json</span>
-<span class="n">headers</span> <span class="o">=</span> <span class="p">{</span> <span class="s1">&#39;Authorization&#39;</span><span class="p">:</span> <span class="s1">&#39;Token 4b762569bb349bd8d60f1bc7da3f39dbfaefff9a&#39;</span> <span class="p">}</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">lasair</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">settings</span>
+    <span class="n">token</span> <span class="o">=</span> <span class="n">settings</span><span class="o">.</span><span class="n">token</span>
+<span class="k">except</span><span class="p">:</span>
+    <span class="n">token</span> <span class="o">=</span> <span class="s1">&#39;4b762569bb349bd8d60f1bc7da3f39dbfaefff9a&#39;</span>
+<span class="n">L</span> <span class="o">=</span> <span class="n">lasair</span><span class="o">.</span><span class="n">lasair</span><span class="p">(</span><span class="n">token</span><span class="p">)</span>
 </pre></div>
 
     </div>
@@ -13145,7 +13150,7 @@ div#notebook {
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[16]:</div>
+<div class="prompt input_prompt">In&nbsp;[21]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">selected</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
@@ -13170,16 +13175,16 @@ div#notebook {
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[17]:</div>
+<div class="prompt input_prompt">In&nbsp;[22]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">conditions</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
 <span class="s2">sherlock_classifications.classification IS NOT NULL</span>
 <span class="s2">AND sherlock_classifications.classification NOT IN (&#39;VS&#39; , &#39;BS&#39;, &#39;AGN&#39;, &#39;CV&#39;)</span>
-<span class="s2">AND objects.jdmin &gt; (jdnow() - 4.0)</span>
+<span class="s2">AND objects.jdmin &gt; (jdnow() - 20.0)</span>
 <span class="s2">AND objects.jdmax - objects.jdmin &gt; 1.0</span>
 <span class="s2">AND objects.sgscore1 &gt; 0.75</span>
-<span class="s2">ORDER BY age DESC</span>
+<span class="s2">ORDER BY jdmax DESC</span>
 <span class="s2">&quot;&quot;&quot;</span>
 </pre></div>
 
@@ -13190,24 +13195,15 @@ div#notebook {
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[18]:</div>
+<div class="prompt input_prompt">In&nbsp;[23]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Note that we have limit=10 here</span>
-<span class="n">url</span> <span class="o">=</span> <span class="s1">&#39;https://lasair-iris.roe.ac.uk/api/query/&#39;</span>
-<span class="n">data</span> <span class="o">=</span> <span class="p">{</span>
-<span class="s1">&#39;selected&#39;</span>  <span class="p">:</span> <span class="n">selected</span><span class="p">,</span>
-<span class="s1">&#39;tables&#39;</span>    <span class="p">:</span> <span class="s1">&#39;objects, sherlock_classifications&#39;</span><span class="p">,</span>
-<span class="s1">&#39;conditions&#39;</span><span class="p">:</span> <span class="n">conditions</span><span class="p">,</span>
-<span class="s1">&#39;limit&#39;</span>     <span class="p">:</span> <span class="mi">10</span>
-<span class="p">}</span>
-
-<span class="n">r</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">)</span> 
-<span class="k">if</span> <span class="n">r</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">200</span><span class="p">:</span>
-    <span class="n">response</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
-<span class="k">else</span><span class="p">:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Oops, status code is&#39;</span><span class="p">,</span> <span class="n">r</span><span class="o">.</span><span class="n">status_code</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">rows</span> <span class="o">=</span> <span class="n">L</span><span class="o">.</span><span class="n">query</span><span class="p">(</span>
+    <span class="n">selected</span><span class="p">,</span> 
+    <span class="s1">&#39;objects, sherlock_classifications&#39;</span><span class="p">,</span> 
+    <span class="n">conditions</span><span class="p">,</span> 
+    <span class="n">limit</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+<span class="c1">#print(rows)</span>
 </pre></div>
 
     </div>
@@ -13217,13 +13213,13 @@ div#notebook {
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[20]:</div>
+<div class="prompt input_prompt">In&nbsp;[24]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%d</span><span class="s1"> objects found&#39;</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">response</span><span class="p">))</span>
-<span class="k">for</span> <span class="n">obj</span> <span class="ow">in</span> <span class="n">response</span><span class="p">:</span>
-    <span class="n">url</span> <span class="o">=</span> <span class="s1">&#39;https://lasair-iris.roe.ac.uk/object/</span><span class="si">%s</span><span class="s1">/&#39;</span> <span class="o">%</span> <span class="n">obj</span><span class="p">[</span><span class="s1">&#39;objectId&#39;</span><span class="p">]</span>
-    <span class="nb">print</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="s1">&#39;age </span><span class="si">%.1f</span><span class="s1"> and </span><span class="si">%.1f</span><span class="s1"> from PS object&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">obj</span><span class="p">[</span><span class="s1">&#39;age&#39;</span><span class="p">],</span> <span class="n">obj</span><span class="p">[</span><span class="s1">&#39;distpsnr1&#39;</span><span class="p">]))</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%d</span><span class="s1"> objects found&#39;</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">rows</span><span class="p">))</span>
+<span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">rows</span><span class="p">:</span>
+    <span class="n">url</span> <span class="o">=</span> <span class="s1">&#39;https://lasair-iris.roe.ac.uk/object/</span><span class="si">%s</span><span class="s1">/&#39;</span> <span class="o">%</span> <span class="n">row</span><span class="p">[</span><span class="s1">&#39;objectId&#39;</span><span class="p">]</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="s1">&#39;age </span><span class="si">%.1f</span><span class="s1"> and </span><span class="si">%.1f</span><span class="s1"> from PS object&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="s1">&#39;age&#39;</span><span class="p">],</span> <span class="n">row</span><span class="p">[</span><span class="s1">&#39;distpsnr1&#39;</span><span class="p">]))</span>
 </pre></div>
 
     </div>
@@ -13240,14 +13236,17 @@ div#notebook {
 
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>7 objects found
-https://lasair-iris.roe.ac.uk/object/ZTF18abnytkt/ age 1.5 and 0.1 from PS object
-https://lasair-iris.roe.ac.uk/object/ZTF18abcpbqt/ age 1.4 and 0.3 from PS object
-https://lasair-iris.roe.ac.uk/object/ZTF20acuoagl/ age 1.2 and 6.5 from PS object
-https://lasair-iris.roe.ac.uk/object/ZTF18aaabbbe/ age 1.2 and 0.3 from PS object
-https://lasair-iris.roe.ac.uk/object/ZTF18abftupk/ age 0.5 and 0.2 from PS object
-https://lasair-iris.roe.ac.uk/object/ZTF19aalnwil/ age 0.1 and 0.1 from PS object
-https://lasair-iris.roe.ac.uk/object/ZTF19aanwkba/ age 0.1 and 0.6 from PS object
+<pre>10 objects found
+https://lasair-iris.roe.ac.uk/object/ZTF21aapkarm/ age 1.0 and 4.7 from PS object
+https://lasair-iris.roe.ac.uk/object/ZTF21aaqwlqf/ age 1.0 and 9.4 from PS object
+https://lasair-iris.roe.ac.uk/object/ZTF21aaqwlgu/ age 1.0 and 1.7 from PS object
+https://lasair-iris.roe.ac.uk/object/ZTF18abaqvqf/ age 1.0 and 0.6 from PS object
+https://lasair-iris.roe.ac.uk/object/ZTF18aanwusn/ age 1.0 and 1.4 from PS object
+https://lasair-iris.roe.ac.uk/object/ZTF21aaphlty/ age 1.1 and 7.6 from PS object
+https://lasair-iris.roe.ac.uk/object/ZTF21aapyiku/ age 1.1 and 8.1 from PS object
+https://lasair-iris.roe.ac.uk/object/ZTF21aapnlfx/ age 1.1 and 10.8 from PS object
+https://lasair-iris.roe.ac.uk/object/ZTF21aaqvmig/ age 1.2 and 10.5 from PS object
+https://lasair-iris.roe.ac.uk/object/ZTF21aapdphm/ age 1.3 and 3.3 from PS object
 </pre>
 </div>
 </div>

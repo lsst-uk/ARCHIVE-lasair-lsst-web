@@ -13124,17 +13124,17 @@ with no candidates between two times, but candidates before and after those time
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[79]:</div>
+<div class="prompt input_prompt">In&nbsp;[6]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">sys</span><span class="o">,</span> <span class="nn">time</span>
 
-<span class="n">mjd_now</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span><span class="o">/</span><span class="mi">86400</span> <span class="o">+</span> <span class="mf">40587.0</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;MJD now is </span><span class="si">%.3f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">mjd_now</span><span class="p">)</span>
+<span class="n">jd_now</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span><span class="o">/</span><span class="mi">86400</span> <span class="o">+</span> <span class="mf">40587.0</span> <span class="o">+</span> <span class="mf">2400000.5</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;JD now is </span><span class="si">%.3f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">jd_now</span><span class="p">)</span>
 
 <span class="c1"># boundaries of the time region</span>
-<span class="n">old</span>   <span class="o">=</span> <span class="n">mjd_now</span> <span class="o">-</span> <span class="mi">5</span>
-<span class="n">young</span> <span class="o">=</span> <span class="n">mjd_now</span> <span class="o">-</span> <span class="mi">9</span>
+<span class="n">old</span>   <span class="o">=</span> <span class="n">jd_now</span> <span class="o">-</span> <span class="mi">5</span>
+<span class="n">young</span> <span class="o">=</span> <span class="n">jd_now</span> <span class="o">-</span> <span class="mi">9</span>
 
 <span class="c1"># boundaries of the space region</span>
 <span class="n">ramin</span> <span class="o">=</span> <span class="mi">100</span>
@@ -13157,11 +13157,30 @@ with no candidates between two times, but candidates before and after those time
 
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>MJD now is 59185.587
+<pre>JD now is 2459302.917
 </pre>
 </div>
 </div>
 
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[7]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">lasair</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">settings</span>
+    <span class="n">token</span> <span class="o">=</span> <span class="n">settings</span><span class="o">.</span><span class="n">token</span>
+<span class="k">except</span><span class="p">:</span>
+    <span class="n">token</span> <span class="o">=</span> <span class="s1">&#39;4b762569bb349bd8d60f1bc7da3f39dbfaefff9a&#39;</span>
+<span class="n">L</span> <span class="o">=</span> <span class="n">lasair</span><span class="o">.</span><span class="n">lasair</span><span class="p">(</span><span class="n">token</span><span class="p">)</span>
+</pre></div>
+
+    </div>
 </div>
 </div>
 
@@ -13176,7 +13195,7 @@ with no candidates between two times, but candidates before and after those time
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[80]:</div>
+<div class="prompt input_prompt">In&nbsp;[8]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">conditions</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
@@ -13185,7 +13204,6 @@ with no candidates between two times, but candidates before and after those time
 <span class="s2">AND objects.ramean BETWEEN </span><span class="si">%f</span><span class="s2"> AND </span><span class="si">%f</span><span class="s2"></span>
 <span class="s2">AND objects.decmean BETWEEN </span><span class="si">%f</span><span class="s2"> and </span><span class="si">%f</span><span class="s2"></span>
 <span class="s2">&quot;&quot;&quot;</span>
-
 <span class="n">conditions</span> <span class="o">=</span> <span class="n">conditions</span> <span class="o">%</span> <span class="p">(</span><span class="n">ramin</span><span class="p">,</span> <span class="n">ramax</span><span class="p">,</span> <span class="n">decmin</span><span class="p">,</span> <span class="n">decmax</span><span class="p">)</span>
 </pre></div>
 
@@ -13205,11 +13223,15 @@ with no candidates between two times, but candidates before and after those time
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[81]:</div>
+<div class="prompt input_prompt">In&nbsp;[9]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">requests</span>
-<span class="n">headers</span> <span class="o">=</span> <span class="p">{</span> <span class="s1">&#39;Authorization&#39;</span><span class="p">:</span> <span class="s1">&#39;Token 4b762569bb349bd8d60f1bc7da3f39dbfaefff9a&#39;</span> <span class="p">}</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">rows</span> <span class="o">=</span> <span class="n">L</span><span class="o">.</span><span class="n">query</span><span class="p">(</span>
+    <span class="s1">&#39;objects.objectId&#39;</span><span class="p">,</span> 
+    <span class="s1">&#39;objects, sherlock_classifications&#39;</span><span class="p">,</span> 
+    <span class="n">conditions</span><span class="p">,</span> 
+    <span class="n">limit</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+<span class="n">objectIds</span> <span class="o">=</span> <span class="p">[</span><span class="n">row</span><span class="p">[</span><span class="s1">&#39;objectId&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">rows</span><span class="p">]</span>
 </pre></div>
 
     </div>
@@ -13225,33 +13247,6 @@ with no candidates between two times, but candidates before and after those time
 </div>
 </div>
 </div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">In&nbsp;[82]:</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">url</span> <span class="o">=</span> <span class="s1">&#39;https://lasair-iris.roe.ac.uk/api/query/&#39;</span>
-<span class="n">data</span> <span class="o">=</span> <span class="p">{</span>
-<span class="s1">&#39;selected&#39;</span>  <span class="p">:</span> <span class="s1">&#39;objects.objectId&#39;</span><span class="p">,</span>
-<span class="s1">&#39;tables&#39;</span>    <span class="p">:</span> <span class="s1">&#39;objects, sherlock_classifications&#39;</span><span class="p">,</span>
-<span class="s1">&#39;conditions&#39;</span><span class="p">:</span> <span class="n">conditions</span>
-<span class="p">}</span>
-
-<span class="n">r</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">)</span> 
-<span class="k">if</span> <span class="n">r</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">200</span><span class="p">:</span>
-    <span class="n">rows</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
-<span class="k">else</span><span class="p">:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Oops, status code is&#39;</span><span class="p">,</span> <span class="n">r</span><span class="o">.</span><span class="n">status_code</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
-    <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">()</span>
-<span class="n">objectIdList</span> <span class="o">=</span> <span class="p">[</span><span class="n">row</span><span class="p">[</span><span class="s1">&#39;objectId&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">rows</span><span class="p">]</span>
-</pre></div>
-
-    </div>
-</div>
-</div>
-
-</div>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
@@ -13262,30 +13257,24 @@ with no candidates between two times, but candidates before and after those time
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[83]:</div>
+<div class="prompt input_prompt">In&nbsp;[10]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">url</span> <span class="o">=</span> <span class="s1">&#39;https://lasair-iris.roe.ac.uk/api/lightcurves/&#39;</span>
-<span class="n">chunk</span> <span class="o">=</span> <span class="mi">10</span>
-<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">objectIdList</span><span class="p">),</span> <span class="n">chunk</span><span class="p">):</span>
-    <span class="n">objectIds</span> <span class="o">=</span> <span class="n">objectIdList</span><span class="p">[</span><span class="n">i</span><span class="p">:</span><span class="n">i</span><span class="o">+</span><span class="n">chunk</span><span class="p">]</span>
-    <span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;objectIds&#39;</span><span class="p">:</span> <span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">objectIds</span><span class="p">)}</span>
-    <span class="n">r</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">r</span><span class="o">.</span><span class="n">status_code</span> <span class="o">!=</span> <span class="mi">200</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
-        <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">()</span>
-    <span class="k">for</span> <span class="n">objectId</span><span class="p">,</span><span class="n">lightcurve</span> <span class="ow">in</span> <span class="n">r</span><span class="o">.</span><span class="n">json</span><span class="p">()</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-        <span class="n">n_old</span>   <span class="o">=</span> <span class="mi">0</span>
-        <span class="n">n_mid</span>   <span class="o">=</span> <span class="mi">0</span>
-        <span class="n">n_young</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="k">for</span> <span class="n">cand</span> <span class="ow">in</span> <span class="n">lightcurve</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">cand</span><span class="p">[</span><span class="s1">&#39;mjd&#39;</span><span class="p">]</span>   <span class="o">&lt;</span>   <span class="n">old</span><span class="p">:</span> <span class="n">n_old</span>    <span class="o">+=</span> <span class="mi">1</span>
-            <span class="k">elif</span> <span class="n">cand</span><span class="p">[</span><span class="s1">&#39;mjd&#39;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">young</span><span class="p">:</span> <span class="n">n_young</span>  <span class="o">+=</span> <span class="mi">1</span>
-            <span class="k">else</span><span class="p">:</span>                     <span class="n">n_mid</span>    <span class="o">+=</span> <span class="mi">1</span>
-        <span class="n">announce</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
-        <span class="k">if</span> <span class="p">(</span><span class="n">n_old</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">n_mid</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">n_young</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">):</span> 
-            <span class="n">announce</span> <span class="o">=</span> <span class="s1">&#39;FOUND A DONUT!&#39;</span>
-        <span class="nb">print</span><span class="p">(</span><span class="n">objectId</span><span class="p">,</span> <span class="n">n_old</span><span class="p">,</span> <span class="n">n_mid</span><span class="p">,</span> <span class="n">n_young</span><span class="p">,</span> <span class="n">announce</span><span class="p">)</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">lcs</span> <span class="o">=</span> <span class="n">L</span><span class="o">.</span><span class="n">lightcurves</span><span class="p">(</span><span class="n">objectIds</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">lc</span> <span class="ow">in</span> <span class="n">lcs</span><span class="p">:</span>
+    <span class="n">objectId</span>   <span class="o">=</span> <span class="n">lc</span><span class="p">[</span><span class="s1">&#39;objectId&#39;</span><span class="p">]</span>
+    <span class="n">candidates</span> <span class="o">=</span> <span class="n">lc</span><span class="p">[</span><span class="s1">&#39;candidates&#39;</span><span class="p">]</span>
+    <span class="n">n_old</span>   <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">n_mid</span>   <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">n_young</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">cand</span> <span class="ow">in</span> <span class="n">candidates</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">cand</span><span class="p">[</span><span class="s1">&#39;jd&#39;</span><span class="p">]</span>   <span class="o">&lt;</span>   <span class="n">old</span><span class="p">:</span> <span class="n">n_old</span>    <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">elif</span> <span class="n">cand</span><span class="p">[</span><span class="s1">&#39;jd&#39;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">young</span><span class="p">:</span> <span class="n">n_young</span>  <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">else</span><span class="p">:</span>                     <span class="n">n_mid</span>    <span class="o">+=</span> <span class="mi">1</span>
+    <span class="n">announce</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">n_old</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">n_mid</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">n_young</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">):</span> 
+         <span class="n">announce</span> <span class="o">=</span> <span class="s1">&#39;FOUND A DONUT!&#39;</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">objectId</span><span class="p">,</span> <span class="n">n_old</span><span class="p">,</span> <span class="n">n_mid</span><span class="p">,</span> <span class="n">n_young</span><span class="p">,</span> <span class="n">announce</span><span class="p">)</span>
 </pre></div>
 
     </div>
@@ -13302,33 +13291,16 @@ with no candidates between two times, but candidates before and after those time
 
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>ZTF20actgepo 2 0 0 
-ZTF20acnfrzt 5 0 0 
-ZTF20actgima 4 0 0 
-ZTF20aclfivs 3 0 0 
-ZTF20acqnozc 6 0 0 
-ZTF20aclhdyp 5 0 0 
-ZTF20acneunu 6 0 0 
-ZTF18acdsboe 2 0 0 
-ZTF20actzqom 2 0 0 
-ZTF18aaapivw 31 0 5 FOUND A DONUT!
-ZTF20actztlq 3 0 0 
-ZTF17aacbtom 10 0 0 
-ZTF20aafecmx 0 0 2 
-ZTF20actvadu 6 0 0 
-ZTF20actubyn 3 0 0 
-ZTF18aceefae 8 0 0 
-ZTF18adancfy 7 0 0 
-ZTF18acrvlud 4 0 4 FOUND A DONUT!
-ZTF20acrqeje 4 0 3 FOUND A DONUT!
-ZTF18aceeoao 15 0 1 FOUND A DONUT!
-ZTF20acfacce 11 0 0 
-ZTF20acphdcg 27 0 5 FOUND A DONUT!
-ZTF18adgetgh 4 0 0 
-ZTF18aaapjfq 18 0 7 FOUND A DONUT!
-ZTF18aabhqnr 18 0 0 
-ZTF20acudmzs 2 0 1 FOUND A DONUT!
-ZTF19aceyegx 4 0 0 
+<pre>ZTF18aabpzrz 23 0 1 FOUND A DONUT!
+ZTF20actgima 7 0 0 
+ZTF21aaojxkz 7 0 0 
+ZTF21aapdvea 12 0 3 FOUND A DONUT!
+ZTF21aanqseo 3 0 0 
+ZTF19acyvlss 4 0 0 
+ZTF21aailzvx 4 0 0 
+ZTF21aaojvgk 6 0 0 
+ZTF20aclhizn 3 0 0 
+ZTF20aaewcfd 2 0 0 
 </pre>
 </div>
 </div>
