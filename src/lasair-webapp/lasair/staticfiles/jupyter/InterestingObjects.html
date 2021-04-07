@@ -13123,7 +13123,7 @@ div#notebook {
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[20]:</div>
+<div class="prompt input_prompt">In&nbsp;[1]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">lasair</span>
@@ -13132,7 +13132,7 @@ div#notebook {
     <span class="n">token</span> <span class="o">=</span> <span class="n">settings</span><span class="o">.</span><span class="n">token</span>
 <span class="k">except</span><span class="p">:</span>
     <span class="n">token</span> <span class="o">=</span> <span class="s1">&#39;4b762569bb349bd8d60f1bc7da3f39dbfaefff9a&#39;</span>
-<span class="n">L</span> <span class="o">=</span> <span class="n">lasair</span><span class="o">.</span><span class="n">lasair</span><span class="p">(</span><span class="n">token</span><span class="p">)</span>
+<span class="n">L</span> <span class="o">=</span> <span class="n">lasair</span><span class="o">.</span><span class="n">lasair_client</span><span class="p">(</span><span class="n">token</span><span class="p">)</span>
 </pre></div>
 
     </div>
@@ -13150,7 +13150,7 @@ div#notebook {
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[21]:</div>
+<div class="prompt input_prompt">In&nbsp;[2]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">selected</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
@@ -13175,7 +13175,7 @@ div#notebook {
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[22]:</div>
+<div class="prompt input_prompt">In&nbsp;[3]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">conditions</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
@@ -13195,7 +13195,7 @@ div#notebook {
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[23]:</div>
+<div class="prompt input_prompt">In&nbsp;[4]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">rows</span> <span class="o">=</span> <span class="n">L</span><span class="o">.</span><span class="n">query</span><span class="p">(</span>
@@ -13213,7 +13213,7 @@ div#notebook {
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[24]:</div>
+<div class="prompt input_prompt">In&nbsp;[5]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%d</span><span class="s1"> objects found&#39;</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">rows</span><span class="p">))</span>
@@ -13237,16 +13237,16 @@ div#notebook {
 
 <div class="output_subarea output_stream output_stdout output_text">
 <pre>10 objects found
-https://lasair-iris.roe.ac.uk/object/ZTF21aapkarm/ age 1.0 and 4.7 from PS object
-https://lasair-iris.roe.ac.uk/object/ZTF21aaqwlqf/ age 1.0 and 9.4 from PS object
-https://lasair-iris.roe.ac.uk/object/ZTF21aaqwlgu/ age 1.0 and 1.7 from PS object
-https://lasair-iris.roe.ac.uk/object/ZTF18abaqvqf/ age 1.0 and 0.6 from PS object
-https://lasair-iris.roe.ac.uk/object/ZTF18aanwusn/ age 1.0 and 1.4 from PS object
-https://lasair-iris.roe.ac.uk/object/ZTF21aaphlty/ age 1.1 and 7.6 from PS object
-https://lasair-iris.roe.ac.uk/object/ZTF21aapyiku/ age 1.1 and 8.1 from PS object
-https://lasair-iris.roe.ac.uk/object/ZTF21aapnlfx/ age 1.1 and 10.8 from PS object
-https://lasair-iris.roe.ac.uk/object/ZTF21aaqvmig/ age 1.2 and 10.5 from PS object
-https://lasair-iris.roe.ac.uk/object/ZTF21aapdphm/ age 1.3 and 3.3 from PS object
+https://lasair-iris.roe.ac.uk/object/ZTF21aaqzqaa/ age 0.0 and 7.4 from PS object
+https://lasair-iris.roe.ac.uk/object/ZTF18aakvvsz/ age 0.0 and 0.1 from PS object
+https://lasair-iris.roe.ac.uk/object/ZTF21aatcuvx/ age 0.2 and 11.5 from PS object
+https://lasair-iris.roe.ac.uk/object/ZTF21aarzrst/ age 0.2 and 14.4 from PS object
+https://lasair-iris.roe.ac.uk/object/ZTF19aatnxby/ age 0.2 and 0.3 from PS object
+https://lasair-iris.roe.ac.uk/object/ZTF21aatcgps/ age 0.2 and 9.6 from PS object
+https://lasair-iris.roe.ac.uk/object/ZTF21aasrlhr/ age 0.2 and 2.2 from PS object
+https://lasair-iris.roe.ac.uk/object/ZTF21aaquhdq/ age 0.2 and 7.9 from PS object
+https://lasair-iris.roe.ac.uk/object/ZTF20abgvvox/ age 0.2 and 0.3 from PS object
+https://lasair-iris.roe.ac.uk/object/ZTF19aadyhij/ age 0.2 and 0.4 from PS object
 </pre>
 </div>
 </div>

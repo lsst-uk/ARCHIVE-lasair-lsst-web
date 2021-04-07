@@ -30,12 +30,11 @@ def make_query(selected, tables, conditions, limit, offset, limitseconds = 300):
         else:
             toktables.append(table)
 
+    wlar_conditions = []
     if wl_id >= 0:
-        wlar_conditions = ['watchlist_hits.wl_id=%d' % wl_id]
-    elif ar_id >= 0:
-        wlar_conditions = ['area_hits.ar_id=%d' % ar_id]
-    else:
-        wlar_conditions = []
+        wlar_conditions.append('watchlist_hits.wl_id=%d' % wl_id)
+    if ar_id >= 0:
+        wlar_conditions.append('area_hits.ar_id=%d' % ar_id)
 
     if len(conditions.strip()) > 0:
         new_conditions = ' AND '.join(wlar_conditions + [conditions])

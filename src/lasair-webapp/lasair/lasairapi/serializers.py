@@ -87,7 +87,7 @@ class ObjectsSerializer(serializers.Serializer):
         olist = []
         for tok in objectIds.split(','):
             olist.append(tok.strip())
-        olist = olist[:10] # restrict to 10
+#        olist = olist[:10] # restrict to 10
 
         # Get the authenticated user, if it exists.
         userId = 'unknown'
@@ -172,7 +172,7 @@ def connect_db():
 class QuerySerializer(serializers.Serializer):
     selected   = serializers.CharField(max_length=4096, required=True)
     tables     = serializers.CharField(max_length=1024, required=True)
-    conditions = serializers.CharField(max_length=4096, required=True)
+    conditions = serializers.CharField(max_length=4096, required=True, allow_blank=True)
     limit      = serializers.IntegerField(max_value=1000000, required=False)
     offset     = serializers.IntegerField(required=False)
 
@@ -255,13 +255,15 @@ class StreamsSerializer(serializers.Serializer):
             record_user(userId, 'streams')
 
         if topic:
-            if 1:
+            try:
                 datafile = open(lasair.settings.BLOB_STORE_ROOT + '/streams/%s' % topic, 'r').read()
                 data = json.loads(datafile)['digest']
-                if limit: data = data[:limit]
+                if limit: 
+                    data = data[:limit]
                 return data
-            else:
-                return []
+            except:
+                error = 'Cannot open digest file for topic %s' % topic
+                return {"error":error}
 
         if regex:
             try:

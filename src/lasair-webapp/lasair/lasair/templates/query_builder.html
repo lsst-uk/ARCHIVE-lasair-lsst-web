@@ -288,8 +288,8 @@ $(document).ready(function(){
 <td><input type="checkbox" name="put" id="watchlist"    onclick="showwatchlistradiolist();puttext();"> Watchlist
 <div id="watchlistradios">
 {% for wl in watchlists %}
-&nbsp;&nbsp;&nbsp;<input type="radio" name="wl" value="{{ wl.wl_id }}" onclick="puttext();"> {{ wl.name }} 
-{% if not wl.active %}<i>inactive</i>{% endif %}
+&nbsp;&nbsp;&nbsp;<input type="radio" name="wl" value="{{ wl.wl_id }}" onclick="puttext();"> {{ wl.name }}, ID={{ wl.wl_id }}
+{% if not wl.active %}<i>(inactive)</i>{% endif %}
 <br/>
 {% endfor %}
 </div>
@@ -298,8 +298,8 @@ $(document).ready(function(){
 <td><input type="checkbox" name="put" id="area"    onclick="showarearadiolist();puttext();"> Area
 <div id="arearadios">
 {% for ar in areas %}
-&nbsp;&nbsp;&nbsp;<input type="radio" name="ar" value="{{ ar.ar_id }}" onclick="puttext();"> {{ ar.name }} 
-{% if not ar.active %}<i>inactive</i>{% endif %}
+&nbsp;&nbsp;&nbsp;<input type="radio" name="ar" value="{{ ar.ar_id }}" onclick="puttext();"> {{ ar.name }}, ID={{ ar.ar_id }}
+{% if not ar.active %}<i>(inactive)</i>{% endif %}
 <br/>
 {% endfor %}
 </div>
