@@ -276,7 +276,7 @@ $(document).ready(function(){
 <tr class="bg-primary">
 
 <td> <font size=+1>
-<input type="checkbox" name="put" id="objects"                  onclick="puttext();"> objects
+<input type="checkbox" name="put" id="objects"   CHECKED          onclick="return false;"> objects
 </font></td>
 
 <td> 
@@ -312,6 +312,10 @@ $(document).ready(function(){
 
 <b><font color="red">WHERE</font></b>
 <tt><textarea class="form-control" rows="4" cols="40" name="conditions" id="conditions">{{ myquery.conditions }}</textarea></tt>
+<br/>
+
+<b><font color="red">LIMIT</font></b> <input name="limit" value=1000>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<b><font color="red">OFFSET</font></b> <input name="offset" value=0>
 </div>
 
 <input class="form-control" type="hidden" name="page" value="{{ page }}"/><br/>

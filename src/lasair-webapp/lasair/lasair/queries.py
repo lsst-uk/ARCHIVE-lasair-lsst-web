@@ -7,7 +7,7 @@ from django.contrib.auth.models import User
 import lasair.settings
 from lasair.models import Myqueries
 from lasair.models import Watchlists, Areas
-from utility import query_utilities
+from utility import topic_name, query_builder
 import utility.date_nid as date_nid
 from datetime import datetime, timedelta
 import mysql.connector
@@ -47,7 +47,7 @@ def query_list(qs):
         }
         d['streamlink'] = 'inactive'
         if q.active:
-            topic = query_utilities.topic_name(q.user.id, q.name)
+            topic = topic_name.topic_name(q.user.id, q.name)
             d['streamlink'] = '/streams/%s' % topic
         list.append(d)
     return list
@@ -102,7 +102,7 @@ def show_myquery(request, mq_id):
     return handle_myquery(request, mq_id)
 
 def delete_stream_file(request, query_name):
-    topic = query_utilities.topic_name(request.user.id, query_name)
+    topic = topic_name.topic_name(request.user.id, query_name)
     filename = '/mnt/cephfs/roy/streams/%s' % topic
     if os.path.exists(filename):
         os.remove(filename)
@@ -272,7 +272,6 @@ def runquery(request):
     Args:
         request:
     """
-    perpage = 1000
     message = ''
     json_checked = False
 
@@ -282,19 +281,20 @@ def runquery(request):
     selected   = request.POST['selected'].strip()
     tables     = request.POST['tables'].strip()
     conditions = request.POST['conditions'].strip()
-    page     = request.POST['page']
-    if len(page.strip()) == 0: page = 0
-    else:                      page = int(page)
+    limit      = request.POST['limit']
+    offset     = request.POST['offset']
 
     if 'json' in request.POST and request.POST['json'] == 'on':
         json_checked = True
 
-    limit = perpage
-    offset = page*perpage
-    ps = page    *perpage
-    pe = (page+1)*perpage
 
-    sqlquery_real = query_utilities.make_query(selected, tables, conditions, limit, offset)
+#    sqlquery_real = query_utilities.make_query(selected, tables, conditions, limit, offset)
+
+    e = query_builder.check_query_builder(selected, tables, conditions, limit, offset)
+    if e:
+        return render(request, 'error.html', {'message': message})
+    else:
+        sqlquery_real = query_builder.query_builder(selected, tables, conditions, limit, offset)
     message += sqlquery_real
 
 # lets keep a record of all the queries the people try to execute
@@ -314,17 +314,14 @@ def runquery(request):
     for row in cursor:
         queryset.append(row)
         nalert += 1
-    lastpage = 0
-    if ps + nalert < pe:
-        pe = ps + nalert
-        lastpage = 1
 
     if json_checked:
         return HttpResponse(json.dumps(queryset, indent=2), content_type="application/json")
     else:
         return render(request, 'runquery.html',
-            {'table': queryset, 'nalert': nalert, 'nextpage': page+1, 'ps':ps, 'pe':pe, 
+            {'table': queryset, 'nalert': nalert, 
                 'selected'  :selected, 
                 'tables'    :tables, 
                 'conditions'  :conditions, 
-                'message': message, 'lastpage':lastpage})
+                'limit'  :limit, 'offset'  :offset, 
+                'message': message})
