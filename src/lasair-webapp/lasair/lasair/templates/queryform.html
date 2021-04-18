@@ -1,21 +1,14 @@
 {% extends "base.html"%}
 {% block content %}
+<link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
+<script src="//code.jquery.com/jquery-1.10.2.js"></script>
+<script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+<script src="/lasair/static/js/query.js"></script>
+
 
 <div class="row">
 <div class="col-sm">
 <!--	{{ message }} -->
-
-<script>
-function showinfodiv(){
-    if(document.getElementById('infodiv' ).style.display == 'block') { 
-        document.getElementById('infodiv' ).style.display = 'none' 
-    } else { 
-        document.getElementById('infodiv' ).style.display = 'block' 
-    }
-}
-</script>
-
-
 
 <button style="color: blue; background-color: #EEEEFF;" onclick="showinfodiv();">Show/Hide information</button>
 <div id="infodiv" style="display:none">
@@ -66,7 +59,9 @@ is a good resource.
 {% endif %}
 {% csrf_token %}
 
-{% if is_owner %}
+<!-- if you can save or edit this query -->
+{% if logged_in %}
+{% if new or is_owner %}
 Query Name {% if random %}(replace this name please){% endif %}<br/>
 <h3><input name="name" value="{% if random %}Query-{{ random }}{% else %}{{ myquery.name }}{% endif %}" size=50></h3>
 Description<br/>
@@ -74,18 +69,81 @@ Description<br/>
 
 Public: <input type="checkbox" name="public" {% if myquery.public > 0 %}checked{% endif %}><br/>
 Streaming:<br/>
-&nbsp;&nbsp;&nbsp;<input type="radio" name="active" value="0" {% if myquery.active == 0 %}checked{% endif %}> Not streaming <br/>
+&nbsp;&nbsp;&nbsp;<input type="radio" name="active" value="0" {% if myquery.active == 0 or new %}checked{% endif %}> Not streaming <br/>
 &nbsp;&nbsp;&nbsp;<input type="radio" name="active" value="1" {% if myquery.active == 1 %}checked{% endif %}> Email to {{ email }} (max once a day) and log <br/>
 &nbsp;&nbsp;&nbsp;<input type="radio" name="active" value="2" {% if myquery.active == 2 %}checked{% endif %}> Kafka and log <br/>
 <font size=-1>A 'Streaming' query will run real time as alerts come in. 
 Results can be sent, also in real time, via email or Kafka.
 </font>
+{% endif %}
+{% endif %}
 
-<hr/>
-{% include "query_builder.html" %}
+<!-- run, save or edit this query -->
+{% if new or is_owner %}
+<div class ="form-group">
+{% csrf_token %}
 
-{% else %}
+<b><font color="red">SELECT ATTRIBUTES</font></b>
+<tt><textarea class="form-control" rows="4" cols="40" name="selected" id="selected">{{ myquery.selected }}</textarea></tt>
+
+<b><font color="red">TABLES TO USE</font></b>
+<div style="display:none">
+<tt><textarea class="form-control" rows="1" cols="40" name="tables" id="tables">{{ myquery.tables }}</textarea></tt>
+</div>
+<table class="table table-bordered">
+<tr>
+
+<td> <font size=+1>
+<input type="checkbox" name="put" id="objects"   CHECKED          onclick="return false;"> objects
+</font></td>
+
+<td>
+<input type="checkbox" name="put" id="sherlock_classifications"    onclick="puttext();"> sherlock_classifications
+</td>
+
+<td>
+<input type="checkbox" name="put" id="crossmatch_tns"    onclick="puttext();"> crossmatch_tns
+</td>
+</tr>
+
+<tr>
+<td><input type="checkbox" name="put" id="watchlist"    onclick="showwatchlistradiolist();puttext();"> Watchlist
+<div id="watchlistradios">
+{% for wl in watchlists %}
+&nbsp;&nbsp;&nbsp;<input type="radio" name="wl" value="{{ wl.wl_id }}" onclick="puttext();"> {{ wl.name }}, ID={{ wl.wl_id }}
+{% if not wl.active %}<i>(inactive)</i>{% endif %}
+<br/>
+{% endfor %}
+</div>
+</td>
+
+<td><input type="checkbox" name="put" id="area"    onclick="showarearadiolist();puttext();"> Area
+<div id="arearadios">
+{% for ar in areas %}
+&nbsp;&nbsp;&nbsp;<input type="radio" name="ar" value="{{ ar.ar_id }}" onclick="puttext();"> {{ ar.name }}, ID={{ ar.ar_id }}
+{% if not ar.active %}<i>(inactive)</i>{% endif %}
+<br/>
+{% endfor %}
+</div>
+</td>
+
+</tr>
+
+</table>
+
+<b><font color="red">WHERE</font></b>
+<tt><textarea class="form-control" rows="4" cols="40" name="conditions" id="conditions">{{ myquery.conditions }}</textarea></tt>
+<br/>
+
+<b><font color="red">LIMIT</font></b> <input name="limit" value=1000>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<b><font color="red">OFFSET</font></b> <input name="offset" value=0>
+</div>
+
+<input class="form-control" type="hidden" name="page" value="{{ page }}"/><br/>
+{% endif %}
+
 <!-- viewing a public query not yours -->
+{% if not new and not is_owner %}
 <table border=1>
 <tr><td>Name</td><td><h2>{{ myquery.name }}</h2></td></tr>
 <tr><td>Description</td><td>{{ myquery.description }}</td></tr>
@@ -101,14 +159,15 @@ Results can be sent, also in real time, via email or Kafka.
 <input name='page'       type='hidden' value=0>
 {% endif %}
 
-
 <table border=1 cellpadding=30><tr>
 <!-- SAVE QUERY -->
-{% if is_owner %}
+{% if logged_in %}
+{% if new or is_owner %}
 <td>
 <input type="submit" class="button" style="color: blue; background-color: #EEEEFF;" 
 {% if new %} value=" Create query" {% else %} value=" Save this Query" {% endif %} ></td>
 </td>
+{% endif %}
 {% endif %}
 
 <!-- RUN QUERY -->
@@ -117,12 +176,12 @@ Results can be sent, also in real time, via email or Kafka.
 <button style="color: blue; background-color: #EEEEFF;" type="submit" formaction=/runquery/>Run this Query</button>
 </td></tr>
 
-{% if is_owner %}
+{% if new or is_owner %}
 </form>   <!-- END OF FORM -->
 {% endif %}
 
 <!-- DELETE QUERY -->
-{% if is_owner and not new %}
+{% if logged_in and is_owner and not new %}
 <tr><td>
 <script>
 function ConfirmDelete()
@@ -152,5 +211,11 @@ function ConfirmDelete()
 
 </div>
 </div>
+
+<script type="text/javascript">
+$(document).ready(function(){
+  check_boxes();
+});
+</script>
 
 {% endblock %}

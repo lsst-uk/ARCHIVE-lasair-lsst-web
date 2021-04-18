@@ -7,7 +7,8 @@ from django.contrib.auth.models import User
 import lasair.settings
 from lasair.models import Myqueries
 from lasair.models import Watchlists, Areas
-from utility import topic_name, query_builder
+from utility.query_builder import check_query, build_query
+from utility.topic_name import topic_name
 import utility.date_nid as date_nid
 from datetime import datetime, timedelta
 import mysql.connector
@@ -47,7 +48,7 @@ def query_list(qs):
         }
         d['streamlink'] = 'inactive'
         if q.active:
-            topic = topic_name.topic_name(q.user.id, q.name)
+            topic = topic_name(q.user.id, q.name)
             d['streamlink'] = '/streams/%s' % topic
         list.append(d)
     return list
@@ -102,7 +103,7 @@ def show_myquery(request, mq_id):
     return handle_myquery(request, mq_id)
 
 def delete_stream_file(request, query_name):
-    topic = topic_name.topic_name(request.user.id, query_name)
+    topic = topic_name(request.user.id, query_name)
     filename = '/mnt/cephfs/roy/streams/%s' % topic
     if os.path.exists(filename):
         os.remove(filename)
@@ -145,8 +146,18 @@ def handle_myquery(request, mq_id=None):
             else:
                 public = 0
 
-            myquery = Myqueries(user=request.user, name=name, description=description,
-                public=public, active=active, selected=selected, conditions=conditions, tables=tables)
+            e = check_query(selected, tables, conditions)
+            if e:
+                return render(request, 'error.html', {'message': e})
+
+            sqlquery_real = build_query(selected, tables, conditions)
+            tn = topic_name(request.user.id, name)
+
+            myquery = Myqueries(user=request.user, 
+                    name=name, description=description,
+                    public=public, active=active, 
+                    selected=selected, conditions=conditions, tables=tables,
+                    real_sql=sqlquery_real, topic_name=tn)
             myquery.save()
             message += "Query saved successfully"
             return render(request, 'queryform.html',{
@@ -174,6 +185,9 @@ def handle_myquery(request, mq_id=None):
     myquery = get_object_or_404(Myqueries, mq_id=mq_id)
     is_owner = logged_in and (request.user == myquery.user)
 
+    if not is_owner and myquery.public==0:
+        return render(request, 'error.html', {'message': 'This query is private'})
+
     # Existing query, owner wants to change it
     if request.method == 'POST' and logged_in:
 
@@ -188,11 +202,13 @@ def handle_myquery(request, mq_id=None):
             newname = 'Copy_Of_' + myquery.name + '_'
             letters = string.ascii_lowercase
             newname += ''.join(random.choice(letters) for i in range(6))
+            tn = topic_name(request.user.id, newname)
             mq = Myqueries(user=request.user, name=newname, 
                     description=myquery.description,
                     public=0, active=0, 
                     selected=myquery.selected, 
-                    conditions=myquery.conditions, tables=myquery.tables)
+                    conditions=myquery.conditions, tables=myquery.tables,
+                    real_sql=myquery.real_sql, topic_name=tn)
             mq.save()
             message += 'Query copied'
             return redirect('/query/%d/' % mq.mq_id)
@@ -205,6 +221,14 @@ def handle_myquery(request, mq_id=None):
             myquery.tables       = request.POST.get('tables')
             myquery.conditions   = request.POST.get('conditions')
             public               = request.POST.get('public')
+            e = check_query(myquery.selected, myquery.tables, myquery.conditions)
+            if e:
+                return render(request, 'error.html', {'message': e})
+
+            myquery.real_sql = build_query(\
+                    myquery.selected, myquery.tables, myquery.conditions)
+            tn = topic_name(request.user.id, myquery.name)
+            myquery.topic_name = tn
             try:
                 myquery.active   = int(request.POST.get('active'))
             except:
@@ -281,8 +305,24 @@ def runquery(request):
     selected   = request.POST['selected'].strip()
     tables     = request.POST['tables'].strip()
     conditions = request.POST['conditions'].strip()
-    limit      = request.POST['limit']
-    offset     = request.POST['offset']
+
+    limit = 1000
+    if 'limit' in request.POST:
+        limit      = request.POST['limit']
+        try:
+            limit = int(limit)
+        except:
+            return render(request, 'error.html', {'message': 'LIMIT must be an integer'})
+        if limit > 1000:
+            return render(request, 'error.html', {'message': 'LIMIT must be 1000 or less'})
+
+    offset = 0
+    if 'offset' in request.POST:
+        offset     = request.POST['offset']
+        try:
+            offset = int(offset)
+        except:
+            return render(request, 'error.html', {'message': 'OFFSET must be an integer'})
 
     if 'json' in request.POST and request.POST['json'] == 'on':
         json_checked = True
@@ -290,12 +330,15 @@ def runquery(request):
 
 #    sqlquery_real = query_utilities.make_query(selected, tables, conditions, limit, offset)
 
-    e = query_builder.check_query_builder(selected, tables, conditions, limit, offset)
+    e = check_query(selected, tables, conditions)
     if e:
         return render(request, 'error.html', {'message': message})
     else:
-        sqlquery_real = query_builder.query_builder(selected, tables, conditions, limit, offset)
-    message += sqlquery_real
+        sqlquery_real = build_query(selected, tables, conditions)
+        sqlquery_limit = sqlquery_real + ' LIMIT %d OFFSET %d' % (limit, offset)
+    message += sqlquery_limit
+
+    # SAVE sqlquery_real to database
 
 # lets keep a record of all the queries the people try to execute
 #    record_query(request, sqlquery_real)
@@ -305,9 +348,9 @@ def runquery(request):
     cursor = msl.cursor(buffered=True, dictionary=True)
 
     try:
-        cursor.execute(sqlquery_real)
+        cursor.execute(sqlquery_limit)
     except Exception as e:
-        message = 'Your query:<br/><b>' + sqlquery_real + '</b><br/>returned the error<br/><i>' + str(e) + '</i>'
+        message = 'Your query:<br/><b>' + sqlquery_limit + '</b><br/>returned the error<br/><i>' + str(e) + '</i>'
         return render(request, 'error.html', {'message': message})
 
     queryset = []

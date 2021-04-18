@@ -210,11 +210,12 @@ class QuerySerializer(serializers.Serializer):
         if offset == None: offset = 0
         else:              offset = int(offset)
 
-        error = query_builder.check_query_builder(selected, tables, conditions, limit, offset)
+        error = query_builder.check_query(selected, tables, conditions)
         if error:
             return {"error":error}
 
-        sqlquery_real = query_builder.query_builder(selected, tables, conditions, limit, offset)
+        sqlquery_real = query_builder.build_query(selected, tables, conditions)
+        sqlquery_real += ' LIMIT %d OFFSET %d' % (limit, offset)
 
         msl = connect_db()
         cursor = msl.cursor(buffered=True, dictionary=True)

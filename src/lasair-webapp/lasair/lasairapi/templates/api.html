@@ -100,7 +100,7 @@ https://lasair-iris.roe.ac.uk/api/cone/
 <pre class="literal-block">
 import lasair
 token = '4b762569bb349bd8d60f1bc7da3f39dbfaefff9a'
-L = lasair.lasair(token)
+L = lasair.lasair_client(token)
 c = L.cone(ra, dec, radius=240.0, requestType='all')
 print(c)
 </pre>
@@ -155,7 +155,7 @@ https://lasair-iris.roe.ac.uk/api/query/
 <pre class="literal-block">
 import lasair
 token = '4b762569bb349bd8d60f1bc7da3f39dbfaefff9a'
-L = lasair.lasair(token)
+L = lasair.lasair_client(token)
 selected    = 'objectId, gmag'
 tables      = 'objects'
 conditions  = 'gmag &lt; 12.0'
@@ -265,7 +265,7 @@ status= 200
 <pre class="literal-block">
 import lasair
 token = '4b762569bb349bd8d60f1bc7da3f39dbfaefff9a'
-L = lasair.lasair(token)
+L = lasair.lasair_client(token)
 print(L.streams_topics())
 c = L.streams('2SN-likecandidates', limit=10)
 </pre>
@@ -305,7 +305,7 @@ https://lasair-iris.roe.ac.uk/api/objects/
 <pre class="literal-block">
 import lasair
 token = '4b762569bb349bd8d60f1bc7da3f39dbfaefff9a'
-L = lasair.lasair(token)
+L = lasair.lasair_client(token)
 c = L.objects(objectIds)
 print(c)
 </pre>
@@ -373,7 +373,7 @@ https://lasair-iris.roe.ac.uk/api/lightcurves/
 <pre class="literal-block">
 import lasair
 token = '4b762569bb349bd8d60f1bc7da3f39dbfaefff9a'
-L = lasair.lasair(token)
+L = lasair.lasair_client(token)
 c = L.lightcurves(['ZTF20acgrvqo','ZTF19acylwtd','ZTF18acmziob'])
 print(c)
 </pre>
@@ -438,7 +438,7 @@ https://lasair-iris.roe.ac.uk/api/sherlock/objects/
 <pre class="literal-block">
 import lasair
 token = '4b762569bb349bd8d60f1bc7da3f39dbfaefff9a'
-L = lasair.lasair(token)
+L = lasair.lasair_client(token)
 c = L.sherlock_objects(['ZTF20acgrvqo','ZTF19acylwtd','ZTF18acmziob'])
 print(c)
 </pre>
@@ -505,7 +505,7 @@ https://lasair-iris.roe.ac.uk/api/sherlock/position/
 <pre class="literal-block">
 import lasair
 token = '4b762569bb349bd8d60f1bc7da3f39dbfaefff9a'
-L = lasair.lasair(token)
+L = lasair.lasair_client(token)
 c = L.sherlock_position(['ZTF20acgrvqo','ZTF19acylwtd','ZTF18acmziob'])
 print(c)
 </pre>

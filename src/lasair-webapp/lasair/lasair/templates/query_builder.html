@@ -3,6 +3,14 @@
 <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
 
 <script type="text/javascript">
+	function showinfodiv(){
+    if(document.getElementById('infodiv' ).style.display == 'block') {
+        document.getElementById('infodiv' ).style.display = 'none'
+    } else {
+        document.getElementById('infodiv' ).style.display = 'block'
+    }
+}
+
 /* respond to clicking a checkbox */
 function puttext() {
   var boxes = document.getElementsByName('put');

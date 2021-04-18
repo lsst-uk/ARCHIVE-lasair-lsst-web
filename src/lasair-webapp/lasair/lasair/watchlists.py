@@ -130,7 +130,7 @@ def show_watchlist_txt(request, wl_id):
             'message': "This watchlist is private and not visible to you"})
     cursor = connection.cursor()
     s = []
-    cursor.execute('SELECT ra, decl, name, radius FROM watchlist_cones WHERE wl_id=%d ' % wl_id)
+    cursor.execute('SELECT ra, decl, name, radius FROM watchlist_cones WHERE wl_id=%d LIMIT 10000' % wl_id)
     cones = cursor.fetchall()
     for c in cones:
         if c[3]:
