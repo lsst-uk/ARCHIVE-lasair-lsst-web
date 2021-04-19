@@ -158,7 +158,7 @@ class SherlockPositionSerializer(serializers.Serializer):
         else:
             return json.loads(r.text)
 
-from utility import topic_name, query_builder
+from lasair.query_builder import check_query, build_query
 import mysql.connector
 
 def connect_db():
@@ -210,11 +210,11 @@ class QuerySerializer(serializers.Serializer):
         if offset == None: offset = 0
         else:              offset = int(offset)
 
-        error = query_builder.check_query(selected, tables, conditions)
+        error = check_query(selected, tables, conditions)
         if error:
             return {"error":error}
 
-        sqlquery_real = query_builder.build_query(selected, tables, conditions)
+        sqlquery_real = build_query(selected, tables, conditions)
         sqlquery_real += ' LIMIT %d OFFSET %d' % (limit, offset)
 
         msl = connect_db()
@@ -277,10 +277,10 @@ class StreamsSerializer(serializers.Serializer):
             msl = connect_db()
             cursor = msl.cursor(buffered=True, dictionary=True)
             result = []
-            query = 'SELECT mq_id, user, name FROM myqueries WHERE active>0'
+            query = 'SELECT mq_id, user, name, topic_name FROM myqueries WHERE active>0'
             cursor.execute(query)
             for row in cursor: 
-                tn = topic_name.topic_name(row['user'], row['name'])
+                tn = row['topic_name']
                 if r.match(tn):
                     td = {'topic':tn, 'more_info':'https://lasair-iris.roe.ac.uk/query/%d/' % row['mq_id']}
                     result.append(td)

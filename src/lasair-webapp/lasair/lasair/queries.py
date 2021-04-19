@@ -7,8 +7,8 @@ from django.contrib.auth.models import User
 import lasair.settings
 from lasair.models import Myqueries
 from lasair.models import Watchlists, Areas
-from utility.query_builder import check_query, build_query
-from utility.topic_name import topic_name
+from lasair.query_builder import check_query, build_query
+from lasair.topic_name import topic_name
 import utility.date_nid as date_nid
 from datetime import datetime, timedelta
 import mysql.connector
@@ -23,6 +23,17 @@ def connect_db():
         host    =lasair.settings.DATABASES['default']['HOST'],
         database='ztf')
     return msl
+
+def check_query_zero_limit(real_sql):
+    msl = connect_db()
+    cursor = msl.cursor(buffered=True, dictionary=True)
+
+    try:
+        cursor.execute(real_sql + ' LIMIT 0')
+        return None
+    except Exception as e:
+        message = 'Your query:<br/><b>' + real_sql + '</b><br/>returned the error<br/><i>' + str(e) + '</i>'
+        return message
 
 def query_list(qs):
     """query_list.
@@ -151,6 +162,10 @@ def handle_myquery(request, mq_id=None):
                 return render(request, 'error.html', {'message': e})
 
             sqlquery_real = build_query(selected, tables, conditions)
+            e = check_query_zero_limit(real_sql)
+            if e:
+                return render(request, 'error.html', {'message': e})
+
             tn = topic_name(request.user.id, name)
 
             myquery = Myqueries(user=request.user, 
@@ -225,8 +240,11 @@ def handle_myquery(request, mq_id=None):
             if e:
                 return render(request, 'error.html', {'message': e})
 
-            myquery.real_sql = build_query(\
-                    myquery.selected, myquery.tables, myquery.conditions)
+            myquery.real_sql = build_query(myquery.selected, myquery.tables, myquery.conditions)
+            e = check_query_zero_limit(myquery.real_sql)
+            if e:
+                return render(request, 'error.html', {'message': e})
+
             tn = topic_name(request.user.id, myquery.name)
             myquery.topic_name = tn
             try:
@@ -333,12 +351,9 @@ def runquery(request):
     e = check_query(selected, tables, conditions)
     if e:
         return render(request, 'error.html', {'message': message})
-    else:
-        sqlquery_real = build_query(selected, tables, conditions)
-        sqlquery_limit = sqlquery_real + ' LIMIT %d OFFSET %d' % (limit, offset)
+    sqlquery_real = build_query(selected, tables, conditions)
+    sqlquery_limit = sqlquery_real + ' LIMIT %d OFFSET %d' % (limit, offset)
     message += sqlquery_limit
-
-    # SAVE sqlquery_real to database
 
 # lets keep a record of all the queries the people try to execute
 #    record_query(request, sqlquery_real)
