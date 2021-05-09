@@ -167,7 +167,7 @@ def obj(objectId):
     TNS = {}
     query = 'SELECT tns_name, tns_prefix, disc_mag, type, z, host_name, associated_groups '
     query += 'FROM crossmatch_tns JOIN watchlist_hits ON crossmatch_tns.tns_name = watchlist_hits.name '
-    query += 'WHERE watchlist_hits.wl_id=141 AND watchlist_hits.objectId="%s"' % objectId
+    query += 'WHERE watchlist_hits.wl_id=%d AND watchlist_hits.objectId="%s"' % (lasair.settings.TNS_WATCHLIST_ID, objectId)
 
     cursor.execute(query)
     for row in cursor:

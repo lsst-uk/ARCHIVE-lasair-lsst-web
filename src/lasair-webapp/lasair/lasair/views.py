@@ -131,13 +131,14 @@ def readcone(cone):
     tok = cone.strip().split()
 #    message += str(tok)
 
-# if tokens begin with 'ZTF', must be list of ZTF identifier
-    allztf = True
-    for t in tok:
-        if not t.startswith('ZTF'):
-            allztf = False
-    if allztf:
-        return {'objectIds': tok, 'message':'ZTF object list'}
+# if tokens begin with 'SN' or 'AT', must be TNS identifier
+    TNSname = None
+    if len(tok) == 1:
+        t = tok[0]
+        if t[0:2] == 'SN' or t[0:2] == 'AT':
+            return {'TNSprefix':t[0:2], 'TNSname': t[2:]}
+        if t[0:2] == '20':
+            return {'TNSprefix': '',      'TNSname': t}
 
 # if odd number of tokens, must end with radius in arcsec
     radius = 5.0
@@ -214,10 +215,25 @@ def conesearch_impl(cone):
 #    hitdict = {}
     hitlist = []
     d = readcone(cone)
+
     if 'objectIds' in d:
         data = {'cone':cone, 'hitlist': d['objectIds'], 
             'message': 'Found ZTF object names'}
         return data
+
+    if 'TNSname' in d:
+        cursor = connection.cursor()
+        query = 'SELECT objectId FROM watchlist_hits WHERE wl_id=%d AND name="%s"' 
+        query = query % (lasair.settings.TNS_WATCHLIST_ID, d['TNSname'])
+        cursor.execute(query)
+        hits = cursor.fetchall()
+        message = '%s not found in TNS'%cone
+        for hit in hits:
+            hitlist.append(hit[0])
+            message = '%s found in TNS'%cone
+        data = {'TNSname':d['TNSname'], 'hitlist': hitlist, 'message': message}
+        return data
+            
     if 'ra' in d:
         ra = d['ra']
         dec = d['dec']

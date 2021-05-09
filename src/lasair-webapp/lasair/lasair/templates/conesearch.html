@@ -10,7 +10,7 @@ objects in ZTF in that cone. They can be separated by spaces, commas, semicolons
 They can be in decimal degrees (floating point number), 
 or sexagesimal in the form hh:mm:ss and dd:mm:ss or 
 hh mm ss and dd mm ss. If the radius is not specified, it defaults to 5 arcsec.
-You can also enter an objectId, or a list of object Id, each beginning with 'ZTF'.
+You can also enter a TNS object, beginning with 'SN' or 'AT' to be resolved to a ZTF object.
 <form method="POST"  action="/conesearch/">
 <table class="table" style="width:80%">
 {% csrf_token %}
@@ -42,17 +42,15 @@ You can also enter an objectId, or a list of object Id, each beginning with 'ZTF
 <font size=-2>
 Examples of searches:
 <ul><tt>
-<li>ZTF18acsovsw</li>
-<li>ZTF18acsovsw, ZTF19aagqkrq, ZTF18aawohdr</li>
-<li>141.15725 25.39508 </li>
-<li>141.15725;25.39508 </li>
-<li>141.15725| 25.39508 </li>
-<li>141.15725,  25.39508, 5.0</li>
-<li>09:24:37.74 | +25:23:42.3</li>
-<li>09:24:37.74 | +25:23:42.3 10.0</li>
-<li>09 24 37.74   +25 23 42.3</li>
-<li>09 24 37.74 | +25 23 42.3 5</li>
-<li>09 24 37.74 ; +25 23 42.3 5</li>
+<li>AT2021kcr</li>
+<li>219.274497 34.633079 </li>
+<li>219.274497;34.633079 </li>
+<li>219.274497|34.633079 </li>
+<li>219.274497,34.633079, 5.0</li>
+<li>14:37:5.879 | 34:37:59.083</li>
+<li>14:37:5.879 | 34:37:59.083 10.0</li>
+<li>14 37 5.879  34 37 59.083</li>
+<li>14 37 5.879  34 37 59.083 5</li>
 </tt></ul>
 </font>
 {% endblock %}

@@ -162,7 +162,7 @@ def handle_myquery(request, mq_id=None):
                 return render(request, 'error.html', {'message': e})
 
             sqlquery_real = build_query(selected, tables, conditions)
-            e = check_query_zero_limit(real_sql)
+            e = check_query_zero_limit(sqlquery_real)
             if e:
                 return render(request, 'error.html', {'message': e})
 

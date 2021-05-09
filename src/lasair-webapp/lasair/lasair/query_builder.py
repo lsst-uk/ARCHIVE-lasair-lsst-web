@@ -23,7 +23,6 @@ rejected if these are found, with an error message returned.
 import re
 max_execution_time = 300000  # maximum execution time in milliseconds
 max_query_rows     = 1000    # default LIMIT if none specified
-tns_watchlist      = 141     # wl_id of the watchlist that has TNS
 
 class QueryBuilderError(Exception):
     """ Thrown when parsing encounters an error
@@ -176,7 +175,7 @@ def build_query(select_expression, from_expression, where_condition):
         where_clauses.append('area_hits.ar_id=%s' % area_id)
     if crossmatch_tns:
         where_clauses.append('objects.objectId=watchlist_hits.objectId')
-        where_clauses.append('watchlist_hits.wl_id=%d' % tns_watchlist)
+        where_clauses.append('watchlist_hits.wl_id=%d' % lasair.settings.TNS_WATCHLIST_ID)
         where_clauses.append('watchlist_hits.name=crossmatch_tns.tns_name')
 
     # if the WHERE is just an ORDER BY, then we mustn't have AND before it
