@@ -64,6 +64,8 @@ def status(request):
     web_domain = lasair.settings.WEB_DOMAIN
     jsonstr = open(lasair.settings.SYSTEM_STATUS).read()
     status = json.loads(jsonstr)
+    status['today_singleton'] = status['today_filter'] - status['today_filter_out'] - status['today_filter_ss']
+
     nid  = date_nid.nid_now()
     date = date_nid.nid_to_date(nid)
     return render(request, 'status.html', 

@@ -5,50 +5,29 @@
 <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
 <script src="/lasair/static/js/query.js"></script>
 
-
 <div class="row">
-<div class="col-sm">
+	<!-- <div class="col-lg"> -->
 <!--	{{ message }} -->
-
-<button style="color: blue; background-color: #EEEEFF;" onclick="showinfodiv();">Show/Hide information</button>
-<div id="infodiv" style="display:none">
+<h3>Query Builder</h3>
 The form below is a builder for SQL SELECT queries on the ZTF database of objects. 
-There are three tables that can be joined in SELECT queries 
-(only SELECT queries are allowed). See examples below.
-The tables are:
+If you are logged in to Lasair, you can name and save your query, 
+share it with others, run it in real-time as alerts come in, and have results kept for you or pushed to you.
+First you pick the tables to be joined for your query. The "objects" table is mandatory.
 <ul>
-<li> <b>objects</b>: The astrophysical objects which consist of a series
-of candidates (aka detections). The object has a light curve, the candidate has a single magnitude and date.</li>
-<li> <b>sherlock_classifications</b>: Information about each object derived from 
-multiple catalogs by the <a href=/sherlock>Sherlock</a> software. 
+<li> <b>objects</b>: Each astrophysical object consists of a series
+	of candidates (aka detections) forming a light curve. The light-curve is characterised by computed 
+	features that you can use in your selection.</li>
+<li> <b>sherlock_classifications</b>: Sky context information about each object derived from 
+	the results of the <a href=/sherlock>Sherlock</a> spatial cross-match service.
+<li> <b>crossmatch_tns</b>: For those objects also in the 
+	<a href=https://www.wis-tns.org/>Transient Name Server</a>,
+	these attributes can be searched. For example 'WHERE crossmatch_tns.type = "SN Ia"'.
 <li> <b>watchlists</b>: Select one of the watchlists available to you to restrict searching to 
-	ZTF objects within the radius of the watchlist.
+	ZTF objects cross-matched with the watchlist.
 <li> <b>areas</b>: Select one of the areas available to you to restrict searching to 
 	ZTF objects within the area.
 </ul>
 <p>
-<b>For detailed information about the attributes of these three tables, 
-that you can use in the filters :
-<a target="new" href=/schema>click here</a>.</b>
-
-<ul>
-<li> The public survey uses two filters: fid=1 (g) and fid=2 (r)
-<li> For each observing field of the survey and each of the g and r filters,
-ZTF will only issue alerts when it has
-built up a <i>reference image</i> of that field with that filter, by stacking 15 good images.
-<li> Once that is in place, each fresh image is subtracted from the reference,
-and any 5-sigma difference generates an alert.
-<li> When a detection is within 1.5 arcseconds of a previous detection, it gets the same <i>objectId</i>. 
-Thus a light curve can be obtained from all the detections that have a given objectId.
-<li> More details of the processing pipeline are available
-<a href=http://web.ipac.caltech.edu/staff/fmasci/ztf/ztf_pipelines_deliverables.pdf>here</a>.
-<li> Further cuts can be made to remove spurious detections, using the "drb" attribute of each detection:
-the range is 0 to 1 where closer to 1 is more reliable.
-<li>If you would like to learn the SQL language, <a href=http://cas.sdss.org/dr6/en/help/howto/search/>this</a>
-is a good resource.
-</ul>
-</div>
-
 
 
 <!-- editing an existing query -->
@@ -80,13 +59,11 @@ Results can be sent, also in real time, via email or Kafka.
 
 <!-- run, save or edit this query -->
 {% if new or is_owner %}
+<table><tr><td>
 <div class ="form-group">
 {% csrf_token %}
 
-<b><font color="red">SELECT ATTRIBUTES</font></b>
-<tt><textarea class="form-control" rows="4" cols="40" name="selected" id="selected">{{ myquery.selected }}</textarea></tt>
-
-<b><font color="red">TABLES TO USE</font></b>
+<b><font color="red">First pick your tables:</font></b> ("objects" is mandatory)
 <div style="display:none">
 <tt><textarea class="form-control" rows="1" cols="40" name="tables" id="tables">{{ myquery.tables }}</textarea></tt>
 </div>
@@ -131,13 +108,27 @@ Results can be sent, also in real time, via email or Kafka.
 
 </table>
 
-<b><font color="red">WHERE</font></b>
+<b><font color="red">SELECT</font></b> clause here. Which attributes to return? See list at right.
+<tt><textarea class="form-control" rows="4" cols="40" name="selected" id="selected">{{ myquery.selected }}</textarea></tt>
+
+
+The SQL <b><font color="red">WHERE</font></b>. Which objects to return. See list at right.
 <tt><textarea class="form-control" rows="4" cols="40" name="conditions" id="conditions">{{ myquery.conditions }}</textarea></tt>
 <br/>
 
-<b><font color="red">LIMIT</font></b> <input name="limit" value=1000>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-<b><font color="red">OFFSET</font></b> <input name="offset" value=0>
+<table><tr>
+<td><b><font color="red">LIMIT</font></b></td><td><input name="limit" value=1000></td></tr>
+<td><b><font color="red">OFFSET</font></b></td><td><input name="offset" value=0></td></tr>
+</table>
 </div>
+
+		</td><td style="background-color:#AAAAAA">&nbsp;</td><td width=400>
+<div class="overflow-auto" style="height:600px;">
+	<div id="schema_objects"></div>
+	<div id="schema_sherlock_classifications"></div>
+	<div id="schema_crossmatch_tns"></div>
+</div>
+</td></tr></table>
 
 <input class="form-control" type="hidden" name="page" value="{{ page }}"/><br/>
 {% endif %}
@@ -215,6 +206,9 @@ function ConfirmDelete()
 <script type="text/javascript">
 $(document).ready(function(){
   check_boxes();
+  fill_schema('objects');
+  fill_schema('sherlock_classifications');
+  fill_schema('crossmatch_tns');
 });
 </script>
 

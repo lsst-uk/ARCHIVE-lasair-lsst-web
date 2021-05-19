@@ -50,6 +50,10 @@ urlpatterns = [
     path('querylist/',            queries.querylist,        name='querylist'),
     path('query/',                queries.new_myquery,      name='new_myquery'),
     path('query/<int:mq_id>/',    queries.show_myquery,     name='show_myquery'),
+
+    path('query2/',                queries.new_myquery,      name='new_myquery'),   #####
+    path('query2/<int:mq_id>/',    queries.show_myquery,     name='show_myquery'),   #####
+
     path('runquery/',             queries.runquery,         name='runquery'),
 
     path('comment/',                comments.new_comment,       name='new_comment'),
