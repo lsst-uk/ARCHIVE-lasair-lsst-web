@@ -33,9 +33,15 @@ candidates = data.candidates;
 first_ra = Number(data.objectData.ramean)*3600;
 first_dec = Number(data.objectData.decmean)*3600;
 now_mjd = data.objectData.now_mjd;
+mjdmin_ago = data.objectData.mjdmin_ago;
+mjdmax_ago = data.objectData.mjdmax_ago;
+minmag = 100;
+maxmag = 0;
 
 candidates.forEach(function(item){
     y = Number(item.magpsf);
+    if(y > maxmag){maxmag = y;}
+    if(y < minmag){minmag = y;}
     x = Number(item.since_now);
     e = Number(item.sigmapsf);
     x2 = first_ra - Number(item.ra)*3600;
@@ -82,8 +88,6 @@ candidates.forEach(function(item){
         }
     }
 });
-
-
 
 lc_div = document.getElementById('lc');
 var lcg = {x:gt, y: gmag, error_y:{
@@ -152,8 +156,14 @@ Plotly.plot(lc_div, [lcg, lcr, lcfg, lcfr, nlcg, nlcr], {
     yaxis: {
         title: 'Difference Magnitude',
         autorange: 'reversed'    
-    }
-     },
+    },
+    shapes: [
+        { type:'line', x0:-mjdmin_ago, x1:-mjdmin_ago, y0:minmag, y1:maxmag,
+	line: { color: 'blue', dash:'dot'} },
+        { type:'line', x0:-mjdmax_ago, x1:-mjdmax_ago, y0:minmag, y1:maxmag,
+	line: { color: 'blue', dash:'dot'} },
+    ]
+  },
     {displayModeBar: false});
 
 radec_div = document.getElementById('radec');

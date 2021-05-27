@@ -34,7 +34,7 @@ This object is not in the Lasair database.
 
 <div class="w-50">
 <ul>
-<li>Object has {{ data.objectData.ncand }} candidates, at mean position:
+	<li>Object has {{ data.objectData.ncand }} candidates between {{ data.objectData.mjdmin_ago|floatformat:0 }} and {{ data.objectData.mjdmax_ago|floatformat:0 }} days ago, at mean position:
 <ul>
 <li> (RA, Dec) = ({{ data.objectData.ramean|floatformat:6 }}, {{ data.objectData.decmean|floatformat:6 }})</li>
 <li> (RA, Dec) = ({{ data.objectData.rasex }}, {{ data.objectData.decsex }})</li>
@@ -43,7 +43,7 @@ This object is not in the Lasair database.
 </ul>
 
 {% if data.count_isdiffpos %}
-<li>NOTE: There are {{ data.count_isdiffpos }} of {{ data.objectData.ncand }} candidates (below) where the detected brightness is less than the reference brightness (where the magnitude is followed by "f"), also indicated by an open circle in the light curve above.</li>
+<li>NOTE: There are {{ data.count_isdiffpos }} of {{ data.count_all_candidates }} candidates (below) where the detected brightness is less than the reference brightness (where the magnitude is followed by "f"), also indicated by an open circle in the light curve above.</li>
 {% endif %}
 
 
@@ -70,7 +70,7 @@ Moving object, MPC name is <a href="#" onclick="document.forms[1].submit();">{{ 
 &nbsp;&nbsp;|&nbsp;&nbsp;
 <a href="http://ned.ipac.caltech.edu/cgi-bin/nph-objsearch?lon={{ data.objectData.ramean|floatformat:6 }}d&lat={{ data.objectData.decmean|floatformat:6 }}d&radius=2&search_type=Near+Position+Search" target="new">NED</a>
 &nbsp;&nbsp;|&nbsp;&nbsp;
-<a href="https://wis-tns.weizmann.ac.il/search?ra={{ data.objectData.ramean }}&decl={{ data.objectData.decmean }}&radius=5&coords_unit=arcsec" target="new">Transient Name Server</a>
+<a href="https://wis-tns.org/search?ra={{ data.objectData.ramean }}&decl={{ data.objectData.decmean }}&radius=5&coords_unit=arcsec" target="new">Transient Name Server</a>
 &nbsp;&nbsp;|&nbsp;&nbsp;
 <a href="#" onclick="document.forms[2].submit();" target="new">ZTF DR1</a></li>
 </li>

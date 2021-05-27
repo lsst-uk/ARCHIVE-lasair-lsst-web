@@ -62,8 +62,16 @@ def status(request):
     """
     message = ''
     web_domain = lasair.settings.WEB_DOMAIN
-    jsonstr = open(lasair.settings.SYSTEM_STATUS).read()
-    status = json.loads(jsonstr)
+    try:
+        jsonstr = open(lasair.settings.SYSTEM_STATUS).read()
+    except:
+        return render(request, 'error.html', {'message': 'Cannot open status file'})
+
+    try:
+        status = json.loads(jsonstr)
+    except:
+        return render(request, 'error.html', {'message': 'Cannot parse status file'})
+
     status['today_singleton'] = status['today_filter'] - status['today_filter_out'] - status['today_filter_ss']
 
     nid  = date_nid.nid_now()
@@ -141,6 +149,8 @@ def readcone(cone):
             return {'TNSprefix':t[0:2], 'TNSname': t[2:]}
         if t[0:2] == '20':
             return {'TNSprefix': '',      'TNSname': t}
+        if t[0:3] == 'ZTF':
+            return {'objectIds': tok}
 
 # if odd number of tokens, must end with radius in arcsec
     radius = 5.0

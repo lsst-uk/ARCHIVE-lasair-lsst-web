@@ -111,7 +111,7 @@ def obj(objectId):
     message = ''
     msl = connect_db()
     cursor = msl.cursor(buffered=True, dictionary=True)
-    query = 'SELECT ncand, ramean, decmean, glonmean, glatmean '
+    query = 'SELECT ncand, ramean, decmean, glonmean, glatmean, jdmin, jdmax '
     query += 'FROM objects WHERE objectId = "%s"' % objectId
     cursor.execute(query)
     for row in cursor:
@@ -146,6 +146,8 @@ def obj(objectId):
 
         now = mjd_now()
         objectData['now_mjd'] = '%.2f' % now
+        objectData['mjdmin_ago'] = now - (objectData['jdmin'] - 2400000.5)
+        objectData['mjdmax_ago'] = now - (objectData['jdmax'] - 2400000.5)
 
 #        query = 'SELECT catalogue_object_id, catalogue_table_name, catalogue_object_type, separationArcsec, '
 #        query += '_r AS r, _g AS g, photoZ, rank '
@@ -196,7 +198,7 @@ def obj(objectId):
         candidates = []
         candlist = session.execute("""SELECT * from candidates where objectId = %s""", (objectId,) )
 
-        count_isdiffpos = count_real_candidates = 0
+        count_isdiffpos = count_all_candidates = 0
 
         for cand in candlist:
             row = {}
@@ -211,7 +213,8 @@ def obj(objectId):
             ssnamenr = cand['ssnamenr']
             if ssnamenr == 'null':
                 ssnamenr = None
-            if cand['candid'] and cand['isdiffpos'] == 'f':
+            count_all_candidates += 1
+            if cand['candid'] and (cand['isdiffpos'] == 'f' or cand['isdiffpos'] == '0'):
                 count_isdiffpos += 1
             if not cand['candid']:
                 row['magpsf'] = cand['diffmaglim']
@@ -237,7 +240,7 @@ def obj(objectId):
         alert = json.loads(json_object)
         candidates = []
  
-        count_isdiffpos = count_real_candidates = 0
+        count_isdiffpos = count_all_candidates = 0
 
 #        if 'prv_candidates' in alert and alert['prv_candidates']:
 #            candlist = alert['prv_candidates'] + [alert['candidate']]
@@ -265,7 +268,8 @@ def obj(objectId):
                 ssnamenr = cand['ssnamenr']
                 if ssnamenr == 'null':
                     ssnamenr = None
-            if candid and cand['isdiffpos'] == 'f':
+            count_all_candidates += 1
+            if candid and (cand['isdiffpos'] == 'f' or cand['isdiffpos'] == '0'):
                 count_isdiffpos += 1
             if not candid:
                 row['magpsf'] = cand['diffmaglim']
@@ -290,7 +294,7 @@ def obj(objectId):
             'objectData': objectData, 
             'candidates': candidates, 
             'count_isdiffpos': count_isdiffpos, 
-            'count_real_candidates':count_real_candidates,
+            'count_all_candidates':count_all_candidates,
             'sherlock': sherlock, 
             'TNS':TNS, 'message':message,
             }
