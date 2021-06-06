@@ -18,7 +18,7 @@ import time
 #import fastavro
 
 # 2020-08-03 KWS Added cassandra connectivity
-if lasair.settings.CASSANDRA is not None:
+if lasair.settings.CASSANDRA_HEAD is not None:
     from cassandra.cluster import Cluster
     from cassandra.query import dict_factory
 
@@ -178,21 +178,21 @@ def obj(objectId):
     #message += str(TNS)   #%%%%%%%
 
 
-    if lasair.settings.CASSANDRA is not None:
+    if lasair.settings.CASSANDRA_HEAD is not None:
 
         # 2020-08-03 KWS Get lightcurve from Cassandra.  By default Django connects to MySQL.  But we'd also
         #                like to get our lightcurves from Cassandra.  Don't connect to Cassandra here - massive
         #                overhead.  Place settings in settings.py and connect a session at startup.  This is
         #                a quick and dirty fix.  Try passing the session to this method.
 
-        cluster = Cluster()
+        cluster = Cluster(lasair.settings.CASSANDRA_HEAD)
         session = cluster.connect()
 
         # Set the row_factory to dict_factory to simulate what Roy is doing below! Otherwise
         # the data returned will be in the form of object properties.
         session.row_factory = dict_factory
 
-        session.set_keyspace(lasair.settings.CASSANDRA['default']['KEYSPACE'])
+        session.set_keyspace('lasair')
 
         #noncands = session.execute("""SELECT * from prv_candidates where objectId = %s""", (objectId,) )
         candidates = []
@@ -207,6 +207,7 @@ def obj(objectId):
                 if key in cand:
                     row[key] = cand[key]
             row['mjd'] = mjd = float(cand['jd']) - 2400000.5
+            row['since_now'] = mjd - now;
             date = datetime.strptime("1858/11/17", "%Y/%m/%d")
             date += timedelta(mjd)
             row['utc'] = date.strftime("%Y-%m-%d %H:%M:%S")

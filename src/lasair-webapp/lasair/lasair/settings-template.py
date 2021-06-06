@@ -115,15 +115,8 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'lasair.wsgi.application'
 
-CASSANDRA = None
-#CASSANDRA = {
-#    'default': {
-#        'KEYSPACE': CASSANDRA_KEYSPACE,
-#        'USER':     CASSANDRA_USER,
-#        'PASSWORD': CASSANDRA_PASS,
-#        'HOSTS':    CASSANDRA_HOSTS,
-#    }
-#}
+CASSANDRA_HEAD = ['192.168.0.xxx']
+CASSANDRA_HEAD = None
 
 DATABASES = {
     'default': {

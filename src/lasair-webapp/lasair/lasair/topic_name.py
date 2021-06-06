@@ -6,4 +6,4 @@ def topic_name(userid, name):
         name:
     """
     name =  ''.join(e for e in name if e.isalnum() or e=='_' or e=='-' or e=='.')
-    return '%d'%userid + name
+    return 'lasair_' + '%d'%userid + name
