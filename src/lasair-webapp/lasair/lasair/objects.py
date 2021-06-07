@@ -15,12 +15,12 @@ import json
 from utility.mag import dc_mag
 from utility.objectStore import objectStore
 import time
-#import fastavro
+from lasair.lightcurves import lightcurve_fetcher
 
 # 2020-08-03 KWS Added cassandra connectivity
-if lasair.settings.CASSANDRA_HEAD is not None:
-    from cassandra.cluster import Cluster
-    from cassandra.query import dict_factory
+#if lasair.settings.CASSANDRA_HEAD is not None:
+#    from cassandra.cluster import Cluster
+#    from cassandra.query import dict_factory
 
 def connect_db():
     """connect_db.
@@ -175,107 +175,35 @@ def obj(objectId):
     for row in cursor:
         for k,v in row.items():
             if v: TNS[k] = v
-    #message += str(TNS)   #%%%%%%%
 
+    # Fetch the lightcurve, either from cassandra or file system
+    if lasair.settings.CASSANDRA_HEAD is not None:
+        LF = lightcurve_fetcher(cassandra_hosts=lasair.settings.CASSANDRA_HEAD)
+    else:
+        LF = lightcurve_fetcher(fileroot=lasair.settings.BLOB_STORE_ROOT+'/objectjson')
+
+    candidates = LF.fetch(objectId)
 
     if lasair.settings.CASSANDRA_HEAD is not None:
+        LF.close()
 
-        # 2020-08-03 KWS Get lightcurve from Cassandra.  By default Django connects to MySQL.  But we'd also
-        #                like to get our lightcurves from Cassandra.  Don't connect to Cassandra here - massive
-        #                overhead.  Place settings in settings.py and connect a session at startup.  This is
-        #                a quick and dirty fix.  Try passing the session to this method.
-
-        cluster = Cluster(lasair.settings.CASSANDRA_HEAD)
-        session = cluster.connect()
-
-        # Set the row_factory to dict_factory to simulate what Roy is doing below! Otherwise
-        # the data returned will be in the form of object properties.
-        session.row_factory = dict_factory
-
-        session.set_keyspace('lasair')
-
-        #noncands = session.execute("""SELECT * from prv_candidates where objectId = %s""", (objectId,) )
-        candidates = []
-        candlist = session.execute("""SELECT * from candidates where objectId = %s""", (objectId,) )
-
-        count_isdiffpos = count_all_candidates = 0
-
-        for cand in candlist:
-            row = {}
-            for key in ['candid', 'jd', 'ra', 'dec', 'fid', 'nid', 'magpsf', 'sigmapsf', 'isdiffpos', 
-                    'ssdistnr', 'ssnamenr', 'drb']:
-                if key in cand:
-                    row[key] = cand[key]
-            row['mjd'] = mjd = float(cand['jd']) - 2400000.5
-            row['since_now'] = mjd - now;
-            date = datetime.strptime("1858/11/17", "%Y/%m/%d")
-            date += timedelta(mjd)
-            row['utc'] = date.strftime("%Y-%m-%d %H:%M:%S")
+    count_isdiffpos = count_all_candidates = 0
+    for cand in candidates:
+        candid = cand['candid']
+        cand['mjd'] = mjd = float(cand['jd']) - 2400000.5
+        cand['since_now'] = mjd - now;
+        date = datetime.strptime("1858/11/17", "%Y/%m/%d")
+        date += timedelta(mjd)
+        cand['utc'] = date.strftime("%Y-%m-%d %H:%M:%S")
+        if 'ssnamenr' in cand:
             ssnamenr = cand['ssnamenr']
             if ssnamenr == 'null':
                 ssnamenr = None
-            count_all_candidates += 1
-            if cand['candid'] and (cand['isdiffpos'] == 'f' or cand['isdiffpos'] == '0'):
-                count_isdiffpos += 1
-            if not cand['candid']:
-                row['magpsf'] = cand['diffmaglim']
-            candidates.append(row)
-
-        # Disconnect from Cassandra.
-        cluster.shutdown()
-
-    else:
-
-
-
-        json_store = objectStore(suffix = 'json',
-            fileroot=lasair.settings.BLOB_STORE_ROOT + '/objectjson')
-
-        json_object = json_store.getObject(objectId)
-
-        if not json_object:
-            message = 'objectId %s does not exist'%objectId
-            data = {'objectId':objectId, 'message':message}
-            return data
-
-        alert = json.loads(json_object)
-        candidates = []
- 
-        count_isdiffpos = count_all_candidates = 0
-
-#        if 'prv_candidates' in alert and alert['prv_candidates']:
-#            candlist = alert['prv_candidates'] + [alert['candidate']]
-#        else:
-#            candlist = [alert['candidate']]
-        candlist = alert['candidates']
- 
-        candidates = []
-        for cand in candlist:
-            row = {}
-#            if not 'candid' in cand or not cand['candid']:   # nondetections
-#                continue
-
-            candid = cand['candid']
-            for key in ['candid', 'jd', 'ra', 'dec', 'fid', 'nid', 'magpsf', 'sigmapsf', 'isdiffpos', 
-                    'ssdistnr', 'ssnamenr', 'drb']:
-                if key in cand:
-                    row[key] = cand[key]
-            row['mjd'] = mjd = float(cand['jd']) - 2400000.5
-            row['since_now'] = mjd - now;
-            date = datetime.strptime("1858/11/17", "%Y/%m/%d")
-            date += timedelta(mjd)
-            row['utc'] = date.strftime("%Y-%m-%d %H:%M:%S")
-            if 'ssnamenr' in cand:
-                ssnamenr = cand['ssnamenr']
-                if ssnamenr == 'null':
-                    ssnamenr = None
-            count_all_candidates += 1
-            if candid and (cand['isdiffpos'] == 'f' or cand['isdiffpos'] == '0'):
-                count_isdiffpos += 1
-            if not candid:
-                row['magpsf'] = cand['diffmaglim']
-
-            candidates.append(row)
+        count_all_candidates += 1
+        if candid and (cand['isdiffpos'] == 'f' or cand['isdiffpos'] == '0'):
+            count_isdiffpos += 1
+        if not candid:
+            cand['magpsf'] = cand['diffmaglim']
 
     if not objectData:
         ra = float(cand['ra'])
