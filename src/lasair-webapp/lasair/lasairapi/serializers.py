@@ -289,25 +289,11 @@ class StreamsSerializer(serializers.Serializer):
 
         return { "error": 'Must supply either topic or regex' }
 
-def get_lightcurve(objectId):
-    json_store = objectStore(suffix = 'json',
-        fileroot=lasair.settings.BLOB_STORE_ROOT + '/objectjson')
-
-    json_object = json_store.getObject(objectId)
-    if not json_object or len(json_object) == 0:
-        message = 'objectId %s does not exist'%objectId
-        return {"error":message}
-    candidates = json.loads(json_object)
-    return candidates
-
-def get_lightcurves(objectIds):
-    ncand = 0
-    lightcurves = []
-    for objectId in objectIds:
-        lightcurves.append(get_lightcurve(objectId))
-    return lightcurves
-
+from cassandra.cluster import Cluster
+from cassandra.query import dict_factory
 from utility.objectStore import objectStore
+from lasair.lightcurves import lightcurve_fetcher
+
 class LightcurvesSerializer(serializers.Serializer):
     objectIds = serializers.CharField(max_length=16384, required=True)
     def save(self):
@@ -323,5 +309,16 @@ class LightcurvesSerializer(serializers.Serializer):
             userId = request.user
             record_user(userId, 'lightcurves')
 
-        lightcurves = get_lightcurves(olist)
+            # Fetch the lightcurve, either from cassandra or file system
+        if lasair.settings.CASSANDRA_HEAD is not None:
+            LF = lightcurve_fetcher(cassandra_hosts=lasair.settings.CASSANDRA_HEAD)
+        else:
+            LF = lightcurve_fetcher(fileroot=lasair.settings.BLOB_STORE_ROOT+'/objectjson')
+
+        lightcurves = []
+        for objectId in olist:
+            candidates = LF.fetch(objectId)
+            lightcurves.append(candidates)
+
+        LF.close()
         return lightcurves

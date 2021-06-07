@@ -183,9 +183,7 @@ def obj(objectId):
         LF = lightcurve_fetcher(fileroot=lasair.settings.BLOB_STORE_ROOT+'/objectjson')
 
     candidates = LF.fetch(objectId)
-
-    if lasair.settings.CASSANDRA_HEAD is not None:
-        LF.close()
+    LF.close()
 
     count_isdiffpos = count_all_candidates = 0
     for cand in candidates:
