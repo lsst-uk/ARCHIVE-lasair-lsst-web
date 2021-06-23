@@ -214,7 +214,11 @@ class QuerySerializer(serializers.Serializer):
         if error:
             return {"error":error}
 
-        sqlquery_real = build_query(selected, tables, conditions)
+        try:
+            sqlquery_real = build_query(selected, tables, conditions)
+        except Exception as e:
+            return {"error": str(e)}
+            
         sqlquery_real += ' LIMIT %d OFFSET %d' % (limit, offset)
 
         msl = connect_db()
