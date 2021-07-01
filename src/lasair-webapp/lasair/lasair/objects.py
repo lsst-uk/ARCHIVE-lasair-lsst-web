@@ -117,6 +117,9 @@ def obj(objectId):
     for row in cursor:
         objectData = row
 
+    if not objectData:
+        return None
+
 #    comments = []
 #    if objectData:
 #        qcomments = Comments.objects.filter(objectid=objectId).order_by('-time')
@@ -133,6 +136,7 @@ def obj(objectId):
 #        return None
 
 #    crossmatches = []
+    now = mjd_now()
     if objectData:
         if objectData and 'annotation' in objectData and objectData['annotation']:
             objectData['annotation'] = objectData['annotation'].replace('"', '').strip()
@@ -144,7 +148,6 @@ def obj(objectId):
         objectData['ec_lon'] = ec_lon
         objectData['ec_lat'] = ec_lat
 
-        now = mjd_now()
         objectData['now_mjd'] = '%.2f' % now
         objectData['mjdmin_ago'] = now - (objectData['jdmin'] - 2400000.5)
         objectData['mjdmax_ago'] = now - (objectData['jdmax'] - 2400000.5)
@@ -202,6 +205,9 @@ def obj(objectId):
             count_isdiffpos += 1
         if not candid:
             cand['magpsf'] = cand['diffmaglim']
+
+    if count_all_candidates == 0:
+        return None
 
     if not objectData:
         ra = float(cand['ra'])
