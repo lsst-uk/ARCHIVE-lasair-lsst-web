@@ -1,41 +1,24 @@
+# sudo apt update
+# sudo apt-add-repository ppa:ansible/ansible
+# sudo apt install ansible
+# sudo apt install python3-pip
+# sudo pip3 install --upgrade pip
 ---
-- hosts: webserver
+- hosts: localhost
   connection: local
   gather_facts: no
   tasks:
-    - name: install pip3
+    - name: install libraries
       apt: 
-          name: python3-pip
-          state: present
-          update_cache: true
-      become: yes
-
-    - name: install apache2
-      apt: 
-          name: apache2
-          state: present
-          update_cache: true
-      become: yes
-
-    - name: install apache2-dev
-      apt: 
-          name: apache2-dev
-          state: present
-          update_cache: true
-      become: yes
-
-    - name: install libmysqlclient
-      apt: 
-          name: libmysqlclient-dev
-          state: present
-          update_cache: true
-      become: yes
-
-    - name: install swig
-      apt: 
-          name: swig
-          state: present
-          update_cache: true
+      with_items:
+       - python3-pip
+       - apache2
+       - apache2-utils
+       - apache2-dev
+       - libexpat1
+       - ssl-cert
+       - libmysqlclient-dev
+       - swig
       become: yes
 
     - name: install mysql.connector
@@ -79,9 +62,18 @@
           executable: pip3 
           name: mod-wsgi
 
-          #    - name: configure mod-wsgi
-          #      shell: /home/ubuntu/.local/bin/mod_wsgi-express module-config > /etc/apache2/mods-available/wsgi.load
-          #      become: yes
-          #
-          #      copy lasair.conf to /etc/apache2/sites-available
+    - name: configure mod-wsgi
+      shell: 
+         cmd: /home/ubuntu/.local/bin/mod_wsgi-express module-config > /etc/apache2/mods-available/wsgi.load
+      become: yes
 
+    - name: copy conf file
+      shell: 
+          cmd: cp ../conf/webserver.conf /etc/apache2/sites-available
+      become: yes
+
+    - name: link it from sites-enabled
+      shell: 
+          cmd: ln -s ../sites-available/webserver.conf webserver.conf
+          chdir: /etc/apache2/sites-enabled
+      become: yes
