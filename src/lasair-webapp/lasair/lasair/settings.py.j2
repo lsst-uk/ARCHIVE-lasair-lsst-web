@@ -5,7 +5,6 @@ Django settings for lasair project.
 DEFAULT_FROM_EMAIL = "donotreply@roe.ac.uk"
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'localhost'
-#EMAIL_HOST = 'smtp.roe.ac.uk'
 EMAIL_PORT = 25 
 
 LASAIR_ROOT = '/home/ubuntu/'
@@ -14,28 +13,30 @@ LASAIR_ROOT = '/home/ubuntu/'
 # https://docs.djangoproject.com/en/2.0/ref/settings/#databases
 DEBUG          = True
 WEB_DOMAIN     = 'lasair-iris'
-READONLY_USER  = ''
-READONLY_PASS  = ''
+READONLY_USER  = '{{ settings.master_db_readonly_username }}'
+READONLY_PASS  = '{{ settings.master_db_readonly_password }}'
 
-READWRITE_USER = ''
-READWRITE_PASS = ''
+READWRITE_USER = '{{ settings.master_db_username }}'
+READWRITE_PASS = '{{ settings.master_db_password }}'
 
-DB_HOST        = ''
+DB_HOST        = '{{ settings.master_db_ip }}'
 
 DATA_UPLOAD_MAX_MEMORY_SIZE = 26214400
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = ''
+SECRET_KEY = '{{ settings.django_secret_key }}
 
 QUERY_CACHE = LASAIR_ROOT + 'query_cache'
 
-CITIZEN_SCIENCE_USERID = 0
-CITIZEN_SCIENCE_KEY    = ''
+#CITIZEN_SCIENCE_USERID = 69
+#CITIZEN_SCIENCE_KEY    = 'oij2487hfwnjdoq8dhajfw87'
 
-BLOB_STORE_ROOT = '/blah/blah'
+BLOB_STORE_ROOT = '/mnt/cephfs/roy'
 SYSTEM_STATUS   = '/mnt/cephfs/roy/system_status.json'
 
-SHERLOCK_SERVICE = '192.41.108.29'
+SHERLOCK_SERVICE = '192.168.0.10'
+
+TNS_WATCHLIST_ID = 141
 ################################################################
 import os
 
@@ -84,6 +85,9 @@ REST_FRAMEWORK = {
     ),
     'DEFAULT_THROTTLE_RATES': { 'user': '1000000/hour', },
 
+    # direct them to the dox to get more
+    'EXCEPTION_HANDLER': 'lasairapi.throttle.custom_exception_handler',
+
     # this is for the 'dummy' user key in the api dox
     'ANON_THROTTLE_RATES'   : { 'user': '10/hour', },
 
@@ -115,8 +119,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'lasair.wsgi.application'
 
-CASSANDRA_HEAD = ['192.168.0.xxx']
-CASSANDRA_HEAD = None
+CASSANDRA_HEAD          = ['192.168.0.11']
 
 DATABASES = {
     'default': {
@@ -153,7 +156,6 @@ USE_L10N = True
 USE_TZ = True
 
 STATIC_URL = "/lasair/static/"
-
 # 2020-08-18 KWS Moved our local static files to a directory called "staticfiles".
 STATICFILES_DIRS = (
   os.path.join(BASE_DIR, 'staticfiles'),
