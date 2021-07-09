@@ -64,7 +64,7 @@
 
     - name: configure mod-wsgi
       shell: 
-         cmd: /home/ubuntu/.local/bin/mod_wsgi-express module-config > /etc/apache2/mods-available/wsgi.load
+         cmd: python3 /home/ubuntu/.local/bin/mod_wsgi-express module-config > /etc/apache2/mods-available/wsgi.load
       become: yes
 
     - name: copy conf file
@@ -74,6 +74,6 @@
 
     - name: link it from sites-enabled
       shell: 
-          cmd: ln -s ../sites-available/webserver.conf webserver.conf
+          cmd: ln -sf ../sites-available/webserver.conf webserver.conf
           chdir: /etc/apache2/sites-enabled
       become: yes
