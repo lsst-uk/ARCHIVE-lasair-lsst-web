@@ -8,17 +8,67 @@
   connection: local
   gather_facts: no
   tasks:
-    - name: install libraries
+    - name: install python3-pip
       apt: 
-      with_items:
-       - python3-pip
-       - apache2
-       - apache2-utils
-       - apache2-dev
-       - libexpat1
-       - ssl-cert
-       - libmysqlclient-dev
-       - swig
+          name: python3-pip
+          state: present
+          update_cache: true
+      become: yes
+
+    - name: install apache2
+      apt: 
+          name: apache2
+          state: present
+          update_cache: true
+      become: yes
+
+    - name: install apache2-utils
+      apt: 
+          name: apache2-utils
+          state: present
+          update_cache: true
+      become: yes
+
+    - name: install apache2-dev
+      apt: 
+          name: apache2-dev
+          state: present
+          update_cache: true
+      become: yes
+
+    - name: install libexpat1
+      apt: 
+          name: libexpat1
+          state: present
+          update_cache: true
+      become: yes
+
+    - name: install ssl-cert
+      apt: 
+          name: ssl-cert
+          state: present
+          update_cache: true
+      become: yes
+
+    - name: install libmysqlclient-dev
+      apt: 
+          name: libmysqlclient-dev
+          state: present
+          update_cache: true
+      become: yes
+
+    - name: install swig-pip
+      apt: 
+          name: swig
+          state: present
+          update_cache: true
+      become: yes
+
+    - name: install libapache2-mod-wsgi-py3
+      apt: 
+          name: libapache2-mod-wsgi-py3
+          state: present
+          update_cache: true
       become: yes
 
     - name: install mysql.connector
@@ -63,8 +113,8 @@
           name: mod-wsgi
 
     - name: configure mod-wsgi
-      shell: 
-         cmd: python3 /home/ubuntu/.local/bin/mod_wsgi-express module-config > /etc/apache2/mods-available/wsgi.load
+      shell:
+         cmd: mod_wsgi-express module-config > /etc/apache2/mods-available/wsgi.load
       become: yes
 
     - name: copy conf file
@@ -73,7 +123,7 @@
       become: yes
 
     - name: link it from sites-enabled
-      shell: 
-          cmd: ln -sf ../sites-available/webserver.conf webserver.conf
-          chdir: /etc/apache2/sites-enabled
+      file:
+          src:  /etc/apache2/sites-available/webserver.conf
+          dest: /etc/apache2/sites-enabled/webserver.conf
       become: yes
