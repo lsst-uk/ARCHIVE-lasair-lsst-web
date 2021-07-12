@@ -107,15 +107,15 @@
           name: fastavro
       become: yes
 
-    - name: install mod-wsgi
-      pip: 
-          executable: pip3 
-          name: mod-wsgi
+      #    - name: install mod-wsgi
+      #      pip: 
+      #          executable: pip3 
+      #          name: mod-wsgi
 
-    - name: configure mod-wsgi
-      shell:
-         cmd: mod_wsgi-express module-config > /etc/apache2/mods-available/wsgi.load
-      become: yes
+      #    - name: configure mod-wsgi
+      #      shell:
+      #         cmd: mod_wsgi-express module-config > /etc/apache2/mods-available/wsgi.load
+      #      become: yes
 
     - name: copy conf file
       shell: 
@@ -126,4 +126,5 @@
       file:
           src:  /etc/apache2/sites-available/webserver.conf
           dest: /etc/apache2/sites-enabled/webserver.conf
+          state: link
       become: yes
