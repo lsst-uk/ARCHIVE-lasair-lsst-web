@@ -64,12 +64,12 @@
           update_cache: true
       become: yes
 
-    - name: install libapache2-mod-wsgi-py3
-      apt: 
-          name: libapache2-mod-wsgi-py3
-          state: present
-          update_cache: true
-      become: yes
+      #    - name: install libapache2-mod-wsgi-py3
+      #      apt: 
+      #          name: libapache2-mod-wsgi-py3
+      #          state: present
+      #          update_cache: true
+      #      become: yes
 
     - name: install mysql.connector
       pip: 
@@ -107,10 +107,10 @@
           name: fastavro
       become: yes
 
-      #    - name: install mod-wsgi
-      #      pip: 
-      #          executable: pip3 
-      #          name: mod-wsgi
+    - name: install mod-wsgi
+      pip: 
+          executable: pip3 
+          name: mod-wsgi
 
       #    - name: configure mod-wsgi
       #      shell:
