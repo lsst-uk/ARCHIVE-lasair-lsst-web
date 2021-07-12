@@ -3,10 +3,16 @@
 # sudo apt install ansible
 # sudo apt install python3-pip
 # sudo pip3 install --upgrade pip
+#
+# will also need Vault, set the env vars VAULT_ADDR and VAULT_TOKEN
 ---
 - hosts: localhost
   connection: local
   gather_facts: no
+
+  vars:
+      settings: "{{ lookup('hashi_vault', 'secret=secret/lasair/settings')}}"
+
   tasks:
     - name: install python3-pip
       apt: 
@@ -128,3 +134,8 @@
           dest: /etc/apache2/sites-enabled/webserver.conf
           state: link
       become: yes
+
+    - name: settings.py for django
+      template:
+        src:  /home/ubuntu/lasair-lsst-web/src/lasair-webapp/lasair/lasair/settings.py.j2
+        dest: /home/ubuntu/lasair-lsst-web/src/lasair-webapp/lasair/lasair/settings.py 
