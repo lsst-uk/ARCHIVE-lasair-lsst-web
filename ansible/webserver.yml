@@ -6,8 +6,7 @@
 #
 # will also need Vault, set the env vars VAULT_ADDR and VAULT_TOKEN
 ---
-- hosts: localhost
-  connection: local
+- hosts: webserver
   gather_facts: no
 
   vars:
@@ -70,13 +69,6 @@
           update_cache: true
       become: yes
 
-      #    - name: install libapache2-mod-wsgi-py3
-      #      apt: 
-      #          name: libapache2-mod-wsgi-py3
-      #          state: present
-      #          update_cache: true
-      #      become: yes
-
     - name: install mysql.connector
       pip: 
           executable: pip3 
@@ -123,27 +115,28 @@
           name: fastavro
       become: yes
 
-    - name: install mod-wsgi
+    - name: install cassandra client
+      pip:
+          executable: pip3 
+          name: cassandra-driver
+      become: yes
+
+    - name: install mod_wsgi-httpd
       pip: 
           executable: pip3 
-          name: mod-wsgi
-
-      #    - name: configure mod-wsgi
-      #      shell:
-      #         cmd: mod_wsgi-express module-config > /etc/apache2/mods-available/wsgi.load
-      #      become: yes
-
-    - name: copy conf file
-      shell: 
-          cmd: cp ../conf/webserver.conf /etc/apache2/sites-available
+          name: mod_wsgi-httpd
       become: yes
 
-    - name: link it from sites-enabled
-      file:
-          src:  /etc/apache2/sites-available/webserver.conf
-          dest: /etc/apache2/sites-enabled/webserver.conf
-          state: link
+    - name: install mod_wsgi
+      pip: 
+          executable: pip3 
+          name: mod_wsgi
       become: yes
+
+    - name: Make sure the repo is up to date
+      git:
+          repo: https://github.com/lsst-uk/lasair-lsst-web.git
+          dest: /home/ubuntu/lasair-lsst-web
 
     - name: settings.py for django
       template:
