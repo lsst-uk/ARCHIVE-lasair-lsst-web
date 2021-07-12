@@ -82,10 +82,20 @@
           executable: pip3 
           name: mysql-connector-python
 
+    - name: install mysqlclient
+      pip: 
+          executable: pip3 
+          name: mysqlclient
+
     - name: install django
       pip: 
           executable: pip3 
           name: django
+
+    - name: install djangorestframework
+      pip: 
+          executable: pip3 
+          name: djangorestframework
 
     - name: install pyephem
       pip: 
