@@ -121,6 +121,18 @@
           name: cassandra-driver
       become: yes
 
+    - name: install gkhtm
+      pip: 
+          executable: pip3 
+          name: gkhtm
+      become: yes
+
+    - name: install gkutils
+      pip: 
+          executable: pip3 
+          name: gkutils
+      become: yes
+
     - name: install mod_wsgi-httpd
       pip: 
           executable: pip3 
