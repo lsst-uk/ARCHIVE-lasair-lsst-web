@@ -20,6 +20,12 @@
           update_cache: true
       become: yes
 
+    - name: upgrade pip3
+      pip:
+          name: pip
+          executable: pip3
+          state: latest
+
     - name: install apache2
       apt: 
           name: apache2
@@ -109,12 +115,6 @@
           executable: pip3 
           name: astropy
 
-    - name: install fastavro
-      pip:
-          executable: pip3
-          name: fastavro
-      become: yes
-
     - name: install cassandra client
       pip:
           executable: pip3 
@@ -132,6 +132,11 @@
           executable: pip3 
           name: mod_wsgi
       become: yes
+
+    - name: Creates directory
+      file:
+          path: /home/ubuntu/mod_wsgi_space
+          state: directory
 
     - name: Make sure the repo is up to date
       git:

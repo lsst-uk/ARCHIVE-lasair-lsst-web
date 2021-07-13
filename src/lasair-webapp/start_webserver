@@ -1,12 +1,12 @@
-/home/ubuntu/.local/bin/mod_wsgi-express setup-server \
+mod_wsgi-express setup-server \
 --working-directory lasair \
 --python-path /home/ubuntu/lasair-lsst-web/src \
 --url-alias lasair/staticfiles static \
 --url-alias lasair/media media \
 --application-type module lasair.wsgi \
---server-root /tmp/lasair \
+--server-root /home/ubuntu/mod_wsgi_space \
 --port 8080 \
 --mount-point /
 
-cd /tmp/lasair/
+cd /home/ubuntu/mod_wsgi_space
 ./apachectl start
