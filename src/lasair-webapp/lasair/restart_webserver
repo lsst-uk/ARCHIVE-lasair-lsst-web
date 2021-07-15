@@ -1,0 +1,19 @@
+export PREFIX=/
+export APACHEPATH=/home/ubuntu/mod_wsgi
+export PORT=8080
+
+$APACHEPATH/apachectl stop
+sleep 1
+
+mod_wsgi-express setup-server \
+--working-directory lasair \
+--python-path $(pwd) \
+--python-path $(cd ../.. && pwd) \
+--url-alias ${PREFIX}lasair/static static \
+--url-alias ${PREFIX}media media \
+--application-type module lasair.wsgi \
+--server-root $APACHEPATH \
+--port $PORT \
+--mount-point $PREFIX
+
+$APACHEPATH/apachectl start
