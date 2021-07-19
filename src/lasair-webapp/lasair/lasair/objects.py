@@ -5,7 +5,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.db.models import Q
 from django.db import connection
 import lasair.settings
-from lasair.models import Objects, Comments
+#from lasair.models import Objects
 from lasair.models import Myqueries
 from lasair.models import Watchlists
 import mysql.connector

@@ -1,34 +1,34 @@
 from django.db import models
 
-class Objects(models.Model):
-    """Objects.
-    """
-
-    primaryid = models.AutoField(db_column='primaryId', primary_key=True)  # Field name made lowercase.
-    objectid = models.CharField(db_column='objectId', unique=True, max_length=16, blank=True, null=True)  # Field name made lowercase.
-    ncand = models.IntegerField()
-    ramean = models.FloatField()
-    rastd = models.FloatField()
-    decmean = models.FloatField()
-    decstd = models.FloatField()
-    maggmin = models.FloatField()
-    maggmax = models.FloatField()
-    maggmedian = models.FloatField()
-    maggmean = models.FloatField()
-    magrmin = models.FloatField()
-    magrmax = models.FloatField()
-    magrmedian = models.FloatField()
-    magrmean = models.FloatField()
-    latestmag = models.FloatField()
-    jdmin = models.FloatField()
-    jdmax = models.FloatField()
-
-    class Meta:
-        """Meta.
-        """
-
-        managed = False
-        db_table = 'objects'
+#class Objects(models.Model):
+#    """Objects.
+#    """
+#
+#    primaryid = models.AutoField(db_column='primaryId', primary_key=True)  # Field name made lowercase.
+#    objectid = models.CharField(db_column='objectId', unique=True, max_length=16, blank=True, null=True)  # Field name made lowercase.
+#    ncand = models.IntegerField()
+#    ramean = models.FloatField()
+#    rastd = models.FloatField()
+#    decmean = models.FloatField()
+#    decstd = models.FloatField()
+#    maggmin = models.FloatField()
+#    maggmax = models.FloatField()
+#    maggmedian = models.FloatField()
+#    maggmean = models.FloatField()
+#    magrmin = models.FloatField()
+#    magrmax = models.FloatField()
+#    magrmedian = models.FloatField()
+#    magrmean = models.FloatField()
+#    latestmag = models.FloatField()
+#    jdmin = models.FloatField()
+#    jdmax = models.FloatField()
+#
+#    class Meta:
+#        """Meta.
+#        """
+#
+#        managed = False
+#        db_table = 'objects'
 
 # A watchlist is owned by a user and given a name and description
 # Only active watchlists are run against the realtime ingestion
@@ -54,7 +54,7 @@ class WatchlistCones(models.Model):
         """Meta.
         """
 
-        managed = False
+        managed = True
         db_table = 'watchlist_cones'
 
 class WatchlistHits(models.Model):
@@ -93,14 +93,15 @@ class Watchlists(models.Model):
         """Meta.
         """
 
-        managed = False
+        managed = True
         db_table = 'watchlists'
 
 class AreaHits(models.Model):
     """AreaHits.
     """
 
-    ar_id = models.IntegerField(blank=True, null=True)
+    ar_id         = models.AutoField(primary_key=True)
+#    ar_id = models.IntegerField(blank=True, null=True)
     objectid = models.CharField(db_column='objectId', max_length=16, blank=True, null=True)  # Field name made lowercase.
 
     class Meta:
@@ -128,7 +129,7 @@ class Areas(models.Model):
         """Meta.
         """
 
-        managed = False
+        managed = True
         db_table = 'areas'
 
 class Myqueries(models.Model):
@@ -151,23 +152,5 @@ class Myqueries(models.Model):
         """Meta.
         """
 
-        managed = False
+        managed = True
         db_table = 'myqueries'
-
-
-class Comments(models.Model):
-    """Comments.
-    """
-
-    comment_id = models.AutoField(primary_key=True)
-    user = models.ForeignKey(User, models.DO_NOTHING, db_column='user', blank=True, null=True)
-    objectid = models.CharField(db_column='objectId', unique=True, max_length=16, blank=True, null=True)  # Field name made lowercase.
-    content = models.CharField(max_length=4096, blank=True, null=True)
-    time = models.DateTimeField()
-
-    class Meta:
-        """Meta.
-        """
-
-        managed = False
-        db_table = 'comments'

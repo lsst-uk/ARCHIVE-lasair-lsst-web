@@ -18,7 +18,7 @@ from django.contrib.auth import views as authviews
 from django.urls import include, path
 from django.views.generic import TemplateView
 
-from lasair import views, services, candidates, objects, areas, watchlists, queries, comments, cs_comments, skymap
+from lasair import views, services, candidates, objects, areas, watchlists, queries, skymap
 import lasair.settings
 
 from django.contrib import admin
@@ -55,11 +55,6 @@ urlpatterns = [
     path('query2/<int:mq_id>/',    queries.show_myquery,     name='show_myquery'),   #####
 
     path('runquery/',             queries.runquery,         name='runquery'),
-
-    path('comment/',                comments.new_comment,       name='new_comment'),
-    path('delete_comment/<int:comment_id>/',    comments.delete_comment,    name='delete_comment'),
-    path('cs_comment/',             cs_comments.new_comment,    name='new_comment'),
-
 
     path('skymap/',                 skymap.skymap,              name='skymap'),
     path('skymap/<skymap_id_version>/',     skymap.show_skymap, name='show_skymap'),
