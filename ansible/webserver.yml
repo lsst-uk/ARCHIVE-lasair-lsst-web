@@ -5,6 +5,11 @@
 # sudo pip3 install --upgrade pip
 #
 # will also need Vault, set the env vars VAULT_ADDR and VAULT_TOKEN
+#
+# cephfs in order to see the status and streams
+# cd ~/lasair-lsst/ansible
+# change hosts.yml to new cephfs_nodes
+# ansible-playbook --inventory-file=hosts.yml mount_cephfs.yml
 ---
 - hosts: webserver
   gather_facts: no
@@ -119,6 +124,13 @@
       pip:
           executable: pip3 
           name: cassandra-driver
+      become: yes
+
+    - name: install postfix email
+      apt:
+          name: postfix
+          state: present
+          update_cache: true
       become: yes
 
     - name: install gkhtm

@@ -5,7 +5,6 @@ from django.views.decorators.csrf import csrf_exempt
 from django.db.models import Q
 from django.db import connection
 import lasair.settings
-#from lasair.models import Objects
 from lasair.models import Myqueries
 from lasair.models import Watchlists
 import mysql.connector
@@ -16,11 +15,6 @@ from utility.mag import dc_mag
 from utility.objectStore import objectStore
 import time
 from lasair.lightcurves import lightcurve_fetcher
-
-# 2020-08-03 KWS Added cassandra connectivity
-#if lasair.settings.CASSANDRA_HEAD is not None:
-#    from cassandra.cluster import Cluster
-#    from cassandra.query import dict_factory
 
 def connect_db():
     """connect_db.
@@ -120,22 +114,6 @@ def obj(objectId):
     if not objectData:
         return None
 
-#    comments = []
-#    if objectData:
-#        qcomments = Comments.objects.filter(objectid=objectId).order_by('-time')
-#        for c in qcomments: 
-#            comments.append(
-#                {'name':c.user.first_name+' '+c.user.last_name,
-#                 'content': c.content,
-#                 'time': c.time,
-#                 'comment_id': c.comment_id,
-#                 'mine': (c.user == request_user)})
-#        message += ' and %d comments' % len(comments)
-#        message += str(comments)
-#    else:
-#        return None
-
-#    crossmatches = []
     now = mjd_now()
     if objectData:
         if objectData and 'annotation' in objectData and objectData['annotation']:

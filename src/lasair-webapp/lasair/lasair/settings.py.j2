@@ -20,6 +20,7 @@ READWRITE_USER = '{{ settings.master_db_username }}'
 READWRITE_PASS = '{{ settings.master_db_password }}'
 
 DB_HOST        = '{{ settings.master_db_ip }}'
+DB_PORT        = 3306
 
 DATA_UPLOAD_MAX_MEMORY_SIZE = 26214400
 
@@ -128,6 +129,7 @@ DATABASES = {
         'USER':     READWRITE_USER,
         'PASSWORD': READWRITE_PASS,
         'HOST':     DB_HOST, 
+        'PORT':     DB_PORT,
     }
 }
 

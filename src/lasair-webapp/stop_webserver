@@ -1,2 +1,0 @@
-/home/ubuntu/mod_wsgi_space/apachectl stop
-rm -r /home/ubuntu/mod_wsgi_space/*

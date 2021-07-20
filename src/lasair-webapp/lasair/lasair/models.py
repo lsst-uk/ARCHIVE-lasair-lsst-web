@@ -1,35 +1,5 @@
 from django.db import models
 
-#class Objects(models.Model):
-#    """Objects.
-#    """
-#
-#    primaryid = models.AutoField(db_column='primaryId', primary_key=True)  # Field name made lowercase.
-#    objectid = models.CharField(db_column='objectId', unique=True, max_length=16, blank=True, null=True)  # Field name made lowercase.
-#    ncand = models.IntegerField()
-#    ramean = models.FloatField()
-#    rastd = models.FloatField()
-#    decmean = models.FloatField()
-#    decstd = models.FloatField()
-#    maggmin = models.FloatField()
-#    maggmax = models.FloatField()
-#    maggmedian = models.FloatField()
-#    maggmean = models.FloatField()
-#    magrmin = models.FloatField()
-#    magrmax = models.FloatField()
-#    magrmedian = models.FloatField()
-#    magrmean = models.FloatField()
-#    latestmag = models.FloatField()
-#    jdmin = models.FloatField()
-#    jdmax = models.FloatField()
-#
-#    class Meta:
-#        """Meta.
-#        """
-#
-#        managed = False
-#        db_table = 'objects'
-
 # A watchlist is owned by a user and given a name and description
 # Only active watchlists are run against the realtime ingestion
 # The prequel_where can be used to select which candidates are compared with the watchlist
