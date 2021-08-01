@@ -1,0 +1,53 @@
+{% extends "base.html"%}
+{% block content %}
+<div class="container">
+<h3>Build a Watchlist of your sources</h3>
+<div class="col-md-12">
+	Many astronomers are interested in transients that are associated with specific astronomical objects, perhaps active galaxies or star formation regions. Once you have an account on Lasair, you can create any number of watchlists, to be used in the query engine. To be specific, suppose we are interested in the 42 objects in the catalogue BL Lac candidates for TeV observations (Massaro+, 2013), that can be found in the Vizier library of catalogues. You can make your watchlist “public”, so other Lasair users can see it and use it in queries, and you can make your watchlist “active”, meaning that the crossmatch (see below) is done automatically every day.
+<table class="table">
+
+<tr><td>
+<a href=/lasair/static/cookbook/{{ topic }}/fig1.png>
+<img width=200 src=/lasair/static/cookbook/{{ topic }}/fig1.png></a>
+</td><td>
+How to use the Vizier interface to get suitable data to upload. Once you have your catalogue,
+<ul>
+<li>deselect all the columns
+
+<li>select a column that can act as the ID for each source. These need to be unique and not empty: if not, you must edit the resulting file to make it so.
+
+<li>Choose “Decimal” for the coordinates
+
+<li>Choose “|-separated” for the format
+
+<li>Click submit to download the file.
+</ul>
+</td></tr>
+
+<tr><td>
+<a href=/lasair/static/cookbook/{{ topic }}/fig2.png>
+<img width=200 src=/lasair/static/cookbook/{{ topic }}/fig2.png></a>
+</td><td>
+	Fill in the name and description of the watchlist. Choose a default value of the radius to use in matching, in arcseconds. Open the file and paste the contents. Each line should be RA, Dec, ID, and may have a fourth entry, the radius to use in matching, in arcseconds, if different from the default.
+
+Then click “Submit Form”.
+</td></tr>
+
+<tr><td>
+<a href=/lasair/static/cookbook/{{ topic }}/fig3.png>
+<img width=200 src=/lasair/static/cookbook/{{ topic }}/fig3.png></a>
+</td><td>
+	Here is a successful creation of a watchlist. Some messages – “Bad line” – because there were some lines without data, but you can ignore these, and look for where it says “Watchlist created successfully”. You can now find it in the list of “My Watchlists”.
+</td></tr>
+
+<tr><td>
+<a href=/lasair/static/cookbook/{{ topic }}/fig4.png>
+<img width=200 src=/lasair/static/cookbook/{{ topic }}/fig4.png></a>
+</td><td>
+	Click on any of your watchlists, and look for the button “Run Crossmatch”. This finds all the transients that are within the radius of any of the sources  of the watchlist. The left four columns come from your input, and the right four from the Lasair crossmatch. There is a clickable objectId, the number of candidates of that object, and other information.
+</td></tr>
+
+</table>
+</div>
+</div>
+{% endblock %}

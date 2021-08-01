@@ -5,53 +5,11 @@
 <p>
 An area is a region of the sky defined by a MOC. Each user of the Lasair system has their own set of areas, and can be alerted when a ZTF transient is inside one of their areas.
 </p><p>
-You can create an area by preparing a MOC file. For examples and programming see
-<a href=https://cds-astro.github.io/mocpy/>MOCPy’s documentation</a>.
-</p><p>
 An "Active" area is one that is run against all incoming alerts.
 latest objects.
+</p> <p>
+If you are logged in, you can <a href=/area_new>create an area</a>.
 </p>
-
-{% if authenticated %}
-<script>
-function exposeDiv(id) {
-    obj = document.getElementById(id);
-    if(obj.style.display == "none") {
-        obj.style.display = "block";
-    } else {
-        obj.style.display = "none";
-    }
-}
-</script>
-
-    <div class="col-md-12">
-<button style="color: blue; background-color: #EEEEFF;" onclick="exposeDiv('new_area');">Create new area</button>
-        <div style="height: 1px;">
-        </div>
-<br/>
-    </div>
-    <div id="new_area" style="display:none" class="col-sm-10">
-<form method="POST"  action="/area/" enctype="multipart/form-data">
-<table>
-<tr>
-    <th width="40%"></th>
-    <th width="60%"></th>
-</tr>
-
-<tr><td>Name:</td><td> <input name="name" width=50 value='Change_Me_{{ random }}'></td></tr>
-
-<tr><td>Description:</td><td> <textarea name="description" rows=3 cols=40>Change_Me_{{ random }}</textarea></td></tr>
-
-<tr><td>Upload a MOC file:</td> <td><input type="file" name="area_file"></td>
-</tr>
-</table>
-<input type="submit" class="button" style="color: blue; background-color: #EEEEFF;" value="Submit form">
-</form>
-    </div>
-
-<div class="row">
-{{ message }}
-<hr/>
 
     <div class="col-xs-12">
 <h3>My Areas</h3>
@@ -73,7 +31,7 @@ above to make a new one. Click on the name of the area for more information and 
 <td> {% if ar.active == 1 %}&#x2714;{% endif %} </td>
 <td> {% if ar.public == 1 %}&#x2714;{% endif %} </td>
 
-<td><form method="POST"  action="/area/">
+<td><form method="POST"  action="/areas/">
 {% csrf_token %}
 <input type="hidden" name="delete" value="{{ ar.ar_id }}">
 <input type="submit" value="(delete)">
@@ -84,9 +42,6 @@ above to make a new one. Click on the name of the area for more information and 
 </table>
     </div>
 
-{% else %}
-To create your own areas, you must log in.
-{% endif %}
 </div>
 
 <div class="row">

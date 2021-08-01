@@ -1,0 +1,52 @@
+{% extends "base.html"%}
+{% load static %}
+{% block content %}
+
+<div class="row">
+<h2>Create new watchlist</h2>
+<p>
+A watchlist is a set of points in the sky, together with a radius in arcseconds. It is assumed to be a list of "interesting" sources, so that any transient that falls within the radius of one of the sources might indicate activity of that source. Each user of the Lasair system has their own set of watchlists, and can be alerted when a ZTF transient is coincident with a watchlist source.
+</p><p>
+You can create a watchlist of sources by preparing a text file, where each comma-separated  or |-separated
+line has RA and Dec in decimal degrees, an identifier,
+with optional radius in arcseconds. One way to do this is with 
+<a href=http://vizier.u-strasbg.fr/viz-bin/VizieR>Vizier</a> and a spreadsheet program such as Excel or Numbers. 
+Here is <a href="{% static 'BLLac.txt' %}">an example of the data</a>. The 42 entries are <i>BL Lac candidates for TeV observations (Massaro+, 2013)</i>
+</p><p>
+An "Active" watchlist is one that is run every day, so that it is up to date with the
+latest objects.
+</p>
+
+{% if authenticated %}
+<form method="POST"  action="/watchlists/" enctype="multipart/form-data">
+<table>
+<tr>
+    <th width="40%"></th>
+    <th width="60%"></th>
+</tr>
+
+<tr><td>Name:</td><td> <input name="name" width=50 value='Change_Me_{{ random }}'></td></tr>
+
+<tr><td>Description:</td><td> <textarea name="description" rows=3 cols=40>Change_Me_{{ random }}</textarea></td></tr>
+
+<tr><td>default radius (arcsec), max 360:</td><td> <input name="radius" value="2"></td></tr>
+
+<tr><td> <font size=-1>Paste here the list of sources to be watched, as comma-separated values <br/>
+	<b>RA, Dec, ID &lt;,radius&gt;</b> with RA and Dec in decimal degrees, and radius in arcseconds:</font></td> <td> <textarea name="cones_textarea" rows="5" cols="50"></textarea></td></tr>
+
+<tr><td>Or upload a file with the same information:</td> <td><input type="file" name="cones_file"></td>
+</tr>
+</table>
+
+<input type="submit" class="button" style="color: blue; background-color: #EEEEFF;" value="Submit form">
+</form>
+    </div>
+
+    <div class="row"> {{ message|safe }} </div>
+
+{% else %}
+You must be logged in to create a watchlist<br/>
+{% endif %}
+</div>
+
+{% endblock %}

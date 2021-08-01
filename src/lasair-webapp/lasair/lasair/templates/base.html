@@ -34,94 +34,90 @@
 <body>
 
 <header>
-<div class="jumbotron blue">
-   <img class="float-left align-top" width=200 src="{% static 'img/lasair-font.png' %}" >
-  {% if WEB_DOMAIN == 'lasair-dev' %} <font color="red"><h1>DEVELOPMENT</h1></font> {% endif %}
-
-  <a class="float-right mx-2" href=http://www.roe.ac.uk/ifa/wfau/>
-	  <img class="align-middle" src="{% static 'img/uoe.png' %}" width=70></a>
-  <a class="float-right mx-2" href=https://star.pst.qub.ac.uk/wiki/doku.php/public/research_areas/supernovae/start>
-	  <img class="align-middle" src="{% static 'img/qub.png' %}" width=100></a>
-  <a class="float-right mx-2" href=https://www.lsst.ac.uk/>
-	  <img class="align-middle" src="{% static 'img/lusc.png' %}" width=80></a>
-  <a class="float-right mx-2" href=http://www.ztf.caltech.edu/>
-	  <img class="align-middle" src="{% static 'img/ztf.png' %}" width=70></a>
-</div>
 </header>
-
+<div class="col-xs-12" style="height:5px;"></div>
 <div class="container container-lg">
-{% if user.is_authenticated %}
-Logged in as {{ user.get_username }}
-(<a href=/accounts/logout>Logout</a>)
-{% else %}
-<a href=/accounts/login>Login</a> | <a href=/signup>Signup</a>
-{% endif %}
 
-  <nav class="navbar navbar-expand-lg camblue">
 
-  <div class="dropdown">
-    <a class="nav-link camblue" href="/">Home</a>
-  </div>
+  <nav class="navbar navbar-expand-lg justify-content-between" style="background:lightskyblue">
 
     <div class="dropdown">
-      <a class="nav-item nav-link dropdown-toggle camblue " data-toggle="dropdown" 
-	   id="services-dropdown" href="#">About</a>
-      <div class="dropdown-menu">
-        <a class="dropdown-item" href="/about">About Lasair</a>
-        <a class="dropdown-item" href="https://lsst-uk.atlassian.net/wiki/spaces/DOC/pages/881360908/Lasair%2BCookbook">Lasair Cookbook</a>
-        <a class="dropdown-item" href="/sherlock">Context Classification</a>
-        <a class="dropdown-item" href="/jupyter">Jupyter</a>
-        <a class="dropdown-item" href="/lasairlsst">Lasair-LSST</a>
-      </div>
+      <a class="nav-link lightskyblue" href="/">
+      <img width=130 src="{% static 'img/lasair-font.png' %}" ></a>
     </div>
 
     <div class="dropdown">
-      <a class="nav-item nav-link dropdown-toggle camblue " data-toggle="dropdown" 
- 	   id="data-dropdown" href="#">Data</a>
-      <div class="dropdown-menu">
-       <a class="dropdown-item" href="/conesearch">Conesearch</a>
-       <a class="dropdown-item" href="/querylist">Queries and Streams</a>
-       <a class="dropdown-item" href="/query">Make a Query</a>
-       <a class="dropdown-item" href="/api">Lasair API guide</a>
-       <a class="dropdown-item" href="/schema">Table schemas</a>
-       <a class="dropdown-item" href="/watchlist">Watchlists</a>
-       <a class="dropdown-item" href="/area">Areas</a>
-       <a class="dropdown-item" href="/skymap">Gravitational waves</a>
-      </div>
+      <a class="nav-link lightskyblue" href="/explore">Explore</a>
+    </div>
+
+    <div class="dropdown">
+      <a class="nav-link lightskyblue" href="/learn">Learn</a>
     </div>
  
     <div class="dropdown">
-      <a class="nav-item nav-link dropdown-toggle camblue " data-toggle="dropdown" 
- 	   id="documents-dropdown" href="#">Documents</a>
-      <div class="dropdown-menu">
-       <a class="dropdown-item" href="https://lsst-uk.atlassian.net/wiki/x/DICIN">Lasair Cookbook</a>
-       <a class="dropdown-item" href="/about">About Lasair</a>
-       <a class="dropdown-item" href="https://doi.org/10.3847/2515-5172/ab020f">Short paper</a>
-       <a class="dropdown-item" href="/api">Lasair API guide</a>
-      </div>
+      <a class="nav-link lightskyblue" href="/code">Code</a>
     </div>
  
     <div class="dropdown">
-      <a class="nav-item nav-link dropdown-toggle camblue " data-toggle="dropdown" 
- 	   id="status-dropdown" href="#">Status</a>
-      <div class="dropdown-menu">
-       <a class="dropdown-item" href="/status">Ingestion Status</a>
-      </div>
+      <a class="nav-link lightskyblue" href="/documentation">Documentation</a>
     </div>
  
     <div class="dropdown">
-      <a class="nav-item nav-link dropdown-toggle camblue " data-toggle="dropdown" 
- 	   id="contact-dropdown" href="#">Contact</a>
-      <div class="dropdown-menu">
-       <a class="dropdown-item" href="/contact">Contact</a>
-       <a class="dropdown-item" href="mailto:lasair-help@lists.roe.ac.uk?subject=Enquiry">Email Lasair-help</a>
-       <a class="dropdown-item" href="/release">Release Notes</a>
-      </div>
+      <a class="nav-link lightskyblue" href="/support">Support</a>
+    </div>
+    <div class="dropdown">
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
     </div>
 
+    <div class="dropdown float-right">
+      {% if user.is_authenticated %}
+        <a class="nav-item nav-link dropdown-toggle lightskyblue " data-toggle="dropdown"
+	   id="account-dropdown" href="#">{{ user.get_username }}</a>
+          <div class="dropdown-menu">
+            <a class="dropdown-item" href="/accounts/logout">Logout</a>
+          </div>
+      {% else %}
+        <a class="nav-item nav-link dropdown-toggle lightskyblue " data-toggle="dropdown"
+	   id="account-dropdown" href="#">Login</a>
+          <div class="dropdown-menu">
+            <a class="dropdown-item" href="/accounts/login">Login</a>
+            <a class="dropdown-item" href="/signup">Signup</a>
+          </div>
+      {% endif %}
+    </div>
   </nav>
-  <hr/>
 
 {% block content %}{% endblock %}
+
+{% block footer %}
+<div class="col-xs-12" style="height:5px;"></div>
+<div style="height: 100px; background:#ceebfd;">
+  <div class="col-xs-12" style="height:10px;"></div>
+
+
+
+
+
+  <div class="float-left mx-2 row align-items-center" >
+    <a class="col" href=https://www.lsst.ac.uk/>
+    <img class="align-middle" src="{% static 'img/lusc.png' %}" width=80></a>
+
+    <a class="col" href=http://www.roe.ac.uk/ifa/wfau/>
+    <img class="align-middle" src="{% static 'img/uoe.png' %}" width=70></a>
+
+    <a class="col" href=https://star.pst.qub.ac.uk/wiki/doku.php/public/research_areas/supernovae/start>
+    <img class="align-middle" src="{% static 'img/qub.png' %}" width=100></a>
+
+    <a class="col" href=http://www.ztf.caltech.edu/>
+    <img class="align-middle" src="{% static 'img/ztf.png' %}" width=70></a>
+
+  
+  
+
+    <!-- {% if WEB_DOMAIN == 'lasair-dev' %}DEVELOPMENT {% endif %} '-->
+  </div>
+</div>
+{% endblock %}
 </body>
 </html>

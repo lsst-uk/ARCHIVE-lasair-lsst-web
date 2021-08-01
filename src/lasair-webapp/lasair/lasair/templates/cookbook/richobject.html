@@ -1,0 +1,50 @@
+{% extends "base.html"%}
+{% block content %}
+<div class="container">
+<h3>Rich Object Information</h3>
+<div class="col-md-12">
+<table class="table">
+
+<tr><td>
+<a href=/lasair/static/cookbook/{{ topic }}/fig1.png>
+<img width=200 src=/lasair/static/cookbook/{{ topic }}/fig1.png></a>
+</td><td>
+Each object in Lasair has a URL that contains it identifier. 
+This one is <a href=/object/ZTF19acwkwhu/>ZTF19acwkwhu</a>. At left is the light curve with each 
+candidate as a red or white symbol, at right the positions associated with the candidates. 
+On the light curve plot, you can click-drag-release to zoom in. You can also 
+select “apparent magnitude” over difference magnitude; for more information see “Note about Photometry”.
+</td></tr>
+
+<tr><td>
+<a href=/lasair/static/cookbook/{{ topic }}/fig2.png>
+<img width=200 src=/lasair/static/cookbook/{{ topic }}/fig2.png></a>
+</td><td>
+Further down the object page are coordinates, and a note about the nondetections, then the Sherlock context information (classified as NT), and the galaxy it is associated with. You can get all the onfon on the page in a JSON format. You can run conesearches in other astronomical databases such as Simbad, NED, TNS, and look up the objects in ZTF data release.
+</td></tr>
+
+<tr><td>
+<a href=/lasair/static/cookbook/{{ topic }}/fig3.png>
+<img width=200 src=/lasair/static/cookbook/{{ topic }}/fig3.png></a>
+</td><td>
+	More information about the Sherlock crossmatches, and the AladinLite panel. You can see obviously that this object is associated with a galaxy. You can zoom arbitrarily in and out with the “+” and “-” icons on the right, and use the  later selection icon to change the imaging background -- to see the galaxy in the DSS, SDSS, 2MASS and PanSTARRS.
+</td></tr>
+
+<tr><td>
+<a href=/lasair/static/cookbook/{{ topic }}/fig4.png>
+<img width=200 src=/lasair/static/cookbook/{{ topic }}/fig4.png></a>
+</td><td>
+Last the individual candidates, each with a datetime and magnitude through either the g or r filter. Clicking on the CandidateID gives more information (37 attributes) about each candidate. At the right is the image, each with three panels: target, reference, and difference between target and reference.
+</td></tr>
+
+<tr><td>
+<a href=/lasair/static/cookbook/{{ topic }}/fig2.png>
+<img width=200 src=/lasair/static/cookbook/{{ topic }}/fig2.png></a>
+</td><td>
+Lorem ipsum
+</td></tr>
+
+</table>
+</div>
+</div>
+{% endblock %}

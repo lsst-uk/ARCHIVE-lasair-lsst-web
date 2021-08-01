@@ -1,0 +1,40 @@
+{% extends "base.html"%}
+{% block content %}
+<div class="container">
+<h3>Find outbursts from my watchlist</h3>
+<div class="col-md-12">
+	Once you have made a watchlist, you may be interested in being notified whenever something unusual – outburst for example – happens to one of your sources. Thus we combine a watchlist with a query on magnitude that detects fast rise. For the watch list see Build a Watchlist of your sources, and for the query we utilise the moving averages of apparent magnitudes that Lasair provides. See this paper for more information.
+<table class="table">
+
+<tr><td>
+<a href=/lasair/static/cookbook/{{ topic }}/fig1.png>
+<img width=200 src=/lasair/static/cookbook/{{ topic }}/fig1.png></a>
+</td><td>
+	For this example, we use a watchlist of 56 AM CVn stars, which are binaries of compact object (eg white dwarf) with a very short orbit – less than an hour. This screenshot shows a recent crossmatch of the watchlist with ZTF.
+</td></tr>
+
+<tr><td>
+<a href=/lasair/static/cookbook/{{ topic }}/fig2.png>
+<img width=200 src=/lasair/static/cookbook/{{ topic }}/fig2.png></a>
+</td><td>
+This is the active query, that builds a Kafka stream, and joins the object table with the watchlist shown above. The selection criterion at the bottom looks for a magnitude difference between the 2-day moving average (latest_dc_mag_g02), and the 28-day moving average (latest_dc_mag_g28), and requires a difference of at least 0.5 magnitude in both g and r.
+</td></tr>
+
+<tr><td>
+<a href=/lasair/static/cookbook/{{ topic }}/fig3.png>
+<img width=200 src=/lasair/static/cookbook/{{ topic }}/fig3.png></a>
+</td><td>
+	Here is some output from the query in a period of 6 days. The same object appears several times (SDSS J1240-0159).
+</td></tr>
+
+<tr><td>
+<a href=/lasair/static/cookbook/{{ topic }}/fig4.png>
+<img width=200 src=/lasair/static/cookbook/{{ topic }}/fig4.png></a>
+</td><td>
+	We see in the light curve the brightening by 5 magnitudes. Make sure you select the “Apparent Magnitude”, which are more more suitable for variable star work.
+</td></tr>
+
+</table>
+</div>
+</div>
+{% endblock %}

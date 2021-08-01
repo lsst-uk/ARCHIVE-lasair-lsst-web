@@ -23,6 +23,7 @@ def connect_db():
         user    =lasair.settings.READONLY_USER,
         password=lasair.settings.READONLY_PASS,
         host    =lasair.settings.DATABASES['default']['HOST'],
+        port    = lasair.settings.DATABASES['default']['PORT'],
         database='ztf')
     return msl
 

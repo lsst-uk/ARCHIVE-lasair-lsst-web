@@ -25,6 +25,7 @@ def connect_db():
         user    =lasair.settings.READONLY_USER,
         password=lasair.settings.READONLY_PASS,
         host    =lasair.settings.DATABASES['default']['HOST'],
+        port    =lasair.settings.DATABASES['default']['PORT'],
         database='ztf')
     return msl
 
@@ -55,7 +56,11 @@ def make_image_of_MOC(fits_bytes):
         fits_bytes:
     """
     inbuf = io.BytesIO(fits_bytes)
-    moc = MOC.from_fits(inbuf)
+    try:
+        moc = MOC.from_fits(inbuf)
+    except:
+        return render(request, 'error.html', {'message': 'Cannot make MOC from given file'})
+
     notmoc = moc.complement()
 
     fig = plt.figure(111, figsize=(10, 5))
@@ -71,6 +76,12 @@ def make_image_of_MOC(fits_bytes):
     bytes = outbuf.getvalue()
     outbuf.close()
     return bytes
+
+def area_new(request):
+    return render(request, 'area_new.html',
+        {'random': '%d'%random.randrange(1000),
+        'authenticated': request.user.is_authenticated
+        })
 
 @csrf_exempt
 def areas_home(request):
@@ -98,7 +109,7 @@ def areas_home(request):
                 area = Areas(user=request.user, name=name, description=description, 
                     moc=fits_string, mocimage=png_string, active=0)
                 area.save()
-                message += '\nAreas created successfully in %.1f sec' % (time.time()-t)
+                message += '\nArea created successfully in %.1f sec' % (time.time()-t)
             else:
                 message = '\nNo file in upload'
         else:

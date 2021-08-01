@@ -3,29 +3,8 @@
 
 
 
-<div class="row">
-  <div class="col-sm">
-{% if is_authenticated %}
-     <h3>Create a new query</h3>
-<form method="GET"  action="/query/">
-{% csrf_token %}
-<input type="submit" class="button" style="color: blue; background-color: #EEEEFF;" value=" Create query"></td>
-</form>
-{% else %}
-If you signup and login, you can store queries for later use, and insertion in the real-time pipeline.
-{% endif %}
 
-<hr/>
-  </div>		
-</div>
-
-
-<div class="row">
-  <div class="col-sm">
-     <h3>Stored filters and their streams</h3>
-  </div>		
-</div>
-
+{% if which == 'promoted' %}
 <h4>Promoted Filters</h4>
 The following are stored queries from Lasair. First the "promoted queries",
 then your stored queries, then stored queries from others that have been made public.
@@ -64,8 +43,10 @@ stream by modifying it as above, choosing one of the 'Streaming' options.
 </table>
   </div>
 </div>
+{% endif %}
 
 
+{% if which == 'my' %}
 {% if is_authenticated %}
 <h4>My Stored Queries</h4>
 Stored filters that you control are listed below.
@@ -98,7 +79,9 @@ or the link below the name to edit it.
 (If you would like to create your own stored filters, you should be signed in. See links at top left.)
 <hr/>
 {% endif %}
+{% endif %}
 
+{% if which == 'public' %}
 <h4>Contributed Stored Filters</h4>
 Stored filters created and made public are listed below. Click on the name of
 the filter to push it into the area above.
@@ -128,5 +111,9 @@ the filter to push it into the area above.
 </table>
   </div>
 </div>
+{% endif %}
+{% if is_authenticated %}
+If you signup and login, you can store queries for later use, and insertion in the real-time pipeline.
+{% endif %}
 
 {% endblock %}

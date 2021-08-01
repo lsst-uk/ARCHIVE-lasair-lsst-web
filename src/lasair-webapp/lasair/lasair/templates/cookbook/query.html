@@ -1,0 +1,67 @@
+{% extends "base.html"%}
+{% block content %}
+<div class="container">
+<h3>How to query transients</h3>
+<div class="col-md-12">
+
+The Lasair database has information about objects and candidates. Each candidate is a detection made by the telescope, and the collection of detections of a given star is an object.
+Queries are written with the SQL language, that is built in three pieces through the Lasair web interface:
+<ul>
+<li>WHAT you are selecting (“Select Attributes”)
+<li>WHICH tables to use, and
+<li>CONDITIONS on what you are selecting (“Where”).
+</ul>
+<table class="table">
+
+<tr><td>
+<a href=/lasair/static/cookbook/{{ topic }}/fig1.png>
+<img width=200 src=/lasair/static/cookbook/{{ topic }}/fig1.png></a>
+</td><td>
+This example query looks for objects within the Orion Nebula. Once you have logged in to Lasair, you can create a query from the /myquery page, shown at left. Write a name and description, then keep the query inactive and not public (first 2 green boxes). 
+
+The “select attributes” box has autocomplete for the possible attributes, which are also listed in detail at the /schema page. In this case we chose the object identifier objectId, and the number of good candidates, ncandgp.
+
+Select only the objects table – meaning no joins. The “where” box has the square degree of the sky which is the Orion Nebula.
+
+Then click “Create query”.
+</td></tr>
+
+<tr><td>
+<a href=/lasair/static/cookbook/{{ topic }}/fig2.png>
+<img width=200 src=/lasair/static/cookbook/{{ topic }}/fig2.png></a>
+</td><td>
+	Now we can run the query. Go to the page /objlist and find your saved query, then click on its name (green box). The form fields above are now filled in with the details
+</td></tr>
+
+<tr><td>
+<a href=/lasair/static/cookbook/{{ topic }}/fig3.png>
+<img width=200 src=/lasair/static/cookbook/{{ topic }}/fig3.png></a>
+</td><td>
+	In addition to the saved query, we can add an additional constraint (green box), where we restrict to objects that have had a detection in the last 10 days. Now click “Run filter”.
+</td></tr>
+
+<tr><td>
+<a href=/lasair/static/cookbook/{{ topic }}/fig4.png>
+<img width=200 src=/lasair/static/cookbook/{{ topic }}/fig4.png></a>
+</td><td>
+	The results appear, as a table with the columns as specified in the “select attributes” part of the query. The actual SQL that runs against the database is shown. You can see (red boxes) an execution time limit of 300 seconds, the “recent” events constraint written as objects.jdmax $gt; JDNOW() - 10.00000, and a limit of 1000 results. If more, there will be a link to the next page of results. Notice that the objectId is a link
+</td></tr>
+
+<tr><td>
+<a href=/lasair/static/cookbook/{{ topic }}/fig5.png>
+<img width=200 src=/lasair/static/cookbook/{{ topic }}/fig5.png></a>
+</td><td>
+	This is the information page for a Lasair object. You can see the light curve (top left) and sky locations for the candidates. There is a wealth of information (see this page). In particular, you can click on the “Simbad” link, which fetches information about this source.
+</td></tr>
+
+<tr><td>
+<a href=/lasair/static/cookbook/{{ topic }}/fig6.png>
+<img width=200 src=/lasair/static/cookbook/{{ topic }}/fig6.png></a>
+</td><td>
+	The Simbad database tells us that the star we selected is a Variable Star of Orion type.
+</td></tr>
+
+</table>
+</div>
+</div>
+{% endblock %}

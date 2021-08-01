@@ -1,0 +1,53 @@
+{% extends "base.html"%}
+{% block content %}
+<div class="container">
+<h3>Get real-time alerts from ZTF</h3>
+<div class="col-md-12">
+	The Lasair broker can send immediate “push” notifications when your active query/filter sees and interesting alert. Here is how to make that happen with email notification. First make sure you are logged in to your Lasair account (top left of screen, then go to create new stored query.
+
+This page is about how to get email alerts from your active query; the process is very similar for Kafka alerts, except that you will fetch the results by machine instead of by email. See article Reading a Kafka Stream.
+<table class="table">
+
+<tr><td>
+<a href=/lasair/static/cookbook/{{ topic }}/fig1.png>
+<img width=200 src=/lasair/static/cookbook/{{ topic }}/fig1.png></a>
+</td><td>
+	Fill in the form as shown here. Name and description, then check the “email” box, and fill in the SELECT as
+<pre>
+objects.objectId, objects.latestrmag, jdnow()-objects.jdmax as since
+</pre>
+check the “objects” table, and fill in the WHERE as
+<pre>
+objects.latestrmag &lt; 12
+</pre>
+Then click “Create Query”
+</td></tr>
+
+<tr><td>
+<a href=/lasair/static/cookbook/{{ topic }}/fig2.png>
+<img width=200 src=/lasair/static/cookbook/{{ topic }}/fig2.png></a>
+</td><td>
+	Nothing will happen immediately. You can run the query in the usual way from the web browser, but you will have to wait for some alerts to arrive before your active query will be triggered.
+
+
+Once that happens, you will get an email at the address you used to create your account. Something like the message shown here. Note that the attributes you chose above are reported (objectId, latestrmag, since), together with the UTC time at which the alert was triggered.
+</td></tr>
+
+<tr><td>
+<a href=/lasair/static/cookbook/{{ topic }}/fig3.png>
+<img width=200 src=/lasair/static/cookbook/{{ topic }}/fig3.png></a>
+</td><td>
+	In addition to the email, the webserver holds the last 1000 alerts that went to this channel. The link is in your list of queries.
+</td></tr>
+
+<tr><td>
+<a href=/lasair/static/cookbook/{{ topic }}/fig4.png>
+<img width=200 src=/lasair/static/cookbook/{{ topic }}/fig4.png></a>
+</td><td>
+	Click on that link and it will show you a page like this one.
+</td></tr>
+
+</table>
+</div>
+</div>
+{% endblock %}

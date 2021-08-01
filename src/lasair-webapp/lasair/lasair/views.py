@@ -51,6 +51,7 @@ def connect_db():
         user    =lasair.settings.READONLY_USER,
         password=lasair.settings.READONLY_PASS,
         host    =lasair.settings.DATABASES['default']['HOST'],
+        port    =lasair.settings.DATABASES['default']['PORT'],
         database='ztf')
     return msl
 
@@ -95,6 +96,15 @@ def about(request):
         request:
     """
     return render(request, 'about.html')
+
+def cookbook(request, topic):
+    """cookbook.
+
+    Args:
+        request:
+        topic:
+    """
+    return render(request, 'cookbook/%s.html'%topic, {'topic':topic})
 
 def distance(ra1, de1, ra2, de2):
     """distance.

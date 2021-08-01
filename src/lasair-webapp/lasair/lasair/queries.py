@@ -21,6 +21,7 @@ def connect_db():
         user    =lasair.settings.READONLY_USER,
         password=lasair.settings.READONLY_PASS,
         host    =lasair.settings.DATABASES['default']['HOST'],
+        port    =lasair.settings.DATABASES['default']['PORT'],
         database='ztf')
     return msl
 
@@ -64,17 +65,17 @@ def query_list(qs):
         list.append(d)
     return list
 
-def querylist(request):
+def querylist_all(request):
+    return querylist(request, 'all')
+
+def querylist(request, which):
     """querylist.
 
     Args:
         request:
+        which: can be 'promoted', 'pubic', 'my'
     """
     # shows the list of queries
-    promoted_queries = Myqueries.objects.filter(public=2)
-
-    public_queries = Myqueries.objects.filter(public__gte=1)
-
     if request.user.is_authenticated:
         myqueries    = Myqueries.objects.filter(user=request.user)
     else:
@@ -87,7 +88,11 @@ def querylist(request):
         watchlists = Watchlists.objects.filter(public__gte=1)
         areas      =      Areas.objects.filter(public__gte=1)
 
+    promoted_queries = Myqueries.objects.filter(public=2)
+    public_queries = Myqueries.objects.filter(public__gte=1)
+
     return render(request, 'querylist.html', {
+        'which'            : which,
         'promoted_queries' : query_list(promoted_queries),
         'is_authenticated' : request.user.is_authenticated,
         'myqueries'        : query_list(myqueries), 

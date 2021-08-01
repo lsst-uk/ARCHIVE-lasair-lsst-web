@@ -1,0 +1,38 @@
+{% extends "base.html"%}
+{% block content %}
+<div class="container">
+<h3>How to do a Cone Search</h3>
+<div class="col-md-12">
+<table class="table">
+
+<tr><td>
+<a href=/lasair/static/cookbook/{{ topic }}/fig1.png>
+<img width=200 src=/lasair/static/cookbook/{{ topic }}/fig1.png></a>
+</td><td>
+At the top of every Lasair page is a form that can be filled in to do a cone search. just fill in the coordinates and hit return/enter.
+
+Several syntaxes are supported here, including these:
+<pre>
+141.15725 25.39508
+141.15725;25.39508
+141.15725| 25.39508
+141.15725, 25.39508, 5.0
+09:24:37.74 | +25:23:42.3
+09:24:37.74 | +25:23:42.3 10.0
+09 24 37.74 +25 23 42.3
+09 24 37.74 | +25 23 42.3 5
+09 24 37.74 ; +25 23 42.3 5
+</pre>
+</td></tr>
+
+<tr><td>
+<a href=/lasair/static/cookbook/{{ topic }}/fig2.png>
+<img width=200 src=/lasair/static/cookbook/{{ topic }}/fig2.png></a>
+</td><td>
+Results appear in a new window, with the text that was typed, and links to the object that was found, here ZTF19acwkwhu.
+</td></tr>
+
+</table>
+</div>
+</div>
+{% endblock %}

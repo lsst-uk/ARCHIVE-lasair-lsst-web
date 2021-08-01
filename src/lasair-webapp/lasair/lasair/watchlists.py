@@ -19,6 +19,7 @@ def connect_db():
         user    =lasair.settings.READONLY_USER,
         password=lasair.settings.READONLY_PASS,
         host    =lasair.settings.DATABASES['default']['HOST'],
+        port    =lasair.settings.DATABASES['default']['PORT'],
         database='ztf')
     return msl
 
@@ -29,6 +30,12 @@ def handle_uploaded_file(f):
         f:
     """
     return f.read().decode('utf-8')
+
+def watchlist_new(request):
+    return render(request, 'watchlist_new.html',
+        {'random': '%d'%random.randrange(1000),
+        'authenticated': request.user.is_authenticated
+        })
 
 @csrf_exempt
 def watchlists_home(request):
@@ -94,9 +101,12 @@ def watchlists_home(request):
             wl_id = int(delete)
             watchlist = get_object_or_404(Watchlists, wl_id=wl_id)
             if request.user == watchlist.user:
+                WatchlistCones.objects.filter(wl_id=wl_id).delete()
+                WatchlistHits.objects.filter(wl_id=wl_id).delete()
                 watchlist.delete()
                 message = 'Watchlist %s deleted successfully' % watchlist.name
-            WatchlistHits.objects.filter(wl_id=wl_id).delete()
+            else:
+                message = 'Must be owner to delete watchlist'
 
 # public watchlists belong to the anonymous user
     other_watchlists = Watchlists.objects.filter(public=1)
