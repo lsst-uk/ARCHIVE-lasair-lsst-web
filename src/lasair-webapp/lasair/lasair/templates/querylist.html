@@ -34,7 +34,7 @@ stream by modifying it as above, choosing one of the 'Streaming' options.
 <tr>
 <td> <a href="/query/{{ mq.mq_id }}"><b>{{ mq.name }}</b></a> </br>
 {% if mq.active %}
-<i><a href={{ mq.streamlink|safe }}>Stream Log</a><i>
+<i><a href={{ mq.streamlink|safe }}>Stream Log</a></i>
 {% endif %}
 </td>
 <td>{{ mq.description|safe }}</td>
@@ -65,7 +65,7 @@ or the link below the name to edit it.
 {% for mq in myqueries %}
 <tr><td><b> <a href="/query/{{ mq.mq_id }}/">{{ mq.name }}</a></b><br/>
 {% if mq.active %}
-<i><a href={{ mq.streamlink|safe }}>Stream Log</a><i>
+<i><a href={{ mq.streamlink|safe }}>Stream Log</a></i>
 {% endif %}
 </td>
 <td>{{ mq.description }}</td>
@@ -101,7 +101,7 @@ the filter to push it into the area above.
 {% endif %}
 <p>
 {% if mq.active %}
-<i><a href={{ mq.streamlink|safe }}>Stream Log</a><i>
+<i><a href={{ mq.streamlink|safe }}>Stream Log</a></i>
 {% endif %}
 </td>
 <td>{{ mq.usersname }}</td>

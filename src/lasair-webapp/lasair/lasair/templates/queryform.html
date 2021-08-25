@@ -31,6 +31,7 @@ First you pick the tables to be joined for your query. The "objects" table is ma
 
 
 <!-- editing an existing query -->
+{% if logged_in %}
 {% if new %}
 <form method="POST"  action="/query/">
 {% else %}
@@ -39,7 +40,6 @@ First you pick the tables to be joined for your query. The "objects" table is ma
 {% csrf_token %}
 
 <!-- if you can save or edit this query -->
-{% if logged_in %}
 {% if new or is_owner %}
 Query Name {% if random %}(replace this name please){% endif %}<br/>
 <h3><input name="name" value="{% if random %}Query-{{ random }}{% else %}{{ myquery.name }}{% endif %}" size=50></h3>
@@ -156,7 +156,7 @@ The SQL <b><font color="red">WHERE</font></b>. Which objects to return. See list
 {% if new or is_owner %}
 <td>
 <input type="submit" class="button" style="color: blue; background-color: #EEEEFF;" 
-{% if new %} value=" Create query" {% else %} value=" Save this Query" {% endif %} ></td>
+{% if new %} value=" Create query" {% else %} value=" Save this Query" {% endif %} >
 </td>
 {% endif %}
 {% endif %}
@@ -171,9 +171,10 @@ The SQL <b><font color="red">WHERE</font></b>. Which objects to return. See list
 </form>   <!-- END OF FORM -->
 {% endif %}
 
+<tr>
 <!-- DELETE QUERY -->
 {% if logged_in and is_owner and not new %}
-<tr><td>
+<td>
 <script>
 function ConfirmDelete()
 {
@@ -200,7 +201,6 @@ function ConfirmDelete()
 {% endif %}
 </tr></table>
 
-</div>
 </div>
 
 <script type="text/javascript">

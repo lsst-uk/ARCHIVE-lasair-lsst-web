@@ -46,6 +46,7 @@ urlpatterns = [
 
     path('cookbook'  , TemplateView.as_view(template_name='cookbook.html'),            name='cookbook'),
     path('cookbook/<slug:topic>/'  , views.cookbook,            name='cookbook'),
+    path('faq',  TemplateView.as_view(template_name='faq.html')),
 
     path('cand/<int:candid>/',      candidates.cand,            name='cand'),
 

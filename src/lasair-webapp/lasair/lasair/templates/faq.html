@@ -1,0 +1,191 @@
+<style>
+dd, dt { line-height: 1.5; }
+dt { font-weight: bold; }
+</style>
+
+{% extends "base.html"%}
+{% block content %}
+
+
+<div class="container">
+<div class="row">
+<h3>Frequently Asked Questions</h3>
+</div>
+
+<div class="col-sm">
+
+<dl>
+<dt> What can I get from this web site?</dt>
+<dd>The Lasair alert broker gives access to millions of astronomical transient detections: 
+when a star or galaxy becomes brighter or fainter than it was at an earlier time.</dd>
+<hr/>
+
+<dt> What data does Lasair offer?</dt>
+<dd>Whenever a star or galaxy in the sky changes brightness, it is given an "objectId", 
+which can be used to see all the data about that object. Data includes a "light curve" of brightness 
+measurments at different times, in different filters; crossmatching with existing source catalogs,
+and other data.</dd>
+<hr/>
+
+<dt> What is here for an amateur astronomer?</dt>
+<dd>A serious amateur telescope would have a 500 mm aperture, with a limiting magnitude of about 16, 
+costing over $40,000. In any year there will be a few supenovae visible to this system.
+</dd>
+<hr/>
+
+<dt> How can I ask a question to the Lasair team?</dt>
+<dd>Write to the help email: lasair-help at lists.lasair.roe.ac.uk.</dd>
+<hr/>
+
+<dt> How can I use my knowledge of SQL to use Lasair?</dt>
+<dd>Each query/filter/stream in Lasair is an SQL SELECT query. The syntax is 
+"SELECT &lt;attributes&gt; FROM &lt;tables&gt; WHERE &lt;conditions;&gt;"
+The attributes come from the schema -- shown to the right in the query builder page, and can include
+renaming, for example "magg-magr as mag_difference", but no sub-queries.
+The tables are selected from objects, sherlock_classifications, crossmatch_tns, 
+as well as any watchlists or areas you choose.
+The conditions in the WHERE clause allow a simplified SQL, using just comparison operators, without 
+operators such as "group" and "having".
+</dd>
+<hr/>
+
+<dt> How can I query the Lasair database?</dt>
+<dd>You can type SQL into the query builder as above, and you can run a query 
+somebody else has made that is public. If you sign up and login to Lasair, you can save your queries
+and you can copy somebody else's query then modify it.</dd>
+<hr/>
+
+<dt> What is the schema of the Lasair database?</dt>
+<dd>Can be found at the <a href=/schema>schema page</a>.</dd>
+<hr/>
+
+<dt> How do I choose which alerts are interesting to me?</dt>
+<dd>Choosing interesting alerts can be based on several criteria: 
+The characteristics of the light curve; 
+coinicdence of the alert with a galaxy or known variable star;
+coincidence of the alert with one of the sources in which you are interested (a watchlist);
+location of the alert in a given area of the sky, for example a gravitational wave skymap.
+</dd>
+<hr/>
+
+<dt> Why should I register on the Lasair website?</dt>
+<dd>Registration is easy, and just requires a valid email (signup <a href=/signup>here</a>).
+You can then build and save queries, watchlists, and sky areas, 
+convert those to real-time slert treams, and use the Lasair API.
+</dd>
+<hr/>
+
+<dt> Besides Lasair, what other websites carry astronommical transients?</dt>
+<dd>There are seven community brokers that will receive and process LSST alerts in real time:
+<a href="http://alerce.science/">ALeRCE</a>, 
+<a href="https://ampelproject.github.io/">AMPEL</a>, 
+<a href="https://antares.noirlab.edu/">ANTARES</a>, 
+BABAMUL, 
+<a href="https://fink-broker.re
+<dthedocs.io/en/latest/">Fink</a>, 
+<a href="https://lasair.roe.ac.uk/">Lasair</a>, and 
+<a href="https://pitt-broker.re
+<dthedocs.io/en/latest/">Pitt-Google</a>.
+</dd>
+<hr/>
+
+<dt> How long has Lasair been operating?</dt>
+<dd>Lasair has been processing, storing, and distributing alerts from the ZTF survey since 2018.</dd>
+
+<dt> Can I get alerts from a particular region of the sky?</dt>
+<dd>Lasair supports "sky areas", defined by a 
+<a href=https://cds-astro.github.io/mocpy/>MOC</a>, that you build yourself.
+</dd></hr>
+
+<dt> Can I get alerts associated with my favourite sources?</dt>
+<dd>You can build a "watchlist" of your favourite sources, and build a corresponding 
+query that includes crossmatch with that watchlist. Instructions are <a href=/cookbook/watchlist/>here</a>.
+</dd>
+<hr/>
+
+<dt> Can Lasair alert me about supernovae and kilonovae?</dt>
+<dd>There are some filters already built that find alerts in the outskirts of 
+galaxies, see <a href=/querylist/promoted/>here</a>. There are also queries that find supernovae
+already reported to the <a href=https://www.wis-tns.org/>Transient Name Service<a>.
+</dd>
+<hr/>
+
+<dt> Can Lasair alert me about gravitational-wave events?</dt>
+<dd>Lasair receives immediate notification of gravitational wave alerts. See <a href=/skymap>here</a></dd>
+
+<dt> How can I find out about the ZTF survey?</dt>
+<dd>
+The Zwicky Transient Factory (ZTF) is the source of the events to which Lasair provides access. 
+It is well summarised with the following set of papers:
+<ul>
+<li><i>The Zwicky Transient Facility: Data Processing, Products, and Archive</i>, F. Masci et al <a href=https://arxiv.org/abs/1902.01872>arXiv</a></li>
+<li><i>The Zwicky Transient Facility: System Overview, Performance, and First Results</i>, E. Bellm et al <a href=https://arxiv.org/abs/1902.01932>arXiv</a></li>
+<li><i>A Morphological Classification Model to Identify Unresolved PanSTARRS1 Sources: Application in the ZTF Real-Time Pipeline</i>, Y. Tachibana et al, <a href=https://arxiv.org/abs/1902.01935>arXiv</a></li>
+<li><i>Machine Learning for the Zwicky Transient Facility</i>, A. Mahabal et al, <a href=https://arxiv.org/abs/1902.01936>arXiv</a></li>
+<li><i>The Zwicky Transient Facility: Science Objectives</i>, M. Graham et al, <a href=https://arxiv.org/abs/1902.01945>arXiv</a></li>
+<li><i>The Zwicky Transient Facility Alert Distribution System</i>, M. Patterson et al <a href=https://arxiv.org/abs/1902.02227>arXiv</a></li>
+</ul>
+</dd>
+<hr/>
+
+<dt> How can I find out about the LSST survey and the Vera Rubin Observatory?</dt>
+<dd>
+General FAQ on LSST and Rubin is <a href=https://www.lsst.org/content/rubin-observatory-general-public-faqs>here</a>,
+about community alert brokers in particular <a href=https://www.lsst.org/scientists/alert-brokers>here</a>
+</dd>
+<hr/>
+
+<dt> How can I write code and notebooks that use the Lasair database?</dt>
+<dd>The documentation is <a href=/code>here</a></dd>
+<hr/>
+
+<dt> How can I mine a million Lasair light curves?</dt>
+<dd>Lorem Ipsum</dd>
+<hr/>
+
+<dt> Does Lasair classify alerst into classes?</dt>
+<dd>Lorem Ipsum</dd>
+<hr/>
+
+<dt> Does Lasair have an API?</dt>
+<dd>Lorem Ipsum</dd>
+<hr/>
+
+<dt> What is difference magnitude compare to apparent magnitude?</dt>
+<dd>Lorem Ipsum</dd>
+<hr/>
+
+<dt> What is an exponantial moving average?</dt>
+<dd>Lorem Ipsum</dd>
+<hr/>
+
+<dt> What is a cone-search and can Lasair do this?</dt>
+<dd>Lorem Ipsum</dd>
+<hr/>
+
+<dt> How can I do 1000 cone searches all at once?</dt>
+<dd>Lorem Ipsum</dd>
+<hr/>
+
+<dt> What is associated (cross-matched) with a Lasair source?</dt>
+<dd>Lorem Ipsum</dd>
+<hr/>
+
+<dt> Can I see sky images in different wavelengths around a Lasair alert?</dt>
+<dd>Lorem Ipsum</dd>
+<hr/>
+
+<dt> When I make a query, can I share it with my colleagues?</dt>
+<dd>Lorem Ipsum</dd>
+<hr/>
+
+<dt> Can I get immediate notification of interesting alerts?</dt>
+<dd>Lorem Ipsum</dd>
+<hr/>
+</dl>
+
+
+
+</div>
+</div>
+{% endblock %}
