@@ -66,12 +66,12 @@
     {
       "name": "direct_distance",
       "type": "float",
-      "doc": "Direct distance"
+      "doc": "Determined from a non-redshift related measurement - e.g. Cepheids/standard candle (Mpc)"
     },
     {
       "name": "distance",
       "type": "float",
-      "doc": "Distance"
+      "doc": "Luminosity distance -- conversion from the spectral redshift (Mpc)"
     },
     {
       "name": "z",
@@ -107,11 +107,6 @@
       "name": "classificationReliability",
       "type": "int",
       "doc": "Reliability of classification"
-    },
-    {
-      "name": "major_axis_arcsec",
-      "type": "float",
-      "doc": "Size of associated galaxy in arcsec"
     },
     {
       "name": "annotator",
