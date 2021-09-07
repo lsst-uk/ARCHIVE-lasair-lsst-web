@@ -131,22 +131,11 @@ def obj(objectId):
         objectData['mjdmin_ago'] = now - (objectData['jdmin'] - 2400000.5)
         objectData['mjdmax_ago'] = now - (objectData['jdmax'] - 2400000.5)
 
-#        query = 'SELECT catalogue_object_id, catalogue_table_name, catalogue_object_type, separationArcsec, '
-#        query += '_r AS r, _g AS g, photoZ, rank '
-#        query += 'FROM sherlock_crossmatches where objectId="%s"' % objectId
-#        query += 'ORDER BY -rank DESC'
-#        cursor.execute(query)
-#        for row in cursor:
-#            if row['rank']:
-#                crossmatches.append(row)
-#    message += ' and %d crossmatches' % len(crossmatches)
-
     sherlock = {}
     query = 'SELECT * from sherlock_classifications WHERE objectId = "%s"' % objectId
     cursor.execute(query)
     for row in cursor:
         sherlock = row
-    #message += str(sherlock)   #%%%%%%%
 
     TNS = {}
     query = 'SELECT tns_name, tns_prefix, disc_mag, type, z, host_name, associated_groups '
@@ -167,22 +156,24 @@ def obj(objectId):
     candidates = LF.fetch(objectId)
     LF.close()
 
-    count_isdiffpos = count_all_candidates = 0
+    count_isdiffpos = count_all_candidates = count_noncandidate = 0
     for cand in candidates:
-        candid = cand['candid']
         cand['mjd'] = mjd = float(cand['jd']) - 2400000.5
         cand['since_now'] = mjd - now;
-        date = datetime.strptime("1858/11/17", "%Y/%m/%d")
-        date += timedelta(mjd)
-        cand['utc'] = date.strftime("%Y-%m-%d %H:%M:%S")
-        if 'ssnamenr' in cand:
-            ssnamenr = cand['ssnamenr']
-            if ssnamenr == 'null':
-                ssnamenr = None
-        count_all_candidates += 1
-        if candid and (cand['isdiffpos'] == 'f' or cand['isdiffpos'] == '0'):
-            count_isdiffpos += 1
-        if not candid:
+        if 'candid' in cand:
+            count_all_candidates += 1
+            candid = cand['candid']
+            date = datetime.strptime("1858/11/17", "%Y/%m/%d")
+            date += timedelta(mjd)
+            cand['utc'] = date.strftime("%Y-%m-%d %H:%M:%S")
+            if 'ssnamenr' in cand:
+                ssnamenr = cand['ssnamenr']
+                if ssnamenr == 'null':
+                    ssnamenr = None
+            if cand['isdiffpos'] == 'f' or cand['isdiffpos'] == '0':
+                count_isdiffpos += 1
+        else:
+            count_noncandidate += 1
             cand['magpsf'] = cand['diffmaglim']
 
     if count_all_candidates == 0:
@@ -198,7 +189,7 @@ def obj(objectId):
         if row['ssdistnr'] > 0 and row['ssdistnr'] < 10:
             objectData['MPCname'] = ssnamenr
 
-    message += 'Got %d candidates and noncandidates' % len(candidates)
+    message += 'Got %d candidates and %d noncandidates' % (count_all_candidates, count_noncandidate)
 
     candidates.sort(key= lambda c: c['mjd'], reverse=True)
 
@@ -207,6 +198,7 @@ def obj(objectId):
             'candidates': candidates, 
             'count_isdiffpos': count_isdiffpos, 
             'count_all_candidates':count_all_candidates,
+            'count_noncandidate':count_noncandidate,
             'sherlock': sherlock, 
             'TNS':TNS, 'message':message,
             }

@@ -1,19 +1,21 @@
-export PREFIX=/
+# running the webserver on port 80 requires starting this script as root
 export APACHEPATH=/home/ubuntu/mod_wsgi
-export PORT=8080
+export PORT=80
 
 $APACHEPATH/apachectl stop
 sleep 1
 
 mod_wsgi-express setup-server \
---working-directory lasair \
---python-path $(pwd) \
---python-path $(cd ../.. && pwd) \
---url-alias ${PREFIX}lasair/static static \
---url-alias ${PREFIX}media media \
+--user ubuntu \
+--group ubuntu \
+--working-directory /home/ubuntu/lasair-lsst-web/src/lasair-webapp/lasair \
+--python-path       /home/ubuntu/lasair-lsst-web/src/lasair-webapp/lasair \
+--python-path       /home/ubuntu/lasair-lsst-web/src \
+--url-alias /lasair/static static \
+--url-alias /media media \
 --application-type module lasair.wsgi \
 --server-root $APACHEPATH \
 --port $PORT \
---mount-point $PREFIX
+--mount-point /
 
 $APACHEPATH/apachectl start

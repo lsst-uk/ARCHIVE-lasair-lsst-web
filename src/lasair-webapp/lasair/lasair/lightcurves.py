@@ -36,6 +36,12 @@ class lightcurve_fetcher():
             candidates = []
             for cand in ret:
                 candidates.append(cand)
+
+            query = "SELECT jd, fid, diffmaglim "
+            query += "from noncandidates where objectId = '%s'" % objectId
+            ret = self.session.execute(query)
+            for cand in ret:
+                candidates.append(cand)
             return candidates
         else:
             store = objectStore(suffix = 'json', fileroot=self.fileroot)
@@ -43,6 +49,7 @@ class lightcurve_fetcher():
 
             if not lc:
                 raise lightcurve_fetcher_error('Object %s does not exist'%objectId)
+
             try:
                 candlist = json.loads(lc)
                 candidates = candlist['candidates']

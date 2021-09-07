@@ -128,38 +128,6 @@ images in detail.</small>
 </div>
 <hr/>
 
-<!--
-<div class="row">
-<h4>Comments</h4>
-{ data.message }}
-<table border=1>
-{% for c in data.comments %}
-<tr><td><font size=-1>{{ c.name }}</font></td>
-<td><font size=-1>{{ c.time }}</td>
-<td>{% if c.mine %} <form method="POST" action="/delete_comment/{{ c.comment_id }}/"> {% csrf_token %} <input type="submit" value="(delete)"/></form> {% endif %} </td><td>{{ c.content|safe }}</td></tr>
-{% endfor %}
-</table>
-{% if authenticated %}
-<form method="POST" action="/comment/">
-{% csrf_token %}
-<input type="hidden" name="objectId" value="{{ data.objectId }}">
-<input type="submit" value="New comment"/>
-</form>
-{% else %}
-You must be signed in to post comments.
-{% endif %}
-</div>
-<p>&nbsp;</p>
-
-<div class="row">
-  <div class ="col-sm-12">
-  </div>
-</div>
-<hr/>
--->
-
-
-
 <div class ="row">
 <h4>Candidates</h4>&nbsp;&nbsp;
 (To sort, click the column headings)
@@ -256,21 +224,6 @@ $(document).ready(function()
     pd = pd.replace(/&quot;/g,'"')
     var json_data = JSON.parse(pd);
     plotlc(json_data);
-/*    plotlc_apparent(json_data); */
-/*    document.getElementById('lc_apparent' ).style.display = 'none'; */
-
-/*
-$(':radio').change(function (event) {
-    if(document.getElementById('lc_button' ).checked){
-        document.getElementById('lc' ).style.display = 'block';
-        document.getElementById('lc_apparent' ).style.display = 'none';
-    }
-    if(document.getElementById('lc_apparent_button' ).checked){
-        document.getElementById('lc' ).style.display = 'none';
-        document.getElementById('lc_apparent' ).style.display = 'block';
-    }
-});
-*/
 </script>
 {% endif %}
 {% endblock %}
