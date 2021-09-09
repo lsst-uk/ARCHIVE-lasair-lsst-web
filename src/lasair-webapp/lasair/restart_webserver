@@ -1,6 +1,5 @@
-# running the webserver on port 80 requires starting this script as root
 export APACHEPATH=/home/ubuntu/mod_wsgi
-export PORT=80
+export PORT=8080
 
 $APACHEPATH/apachectl stop
 sleep 1
