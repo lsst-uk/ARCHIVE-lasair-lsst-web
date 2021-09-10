@@ -2,7 +2,10 @@
 {% load static %}
 {% block content %}
 <div class="row">
-	<h3>Lasair Ingestion Status</h3>
+<h3>Lasair Ingestion Status</h3>
+</div>
+<div class="row">
+<h5>See <a href=https://ztf-alert-monitor.lsst.ac.uk/d/iILmd8-Wz/alerts?orgId=1&refresh=5m&from=now-24h&to=now&viewPanel=8>graph of last 24 hours</a></h5>
 </div>
 <div class="row">
 	<div class="col-sm">
@@ -25,5 +28,6 @@
 </table>
 
 <a href=/lasair/static/services_log/{{ date }}.log>services log</a>
+</div>
 </div>
 {% endblock %}

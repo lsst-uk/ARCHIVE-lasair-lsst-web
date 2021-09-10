@@ -66,14 +66,18 @@ def status(request):
     try:
         jsonstr = open(lasair.settings.SYSTEM_STATUS).read()
     except:
-        return render(request, 'error.html', {'message': 'Cannot open status file'})
+        jsonstr = ''
+#        return render(request, 'error.html', {'message': 'Cannot open status file'})
 
     try:
         status = json.loads(jsonstr)
     except:
-        return render(request, 'error.html', {'message': 'Cannot parse status file'})
+        status = None
+#        return render(request, 'error.html', {'message': 'Cannot parse status file'})
 
-    status['today_singleton'] = status['today_filter'] - status['today_filter_out'] - status['today_filter_ss']
+    if status:
+        status['today_singleton'] = \
+            status['today_filter'] - status['today_filter_out'] - status['today_filter_ss']
 
     nid  = date_nid.nid_now()
     date = date_nid.nid_to_date(nid)
