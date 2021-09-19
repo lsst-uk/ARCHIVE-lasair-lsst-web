@@ -66,6 +66,9 @@ class Watchlists(models.Model):
         managed = True
         db_table = 'watchlists'
 
+    def __str__(self):
+        return self.user.first_name +' '+ self.user.last_name +': '+ self.name
+
 class AreaHits(models.Model):
     """AreaHits.
     """
@@ -102,6 +105,9 @@ class Areas(models.Model):
         managed = True
         db_table = 'areas'
 
+    def __str__(self):
+        return self.user.first_name +' '+ self.user.last_name +': '+ self.name
+
 class Myqueries(models.Model):
     """Myqueries.
     """
@@ -124,3 +130,6 @@ class Myqueries(models.Model):
 
         managed = True
         db_table = 'myqueries'
+
+    def __str__(self):
+        return self.user.first_name +' '+ self.user.last_name +': '+ self.name
