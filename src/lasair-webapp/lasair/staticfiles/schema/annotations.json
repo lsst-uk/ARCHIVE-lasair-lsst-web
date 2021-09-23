@@ -1,0 +1,46 @@
+{
+  "name": "annotations",
+  "version": "1.0",
+  "fields": [
+  {
+    "name": "objectId",
+    "type": "string",
+    "doc": "ObjectId of the object that this annotator applies to"
+  },
+  {
+    "name": "topic",
+    "type": "string",
+    "doc": "The topic name of the annotator -- acts as primary key"
+  },
+  {
+    "name": "version",
+    "type": "string",
+    "doc": "Version information for the annotator software"
+  },
+  {
+    "name": "timestamp",
+    "type": "datetime",
+    "doc": "Time at which this annotation was added to the database"
+  },
+  {
+    "name": "classification",
+    "type": "string",
+    "doc": "Short, non-trivial string expressing the classification of this object by this annotator"
+  },
+  {
+    "name": "explanation",
+    "type": "string",
+    "doc": "Natural language explanation of the classification"
+  },
+  {
+    "name": "classdict",
+    "type": "JSON",
+    "doc": "Machine readable informayion about the classification"
+  },
+  {
+    "name": "url",
+    "type": "string",
+    "doc": "URL for further information about this annotation of this object"
+  }
+]
+}

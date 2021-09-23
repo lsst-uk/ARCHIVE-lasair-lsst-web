@@ -133,3 +133,36 @@ class Myqueries(models.Model):
 
     def __str__(self):
         return self.user.first_name +' '+ self.user.last_name +': '+ self.name
+
+class Annotations(models.Model):
+    annotationid = models.AutoField(db_column='annotationID', primary_key=True) 
+    objectid = models.CharField(db_column='objectId', max_length=16)
+    topic = models.CharField(max_length=32, blank=True, null=True)
+    version = models.CharField(max_length=8)
+    timestamp = models.DateTimeField()
+    classification = models.CharField(max_length=16)
+    explanation = models.CharField(max_length=1024, blank=True, null=True)
+    classdict = models.JSONField(blank=True, null=True)
+    url = models.CharField(max_length=1024, blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'annotations'
+        unique_together = (('objectid', 'topic'),)
+
+class Annotators(models.Model):
+    topic = models.CharField(primary_key=True, max_length=32)
+    description = models.TextField(blank=True, null=True)
+    user = models.ForeignKey(User, models.DO_NOTHING, db_column='user', blank=True, null=True)
+#    owner = models.IntegerField()
+    username = models.CharField(max_length=32, blank=True, null=True)
+    password = models.CharField(max_length=32, blank=True, null=True)
+    url = models.CharField(max_length=1024, blank=True, null=True)
+    public = models.IntegerField(blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'annotators'
+
+    def __str__(self):
+        return self.user.first_name +' '+ self.user.last_name +': anno_'+ self.topic
