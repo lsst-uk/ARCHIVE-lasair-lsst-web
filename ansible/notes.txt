@@ -7,20 +7,25 @@ cd /home/ubuntu/lasair-lsst-web/ansible
 
 -- On webserver node
 
-cd /home/ubuntu/lasair-lsst-web/src/lasair-webapp/lasair
-/usr/bin/python3 manage.py collectstatic
+$ cd /home/ubuntu/lasair-lsst-web/src/lasair-webapp/lasair
+$ /usr/bin/python3 manage.py collectstatic
 
-ln -s /mnt/cephfs/roy/services_log services_log
-ln -s /mnt/cephfs/roy/streams streams
+Next, insert a couple of symlinks
+$ cd static
+$ ln -s /mnt/cephfs/roy/services_log services_log
+$ ln -s /mnt/cephfs/roy/streams streams
 
-./restart_webserver
+Get the internalal server running on port 8080
+$ ./restart_webserver
 
 -- check it is running on 8080
 
-a2enmod proxy
-a2enmod proxy_http
-a2enmod proxy_balancer
-a2enmod lbmethod_byrequests
+Now set up the external server with the https, that proxies to the internal server
+
+# a2enmod proxy
+# a2enmod proxy_http
+# a2enmod proxy_balancer
+# a2enmod lbmethod_byrequests
 
 # cd /etc/apache2/sites-available
 # cat 000-default.conf 
@@ -63,6 +68,7 @@ a2enmod lbmethod_byrequests
 
 </VirtualHost>
 </IfModule>
+
 
 
 then
