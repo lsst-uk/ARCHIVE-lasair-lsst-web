@@ -26,6 +26,8 @@ First you pick the tables to be joined for your query. The "objects" table is ma
 	ZTF objects cross-matched with the watchlist.
 <li> <b>areas</b>: Select one of the areas available to you to restrict searching to 
 	ZTF objects within the area.
+<li> <b>annotators</b>: Select one of the external annotators available to you to restrict searching to 
+	ZTF objects annotated by that.
 </ul>
 <p>
 
@@ -104,6 +106,16 @@ Results can be sent, also in real time, via email or Kafka.
 </div>
 </td>
 
+<td><input type="checkbox" name="put" id="annotator"    onclick="showannotatorradiolist();puttext();"> Annotator
+<div id="annotatorradios">
+{% for an in annotators %}
+&nbsp;&nbsp;&nbsp;<input type="radio" name="an" value="{{ an.topic }}" onclick="puttext();"> {{ an.topic }}
+{% if not an.active %}<i>(inactive)</i>{% endif %}
+<br/>
+{% endfor %}
+</div>
+</td>
+
 </tr>
 
 </table>
@@ -127,6 +139,7 @@ The SQL <b><font color="red">WHERE</font></b>. Which objects to return. See list
 	<div id="schema_objects"></div>
 	<div id="schema_sherlock_classifications"></div>
 	<div id="schema_crossmatch_tns"></div>
+	<div id="schema_annotations"></div>
 </div>
 </td></tr></table>
 
@@ -209,6 +222,7 @@ $(document).ready(function(){
   fill_schema('objects');
   fill_schema('sherlock_classifications');
   fill_schema('crossmatch_tns');
+  fill_schema('annotations');
 });
 </script>
 

@@ -158,6 +158,7 @@ class Annotators(models.Model):
     username = models.CharField(max_length=32, blank=True, null=True)
     password = models.CharField(max_length=32, blank=True, null=True)
     url = models.CharField(max_length=1024, blank=True, null=True)
+    active = models.IntegerField(blank=True, null=True)
     public = models.IntegerField(blank=True, null=True)
 
     class Meta:

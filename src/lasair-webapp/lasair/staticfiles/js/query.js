@@ -32,6 +32,7 @@ function puttext() {
   var text = '';
   var checked_wl = '';
   var checked_ar = '';
+  var checked_an = '';
   for(i=0; i<boxes.length; i++){
     if(boxes[i].checked && boxes[i].id != 'objects'){
       nonobjects += 1;
@@ -49,6 +50,14 @@ function puttext() {
       for (var j = 0; j < radios.length; j++) {
         if (radios[j].checked) {
           checked_ar = radios[j].value;
+        }
+      }
+    }
+    if(boxes[i].checked && boxes[i].id == 'annotator'){
+      var radios = document.getElementsByName("an");
+      for (var j = 0; j < radios.length; j++) {
+        if (radios[j].checked) {
+          checked_an = radios[j].value;
         }
       }
     }
@@ -74,6 +83,13 @@ function puttext() {
           continue;
 	} else {
           text += 'area:' + checked_ar;
+        }
+      }
+      else if(boxes[i].id == 'annotator'){
+        if(checked_an.length == 0){
+          continue;
+	} else {
+          text += 'annotator:' + checked_an;
         }
       }
       else {
@@ -111,6 +127,14 @@ function check_boxes() {
       document.getElementById('arearadios' ).style.display = 'block';
     }
   }
+  var radios = document.getElementsByName("an");
+  document.getElementById('annotatorradios' ).style.display = 'none';
+  for (var j = 0; j < radios.length; j++) {
+    if (tables.indexOf('annotator:' + radios[j].value) != -1) {
+      radios[j].checked = true;
+      document.getElementById('annotatorradios' ).style.display = 'block';
+    }
+  }
 }
 
 function showwatchlistradiolist(){
@@ -125,5 +149,12 @@ function showarearadiolist(){
         document.getElementById('arearadios' ).style.display = 'block';
     } else {
         document.getElementById('arearadios' ).style.display = 'none';
+    }
+}
+function showannotatorradiolist(){
+    if(document.getElementById('annotator' ).checked){
+        document.getElementById('annotatorradios' ).style.display = 'block';
+    } else {
+        document.getElementById('annotatorradios' ).style.display = 'none';
     }
 }
