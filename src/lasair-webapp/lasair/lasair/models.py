@@ -166,4 +166,4 @@ class Annotators(models.Model):
         db_table = 'annotators'
 
     def __str__(self):
-        return self.user.first_name +' '+ self.user.last_name +': anno_'+ self.topic
+        return self.user.first_name +' '+ self.user.last_name +': ' + self.topic

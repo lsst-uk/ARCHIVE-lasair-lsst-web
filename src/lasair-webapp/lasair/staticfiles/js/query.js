@@ -4,12 +4,13 @@ function fill_schema(schema_name) {
     if (this.readyState == 4 && this.status == 200) {
       var schema = JSON.parse(this.responseText);
       fields = schema.fields;
-      var s = '<h3>' + schema_name + '</h3>';
+      var s = '<h4><a href="#" onclick="showdiv(' + "'table_" + schema_name + "'" + ');">' + schema_name + '</a></h4>';
+      s += '<div id="table_' + schema_name + '" style="display:none">';
       s += '<table class="table w-auto small">';
       for (var i=0; i < fields.length; i++) {
 	s += "<tr><td>" + schema_name + "." + fields[i].name + '</td><td>' + fields[i].doc + '</td></tr>'
       }
-      s += "</table>"
+      s += "</table></div>"
       document.getElementById("schema_" + schema_name).innerHTML = s;
     }
   };
@@ -17,11 +18,11 @@ function fill_schema(schema_name) {
   xmlhttp.send();
 }
 
-function showinfodiv(){
-    if(document.getElementById('infodiv' ).style.display == 'block') {
-        document.getElementById('infodiv' ).style.display = 'none'
+function showdiv(divid){
+    if(document.getElementById(divid).style.display == 'block') {
+        document.getElementById(divid).style.display = 'none'
     } else {
-        document.getElementById('infodiv' ).style.display = 'block'
+        document.getElementById(divid).style.display = 'block'
     }
 }
 

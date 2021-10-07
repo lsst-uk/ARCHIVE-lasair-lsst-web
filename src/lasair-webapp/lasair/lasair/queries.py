@@ -192,7 +192,9 @@ def handle_myquery(request, mq_id=None):
                 'annotators': annotators,
                 'is_owner'  : True,
                 'logged_in' : logged_in,
+                'email'     : email,
                 'new'       : False,
+                'newandloggedin': False,
                 'message'   : message})
         else:
             # New query, blank query form
@@ -202,9 +204,11 @@ def handle_myquery(request, mq_id=None):
                 'annotators': annotators,
                 'random'    : '%d'%random.randrange(1000),
                 'email'     : email,
-                'is_owner'  : True,
+                'is_owner'  : False,
                 'logged_in' : logged_in,
+                'email'     : email,
                 'new'       : True,
+                'newandloggedin': logged_in,
                 'message'   : 'New query'
             })
 
@@ -218,11 +222,16 @@ def handle_myquery(request, mq_id=None):
     # Existing query, owner wants to change it
     if request.method == 'POST' and logged_in:
 
+#        s = ''   ####
+#        for k,v in request.POST.items():
+#            s += '%s --> %s<br/>' % (k,v)
+#        return render(request, 'error.html', {'message': s})
+
         # Delete the given query
         if 'delete' in request.POST:
             myquery.delete()
             delete_stream_file(request, myquery.name)
-            return redirect('/querylist/')
+            return redirect('/explore')
 
         # Copy the given query
         if 'copy' in request.POST:
@@ -280,7 +289,9 @@ def handle_myquery(request, mq_id=None):
             'annotators': annotators,
             'is_owner'  : is_owner,
             'logged_in' : logged_in,
+            'email'     : email,
             'new'       : False,
+            'newandloggedin': False,
             'message'   : message})
 
     # Existing query, view it 
@@ -291,8 +302,10 @@ def handle_myquery(request, mq_id=None):
         'areas'     : areas,
         'annotators': annotators,
         'is_owner'  : is_owner,
-        'logged_in' : logged_in,
+        'logged_in' : logged_in,  
+        'email'     : email,
         'new'       : False,
+        'newandloggedin': False,
         'message'   : message})
 
 
