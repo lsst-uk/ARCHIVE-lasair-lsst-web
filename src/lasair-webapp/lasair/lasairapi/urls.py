@@ -15,4 +15,6 @@ urlpatterns = [
     path('api/sherlock/objects/',      views.SherlockObjectsView.as_view()),
     path('api/sherlock/position/',     views.SherlockPositionView.as_view()),
     path('api/auth-token/',            obtain_auth_token, name='auth_token'),
+
+    path('api/annotate/',              views.AnnotateView.as_view()),
 ]

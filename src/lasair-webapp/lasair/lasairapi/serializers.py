@@ -166,6 +166,7 @@ def connect_db():
         user    =lasair.settings.READONLY_USER,
         password=lasair.settings.READONLY_PASS,
         host    =lasair.settings.DATABASES['default']['HOST'],
+        port    =lasair.settings.DB_PORT,
         database='ztf')
     return msl
 
@@ -326,3 +327,67 @@ class LightcurvesSerializer(serializers.Serializer):
 
         LF.close()
         return lightcurves
+
+
+class AnnotateSerializer(serializers.Serializer):
+    topic          = serializers.CharField(max_length=256, required=True)
+    objectId       = serializers.CharField(max_length=256, required=True)
+    classification = serializers.CharField(max_length=256, required=True)
+    version        = serializers.CharField(max_length=256, required=True)
+    explanation    = serializers.CharField(max_length=256, required=True, allow_blank=True)
+    classdict      = serializers.CharField(max_length=256, required=True)
+    url            = serializers.CharField(max_length=256, required=True, allow_blank=True)
+
+    def save(self):
+        topic          = self.validated_data['topic']
+        objectId       = self.validated_data['objectId']
+        classification = self.validated_data['classification']
+        version        = self.validated_data['version']
+        explanation    = self.validated_data['explanation']
+        classdict      = self.validated_data['classdict']
+        url            = self.validated_data['url']
+        # Get the authenticated user, if it exists.
+        userId = 'unknown'
+        request = self.context.get("request")
+        if request and hasattr(request, "user"):
+            userId = request.user
+            user_name = userId.first_name +' '+ userId.last_name
+            record_user(userId, 'annotate')
+
+        # make sure the user submitting the annotation is the owner of the annotator
+        is_owner = False
+        try:
+            msl = connect_db()
+            cursor = msl.cursor(buffered=True, dictionary=True)
+        except MySQLdb.Error as e:
+            return {'error':"Cannot connect to master database %d: %s\n" % (e.args[0], e.args[1])}
+
+        cursor = msl.cursor (dictionary=True)
+        cursor.execute ('SELECT * from annotators where topic="%s"' % topic)
+        nrow = 0
+        for row in cursor:
+            nrow += 1
+            if row['user'] == userId.id:
+                is_owner = True
+        if nrow == 0:
+            return {'error':"Annotator error: topic %s does not exist" % topic}
+        if not is_owner:
+            return {'error':"Annotator error: %s is not allowed to submit to topic %s" % (user_name, topic)}
+
+        # form the insert query
+        query = 'REPLACE INTO annotations ('
+        query += 'objectId, topic, version, classification, explanation, classdict, url'
+        query += ') VALUES (' 
+        query += "'%s', '%s', '%s', '%s', '%s', '%s', '%s')" 
+        query = query % (objectId, topic, version, classification, explanation, classdict, url)
+
+        try:
+            cursor = msl.cursor (dictionary=True)
+            cursor.execute (query)
+            cursor.close ()
+            msl.commit()
+        except mysql.connector.Error as err:
+            return {'error':"Query failed %d: %s\n" % (e.args[0], e.args[1])}
+
+        result = {'status': 'success', 'query':query}
+        return result

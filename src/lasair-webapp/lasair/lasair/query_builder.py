@@ -115,12 +115,13 @@ def build_query(select_expression, from_expression, where_condition):
     # ----- Handle the from_expression. 
     # This is a comma-separated list, of very restricted form
     # Implicitly includes 'objects', dont care if they includid it or not.
-    # Can include 'sherlock_classifications' and 'tns_crossmatch'
+    # Can include 'sherlock_classifications' and 'tns_crossmatch' and 'annotations'
     # Can include 'watchlists:nnn' and 'areas:nnn' where nnn is an integer.
     # Cannot have both watchlist and crossmatch_tns (the latter IS a watchlist)
 
     sherlock_classifications = False  # using sherlock_classifications
     crossmatch_tns           = False  # using crossmatch tns, but not combined with watchlist
+    annotation_topic         = None  # topic of chosen annotation
     watchlist_id = None     # wl_id of the chosen watchlist, if any
     area_id      = None     # wl_id of the chosen watchlist, if any
 
@@ -137,12 +138,20 @@ def build_query(select_expression, from_expression, where_condition):
                 watchlist_id = int(w[1])
             except:
                 raise QueryBuilderError('Error in FROM list, %s not of the form watchlist:nnn' % table)
+
         if table.startswith('area'):
             w = table.split(':')
             try:
                 area_id = int(w[1])
             except:
                 raise QueryBuilderError('Error in FROM list, %s not of the form area:nnn' % table)
+
+        if table.startswith('annotator'):
+            w = table.split(':')
+            try:
+                annotation_topic = w[1]
+            except:
+                raise QueryBuilderError('Error in FROM list, %s not of the form annotation:topic' % table)
 
     # We know if the watchlist is there or n ot, can see if the put in crossamtch_tns
     for _table in tables:
@@ -163,6 +172,8 @@ def build_query(select_expression, from_expression, where_condition):
     if crossmatch_tns:
         from_table_list.append('watchlist_hits')
         from_table_list.append('crossmatch_tns')
+    if annotation_topic:
+        from_table_list.append('annotations')
 
     # Extra clauses of the WHERE expression to make the JOINs
     where_clauses = []
@@ -178,6 +189,9 @@ def build_query(select_expression, from_expression, where_condition):
         where_clauses.append('objects.objectId=watchlist_hits.objectId')
         where_clauses.append('watchlist_hits.wl_id=%d' % lasair.settings.TNS_WATCHLIST_ID)
         where_clauses.append('watchlist_hits.name=crossmatch_tns.tns_name')
+    if annotation_topic:
+        where_clauses.append('objects.objectId=annotations.objectId')
+        where_clauses.append('annotations.topic="%s"' % annotation_topic)
 
     # if the WHERE is just an ORDER BY, then we mustn't have AND before it
     order_condition = ''
@@ -208,14 +222,14 @@ objects.jdmin-2400000.5 AS mydmin, objects.jdmax-2400000.5 AS mjdmax,
 objects.magrmin, objects.rmag, sherlock_classifications.classification, objects.ncandgp
 """
 
-    f = 'objects, sherlock_classifications'
+    f = 'objects, sherlock_classifications, annotations:test'
     w = """
 order    by magmean
 """
 
-    e = check_query_builder(s, f, w)
+    e = check_query(s, f, w)
     if e:
         print(e)
     else:
-        sql = query_builder(s, f, w)
+        sql = build_query(s, f, w)
         print(sql)

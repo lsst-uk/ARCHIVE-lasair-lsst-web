@@ -26,23 +26,42 @@ First you pick the tables to be joined for your query. The "objects" table is ma
 	ZTF objects cross-matched with the watchlist.
 <li> <b>areas</b>: Select one of the areas available to you to restrict searching to 
 	ZTF objects within the area.
+<li> <b>annotators</b>: Select one of the external annotators available to you to restrict searching to 
+	ZTF objects annotated by that.
 </ul>
 <p>
 
+<!-- The logic in this template depends on several things:
+1 new: is it a new query with a blank form, or is is an existing query 
+  1.1 if logged in , we can save or run the query
+  1.2 if not logged in, we can type and then run the query
+2 we are editing or viewing an existing query
+  2.1 if owner of the query, we can edit, copy, run, or delete
+  2.2 if logged in and its public, we can copy or run the query
+  2.3 if not logged in and its public, we can view run the query
+  2.4 if not owner and its not public, we see nothing
+
+So new means section 1 above
+logged_in means 1.1, 2.2, or 2.3
+is_owner means 2.1
+-->
+
+<!-- new query, blank form -->
+{% if new  %}
+<form method="POST"  action="/query/">
+{% endif %} <!-- new -->
 
 <!-- editing an existing query -->
-{% if logged_in %}
-{% if new %}
-<form method="POST"  action="/query/">
-{% else %}
+{% if not new %}
 <form method="POST"  action="/query/{{ myquery.mq_id }}/">
-{% endif %}
+{% endif %} <!-- is_owner and not new -->
+
 {% csrf_token %}
 
 <!-- if you can save or edit this query -->
-{% if new or is_owner %}
-Query Name {% if random %}(replace this name please){% endif %}<br/>
-<h3><input name="name" value="{% if random %}Query-{{ random }}{% else %}{{ myquery.name }}{% endif %}" size=50></h3>
+{% if newandloggedin or is_owner %}
+Query Name {% if new %}(replace this name please){% endif %}<br/>
+<h3><input name="name" value="{% if new %}Query-{{ random }}{% else %}{{ myquery.name }}{% endif %}" size=50></h3>
 Description<br/>
 <textarea name="description" rows=4 cols=80>{{ myquery.description }}</textarea><br/>
 
@@ -54,8 +73,7 @@ Streaming:<br/>
 <font size=-1>A 'Streaming' query will run real time as alerts come in. 
 Results can be sent, also in real time, via email or Kafka.
 </font>
-{% endif %}
-{% endif %}
+{% endif %} <!-- newandloggedin or is_owner -->
 
 <!-- run, save or edit this query -->
 {% if new or is_owner %}
@@ -104,12 +122,22 @@ Results can be sent, also in real time, via email or Kafka.
 </div>
 </td>
 
+<td><input type="checkbox" name="put" id="annotator"    onclick="showannotatorradiolist();puttext();"> Annotator
+<div id="annotatorradios">
+{% for an in annotators %}
+&nbsp;&nbsp;&nbsp;<input type="radio" name="an" value="{{ an.topic }}" onclick="puttext();"> {{ an.topic }}
+{% if not an.active %}<i>(inactive)</i>{% endif %}
+<br/>
+{% endfor %}
+</div>
+</td>
+
 </tr>
 
 </table>
 
 <b><font color="red">SELECT</font></b> clause here. Which attributes to return? See list at right.
-<tt><textarea class="form-control" rows="4" cols="40" name="selected" id="selected">{{ myquery.selected }}</textarea></tt>
+<tt><textarea class="form-control" rows="4" cols="40" name="selected" id="selected">{% if new %}objects.objectId{% else %}{{ myquery.selected }}{% endif %}</textarea></tt>
 
 
 The SQL <b><font color="red">WHERE</font></b>. Which objects to return. See list at right.
@@ -124,14 +152,16 @@ The SQL <b><font color="red">WHERE</font></b>. Which objects to return. See list
 
 		</td><td style="background-color:#AAAAAA">&nbsp;</td><td width=400>
 <div class="overflow-auto" style="height:600px;">
+	Click on the table name to see the schema:
 	<div id="schema_objects"></div>
 	<div id="schema_sherlock_classifications"></div>
 	<div id="schema_crossmatch_tns"></div>
+	<div id="schema_annotations"></div>
 </div>
 </td></tr></table>
 
 <input class="form-control" type="hidden" name="page" value="{{ page }}"/><br/>
-{% endif %}
+{% endif %} <!-- new or is_owner -->
 
 <!-- viewing a public query not yours -->
 {% if not new and not is_owner %}
@@ -148,18 +178,16 @@ The SQL <b><font color="red">WHERE</font></b>. Which objects to return. See list
 <input name='tables'     type='hidden' value='{{ myquery.tables }}'/>
 <input name='conditions' type='hidden' value='{{ myquery.conditions }}'/>
 <input name='page'       type='hidden' value=0>
-{% endif %}
+{% endif %} <!-- not new and not is_owner -->
 
 <table border=1 cellpadding=30><tr>
 <!-- SAVE QUERY -->
-{% if logged_in %}
-{% if new or is_owner %}
+{% if newandloggedin or is_owner %}
 <td>
 <input type="submit" class="button" style="color: blue; background-color: #EEEEFF;" 
 {% if new %} value=" Create query" {% else %} value=" Save this Query" {% endif %} >
 </td>
-{% endif %}
-{% endif %}
+{% endif %} <!-- newandloggedin or is_owner -->
 
 <!-- RUN QUERY -->
 <td>
@@ -167,13 +195,12 @@ The SQL <b><font color="red">WHERE</font></b>. Which objects to return. See list
 <button style="color: blue; background-color: #EEEEFF;" type="submit" formaction=/runquery/>Run this Query</button>
 </td></tr>
 
-{% if new or is_owner %}
+{% if is_owner %}
 </form>   <!-- END OF FORM -->
-{% endif %}
 
 <tr>
 <!-- DELETE QUERY -->
-{% if logged_in and is_owner and not new %}
+{% if not new %}
 <td>
 <script>
 function ConfirmDelete()
@@ -187,18 +214,19 @@ function ConfirmDelete()
 <input type="submit" class="button" style="color: blue; background-color: #EEEEFF;" value=" Delete this Query" Onclick="ConfirmDelete()"></td>
 </form>
 </td>
-{% endif %}
+{% endif %} <!-- not new  -->
+{% endif %} <!-- is_owner -->
 
 <!-- COPY QUERY -->
 {% if logged_in and not new %}
 <td>
 <form method="POST"  action="/query/{{ myquery.mq_id }}/">
 {% csrf_token %}
-<input type="hidden" name="copy" value="delete">
+<input type="hidden" name="copy" value="copy">
 <input type="submit" class="button" style="color: blue; background-color: #EEEEFF;" value=" Copy this Query"></td>
 </form>
 </td>
-{% endif %}
+{% endif %} <!-- logged_in and not new -->
 </tr></table>
 
 </div>
@@ -209,6 +237,7 @@ $(document).ready(function(){
   fill_schema('objects');
   fill_schema('sherlock_classifications');
   fill_schema('crossmatch_tns');
+  fill_schema('annotations');
 });
 </script>
 

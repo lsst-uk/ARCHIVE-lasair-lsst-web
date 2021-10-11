@@ -6,7 +6,7 @@ from django.db.models import Q
 from django.contrib.auth.models import User
 import lasair.settings
 from lasair.models import Myqueries
-from lasair.models import Watchlists, Areas
+from lasair.models import Watchlists, Areas, Annotators
 from lasair.query_builder import check_query, build_query
 from lasair.topic_name import topic_name
 import utility.date_nid as date_nid
@@ -84,9 +84,11 @@ def querylist(request, which):
     if request.user.is_authenticated:
         watchlists = Watchlists.objects.filter(Q(user=request.user) | Q(public__gte=1))
         areas      =      Areas.objects.filter(Q(user=request.user) | Q(public__gte=1))
+        annotators = Annotators.objects.filter(Q(user=request.user) | Q(public__gte=1))
     else:
         watchlists = Watchlists.objects.filter(public__gte=1)
         areas      =      Areas.objects.filter(public__gte=1)
+        annotators = Annotators.objects.filter(public__gte=1)
 
     promoted_queries = Myqueries.objects.filter(public=2)
     public_queries = Myqueries.objects.filter(public__gte=1)
@@ -98,6 +100,7 @@ def querylist(request, which):
         'myqueries'        : query_list(myqueries), 
         'watchlists'       : watchlists,
         'areas'            : areas,
+        'annotators'       : annotators,
         'public_queries'   : query_list(public_queries)
     })
 
@@ -138,10 +141,12 @@ def handle_myquery(request, mq_id=None):
         email = request.user.email
         watchlists = Watchlists.objects.filter(Q(user=request.user) | Q(public__gte=1))
         areas      =      Areas.objects.filter(Q(user=request.user) | Q(public__gte=1))
+        annotators = Annotators.objects.filter(Q(user=request.user) | Q(public__gte=1))
     else:
         email = ''
         watchlists = Watchlists.objects.filter(public__gte=1)
         areas      =      Areas.objects.filter(public__gte=1)
+        annotators = Annotators.objects.filter(public__gte=1)
 
     if mq_id is None:
         # New query, returned from form
@@ -184,20 +189,26 @@ def handle_myquery(request, mq_id=None):
                 'myquery'   : myquery,
                 'watchlists': watchlists,
                 'areas'     : areas,
+                'annotators': annotators,
                 'is_owner'  : True,
                 'logged_in' : logged_in,
+                'email'     : email,
                 'new'       : False,
+                'newandloggedin': False,
                 'message'   : message})
         else:
             # New query, blank query form
             return render(request, 'queryform.html',{
                 'watchlists': watchlists,
                 'areas'     : areas,
+                'annotators': annotators,
                 'random'    : '%d'%random.randrange(1000),
                 'email'     : email,
-                'is_owner'  : True,
+                'is_owner'  : False,
                 'logged_in' : logged_in,
+                'email'     : email,
                 'new'       : True,
+                'newandloggedin': logged_in,
                 'message'   : 'New query'
             })
 
@@ -211,11 +222,16 @@ def handle_myquery(request, mq_id=None):
     # Existing query, owner wants to change it
     if request.method == 'POST' and logged_in:
 
+#        s = ''   ####
+#        for k,v in request.POST.items():
+#            s += '%s --> %s<br/>' % (k,v)
+#        return render(request, 'error.html', {'message': s})
+
         # Delete the given query
         if 'delete' in request.POST:
             myquery.delete()
             delete_stream_file(request, myquery.name)
-            return redirect('/querylist/')
+            return redirect('/explore')
 
         # Copy the given query
         if 'copy' in request.POST:
@@ -270,9 +286,12 @@ def handle_myquery(request, mq_id=None):
             'myquery'   : myquery,
             'watchlists': watchlists,
             'areas'     : areas,
+            'annotators': annotators,
             'is_owner'  : is_owner,
             'logged_in' : logged_in,
+            'email'     : email,
             'new'       : False,
+            'newandloggedin': False,
             'message'   : message})
 
     # Existing query, view it 
@@ -281,9 +300,12 @@ def handle_myquery(request, mq_id=None):
         'myquery'   : myquery,
         'watchlists': watchlists,
         'areas'     : areas,
+        'annotators': annotators,
         'is_owner'  : is_owner,
-        'logged_in' : logged_in,
+        'logged_in' : logged_in,  
+        'email'     : email,
         'new'       : False,
+        'newandloggedin': False,
         'message'   : message})
 
 
