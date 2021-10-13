@@ -161,10 +161,19 @@ class SherlockPositionSerializer(serializers.Serializer):
 from lasair.query_builder import check_query, build_query
 import mysql.connector
 
-def connect_db():
+def connect_db_readonly():
     msl = mysql.connector.connect(
         user    =lasair.settings.READONLY_USER,
         password=lasair.settings.READONLY_PASS,
+        host    =lasair.settings.DATABASES['default']['HOST'],
+        port    =lasair.settings.DB_PORT,
+        database='ztf')
+    return msl
+
+def connect_db_readwrite():
+    msl = mysql.connector.connect(
+        user    =lasair.settings.READWRITE_USER,
+        password=lasair.settings.READWRITE_PASS,
         host    =lasair.settings.DATABASES['default']['HOST'],
         port    =lasair.settings.DB_PORT,
         database='ztf')
@@ -222,7 +231,7 @@ class QuerySerializer(serializers.Serializer):
             
         sqlquery_real += ' LIMIT %d OFFSET %d' % (limit, offset)
 
-        msl = connect_db()
+        msl = connect_db_readonly()
         cursor = msl.cursor(buffered=True, dictionary=True)
         result = []
         try:
@@ -279,7 +288,7 @@ class StreamsSerializer(serializers.Serializer):
                 replyMessage = '%s is not a regular expression' % regex
                 return { "topics": [], "info": replyMessage }
 
-            msl = connect_db()
+            msl = connect_db_readonly()
             cursor = msl.cursor(buffered=True, dictionary=True)
             result = []
             query = 'SELECT mq_id, user, name, topic_name FROM myqueries WHERE active>0'
@@ -357,7 +366,7 @@ class AnnotateSerializer(serializers.Serializer):
         # make sure the user submitting the annotation is the owner of the annotator
         is_owner = False
         try:
-            msl = connect_db()
+            msl = connect_db_readwrite()
             cursor = msl.cursor(buffered=True, dictionary=True)
         except MySQLdb.Error as e:
             return {'error':"Cannot connect to master database %d: %s\n" % (e.args[0], e.args[1])}
@@ -386,7 +395,7 @@ class AnnotateSerializer(serializers.Serializer):
             cursor.execute (query)
             cursor.close ()
             msl.commit()
-        except mysql.connector.Error as err:
+        except mysql.connector.Error as e:
             return {'error':"Query failed %d: %s\n" % (e.args[0], e.args[1])}
 
         result = {'status': 'success', 'query':query}
