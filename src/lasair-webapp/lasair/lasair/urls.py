@@ -40,7 +40,8 @@ urlpatterns = [
     path('support',       TemplateView.as_view(template_name='support.html')),
 
     path('conesearch/',             views.conesearch,           name='conesearch'),
-    path('status/',                 views.status,               name='status'),
+    path('status/',                 views.status_today,         name='status_today'),
+    path('status/<int:nid>/',       views.status,               name='status'),
     path('streams/<slug:topic>/',   views.streams,              name='streams'),
     path('fitsview/<slug:filename>/', views.fitsview,           name='fitsview'),
 
