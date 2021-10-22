@@ -55,31 +55,30 @@ def connect_db():
         database='ztf')
     return msl
 
-def status(request):
-    """status.
+def status_today(request):
+    nid  = date_nid.nid_now()
+    return status(request, nid)
 
-    Args:
-        request:
-    """
+def status(request, nid):
     message = ''
     web_domain = lasair.settings.WEB_DOMAIN
     try:
-        jsonstr = open(lasair.settings.SYSTEM_STATUS).read()
+        filename = '%s_%d.json' % (lasair.settings.SYSTEM_STATUS, nid)
+        jsonstr = open(filename).read()
     except:
         jsonstr = ''
-#        return render(request, 'error.html', {'message': 'Cannot open status file'})
+        return render(request, 'error.html', {'message': 'Cannot open status file for nid=%d'%nid})
 
     try:
         status = json.loads(jsonstr)
     except:
         status = None
-#        return render(request, 'error.html', {'message': 'Cannot parse status file'})
+        return render(request, 'error.html', {'message': 'Cannot parse status file for nid=%d'%nid})
 
     if status:
         status['today_singleton'] = \
             status['today_filter'] - status['today_filter_out'] - status['today_filter_ss']
 
-    nid  = date_nid.nid_now()
     date = date_nid.nid_to_date(nid)
     return render(request, 'status.html', 
             {'web_domain': web_domain, 'status':status, 'date':date, 'message':message})
