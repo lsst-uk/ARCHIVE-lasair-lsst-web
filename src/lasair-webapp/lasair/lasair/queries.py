@@ -123,7 +123,7 @@ def show_myquery(request, mq_id):
 
 def delete_stream_file(request, query_name):
     topic = topic_name(request.user.id, query_name)
-    filename = '/mnt/cephfs/roy/streams/%s' % topic
+    filename = '/mnt/cephfs/lasair/streams/%s' % topic
     if os.path.exists(filename):
         os.remove(filename)
 
