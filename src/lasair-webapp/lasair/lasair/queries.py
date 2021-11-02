@@ -408,5 +408,7 @@ def runquery(request):
                 'selected'  :selected, 
                 'tables'    :tables, 
                 'conditions'  :conditions, 
+                'nalert'   : nalert,
+                'ps' : offset, 'pe' : offset+nalert,
                 'limit'  :limit, 'offset'  :offset, 
                 'message': message})
