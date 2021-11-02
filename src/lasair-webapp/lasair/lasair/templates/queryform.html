@@ -66,11 +66,11 @@ Description<br/>
 <textarea name="description" rows=4 cols=80>{{ myquery.description }}</textarea><br/>
 
 Public: <input type="checkbox" name="public" {% if myquery.public > 0 %}checked{% endif %}><br/>
-Streaming:<br/>
-&nbsp;&nbsp;&nbsp;<input type="radio" name="active" value="0" {% if myquery.active == 0 or new %}checked{% endif %}> Not streaming <br/>
-&nbsp;&nbsp;&nbsp;<input type="radio" name="active" value="1" {% if myquery.active == 1 %}checked{% endif %}> Email to {{ email }} (max once a day) and log <br/>
-&nbsp;&nbsp;&nbsp;<input type="radio" name="active" value="2" {% if myquery.active == 2 %}checked{% endif %}> Kafka and log <br/>
-<font size=-1>A 'Streaming' query will run real time as alerts come in. 
+This query is:<br/>
+&nbsp;&nbsp;&nbsp;<input type="radio" name="active" value="0" {% if myquery.active == 0 or new %}checked{% endif %}> Not a streaming filter<br/>
+&nbsp;&nbsp;&nbsp;<input type="radio" name="active" value="1" {% if myquery.active == 1 %}checked{% endif %}> Convert to filter and Email to {{ email }} (max once a day) and log <br/>
+&nbsp;&nbsp;&nbsp;<input type="radio" name="active" value="2" {% if myquery.active == 2 %}checked{% endif %}> Convert to Filter and produce Kafka and log <br/>
+<font size=-1>A 'Filter' will run real time as alerts come in. 
 Results can be sent, also in real time, via email or Kafka.
 </font>
 {% endif %} <!-- newandloggedin or is_owner -->
