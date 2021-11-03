@@ -5,8 +5,8 @@
 
 
 {% if which == 'promoted' %}
-<h4>Promoted Filters</h4>
-The following are stored queries from Lasair. First the "promoted queries",
+<h4>Promoted Queries and Filters</h4>
+The following are stored queries and filters from Lasair. First the "promoted queries",
 then your stored queries, then stored queries from others that have been made public.
 <p>
 The first link shows a definition of the query, and there is a button 'Run Query'.
@@ -15,10 +15,10 @@ to your own space, then modify it.
 If you are the owner of this query, you can modify it, then 'Save this Query'.
 You can also 'Delete this Query'.
 
-The second link (Stream Log) is there for <i>streaming</i> queries, which run 
-in real time as the alerts come in. It shows a cache of the output from that streaming
-query, latest first. You can modify your own query and convert it to a real-time
-stream by modifying it as above, choosing one of the 'Streaming' options. 
+The second link (Filter Log) is there for <i>filters</i>, which are queries that run 
+in real time as the alerts come in. It shows a cache of the output from that filter,
+latest first. You can modify your own query and convert it to a filter
+by modifying it as above, choosing one of the 'Convert to filter' options. 
 <p>
 <div class="row">
   <div class="col-xs-12">
@@ -34,7 +34,7 @@ stream by modifying it as above, choosing one of the 'Streaming' options.
 <tr>
 <td> <a href="/query/{{ mq.mq_id }}"><b>{{ mq.name }}</b></a> </br>
 {% if mq.active %}
-<i><a href={{ mq.streamlink|safe }}>Stream Log</a></i>
+<i><a href={{ mq.streamlink|safe }}>Filter Log</a></i>
 {% endif %}
 </td>
 <td>{{ mq.description|safe }}</td>
@@ -48,10 +48,9 @@ stream by modifying it as above, choosing one of the 'Streaming' options.
 
 {% if which == 'my' %}
 {% if is_authenticated %}
-<h4>My Stored Queries</h4>
-Stored filters that you control are listed below.
-Click on the name of the filter to push it into the filter area above,
-or the link below the name to edit it. 
+<h4>My Stored Queries and Filters</h4>
+Stored queries and filters that you control are listed below.
+Click on the name to edit it, or the 'Filter Log' below the name to see its output.
 <div class="row">
   <div class="col-xs-12">
 
@@ -65,7 +64,7 @@ or the link below the name to edit it.
 {% for mq in myqueries %}
 <tr><td><b> <a href="/query/{{ mq.mq_id }}/">{{ mq.name }}</a></b><br/>
 {% if mq.active %}
-<i><a href={{ mq.streamlink|safe }}>Stream Log</a></i>
+<i><a href={{ mq.streamlink|safe }}>Filter Log</a></i>
 {% endif %}
 </td>
 <td>{{ mq.description }}</td>
@@ -76,15 +75,15 @@ or the link below the name to edit it.
 </div>
 <br/>
 {% else %}
-(If you would like to create your own stored filters, you should be signed in. See links at top left.)
+(If you would like to store your own queries and filters, you should be signed in. See links at top left.)
 <hr/>
 {% endif %}
 {% endif %}
 
 {% if which == 'public' %}
-<h4>Contributed Stored Filters</h4>
-Stored filters created and made public are listed below. Click on the name of
-the filter to push it into the area above.
+<h4>Contributed Stored Queries and Filters</h4>
+Stored queries and filters created and made public are listed below. Click on the name
+to edit it, or the 'Filter Log' to see its results.
 <div class="row">
   <div class="col-xs-12">
 <table class="table table-bordered">
@@ -101,7 +100,7 @@ the filter to push it into the area above.
 {% endif %}
 <p>
 {% if mq.active %}
-<i><a href={{ mq.streamlink|safe }}>Stream Log</a></i>
+<i><a href={{ mq.streamlink|safe }}>Filter Log</a></i>
 {% endif %}
 </td>
 <td>{{ mq.usersname }}</td>

@@ -1,8 +1,5 @@
 import json
 import sys
-sys.path.append('../../..')
-from utility.objectStore import objectStore
-
 from cassandra.cluster import Cluster
 from cassandra.query import dict_factory
 
@@ -63,7 +60,6 @@ class lightcurve_fetcher():
             self.cluster.shutdown()
 
 if __name__ == "__main__":
-#    LF = lightcurve_fetcher(fileroot = '/mnt/cephfs/roy/objectjson/')
     LF = lightcurve_fetcher(cassandra_hosts = ['192.168.0.11'])
 
     candidates = LF.fetch('ZTF21abcmlzt')
