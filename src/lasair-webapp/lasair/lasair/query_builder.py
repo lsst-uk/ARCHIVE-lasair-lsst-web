@@ -206,11 +206,11 @@ def build_query(select_expression, from_expression, where_condition):
     sql += select_expression
 
     # FROM these tables
-    sql += '\nFROM ' + ', '.join(from_table_list)
+    sql += ' \nFROM ' + ', '.join(from_table_list)
 
     # The WHERE clauses
     if len(where_clauses) > 0:
-        sql += '\nWHERE\n' + ' AND\n'.join(where_clauses) + order_condition
+        sql += ' \nWHERE\n ' + ' AND\n '.join(where_clauses) + order_condition
 
     return sql
 
