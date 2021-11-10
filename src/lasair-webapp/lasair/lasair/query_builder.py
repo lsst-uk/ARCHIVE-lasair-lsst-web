@@ -97,7 +97,6 @@ def check_where_forbidden(where_condition):
 def check_query(select_expression, from_expression, where_condition):
     """ Check the query arguments with the functions above
     """
-
     # check if the select expression is OK
     s = check_select_forbidden(select_expression)
     if s: return s
@@ -108,9 +107,14 @@ def check_query(select_expression, from_expression, where_condition):
 
     return None
 
+def sanitise(expression):
+    return expression.replace("'", '"')
+
 def build_query(select_expression, from_expression, where_condition):
     """ Build a real SQL query from the pre-sanitised input
     """
+    select_expression = sanitise(select_expression)
+    where_condition  = sanitise(where_condition)
 
     # ----- Handle the from_expression. 
     # This is a comma-separated list, of very restricted form
@@ -121,7 +125,7 @@ def build_query(select_expression, from_expression, where_condition):
 
     sherlock_classifications = False  # using sherlock_classifications
     crossmatch_tns           = False  # using crossmatch tns, but not combined with watchlist
-    annotation_topic         = None  # topic of chosen annotation
+    annotation_topics        = []  # topics of chosen annotations
     watchlist_id = None     # wl_id of the chosen watchlist, if any
     area_id      = None     # wl_id of the chosen watchlist, if any
 
@@ -149,7 +153,7 @@ def build_query(select_expression, from_expression, where_condition):
         if table.startswith('annotator'):
             w = table.split(':')
             try:
-                annotation_topic = w[1]
+                annotation_topics.append(w[1])
             except:
                 raise QueryBuilderError('Error in FROM list, %s not of the form annotation:topic' % table)
 
@@ -172,8 +176,8 @@ def build_query(select_expression, from_expression, where_condition):
     if crossmatch_tns:
         from_table_list.append('watchlist_hits')
         from_table_list.append('crossmatch_tns')
-    if annotation_topic:
-        from_table_list.append('annotations')
+    for at in annotation_topics:
+        from_table_list.append('annotations AS ' + at)
 
     # Extra clauses of the WHERE expression to make the JOINs
     where_clauses = []
@@ -189,9 +193,9 @@ def build_query(select_expression, from_expression, where_condition):
         where_clauses.append('objects.objectId=watchlist_hits.objectId')
         where_clauses.append('watchlist_hits.wl_id=%d' % lasair.settings.TNS_WATCHLIST_ID)
         where_clauses.append('watchlist_hits.name=crossmatch_tns.tns_name')
-    if annotation_topic:
-        where_clauses.append('objects.objectId=annotations.objectId')
-        where_clauses.append('annotations.topic="%s"' % annotation_topic)
+    for at in annotation_topics:
+        where_clauses.append('objects.objectId=%s.objectId' % at)
+        where_clauses.append('%s.topic="%s"' % (at, at))
 
     # if the WHERE is just an ORDER BY, then we mustn't have AND before it
     order_condition = ''
@@ -206,30 +210,53 @@ def build_query(select_expression, from_expression, where_condition):
     sql += select_expression
 
     # FROM these tables
-    sql += '\nFROM ' + ', '.join(from_table_list)
+    sql += '\n FROM ' + ', '.join(from_table_list)
 
     # The WHERE clauses
     if len(where_clauses) > 0:
-        sql += '\nWHERE\n' + ' AND\n'.join(where_clauses) + order_condition
+        sql += '\n WHERE \n' + ' AND \n'.join(where_clauses) + order_condition
 
     return sql
 
-if __name__ == "__main__":
-    print('===============')
-    s = """
-objects.objectId, objects.ramean, objects.decmean, 
-objects.jdmin-2400000.5 AS mydmin, objects.jdmax-2400000.5 AS mjdmax, 
-objects.magrmin, objects.rmag, sherlock_classifications.classification, objects.ncandgp
-"""
+import mysql.connector
+import string, random, json
 
-    f = 'objects, sherlock_classifications, annotations:test'
-    w = """
-order    by magmean
-"""
+def connect_db():
+    """connect_db.
+    """
+    msl = mysql.connector.connect(
+        user    =lasair.settings.READWRITE_USER,
+        password=lasair.settings.READWRITE_PASS,
+        host    =lasair.settings.DATABASES['default']['HOST'],
+        port    =lasair.settings.DATABASES['default']['PORT'],
+        database='ztf')
+    return msl
+
+if __name__ == "__main__":
+    import sys
+    if len(sys.argv) > 1:
+        mq_id = int(sys.argv[1])
+    else:
+        print('Usage: "python query_builder.py 123" for mq_id=123')
+        sys.exit(1)
+
+    msl = connect_db()
+    query = 'SELECT selected, conditions, tables FROM myqueries WHERE mq_id=%d'
+    query = query % mq_id
+    cursor = msl.cursor(buffered=True, dictionary=True)
+    cursor.execute(query)
+    for row in cursor:
+        s = row['selected']
+        f = row['tables']
+        w = row['conditions']
+        break
 
     e = check_query(s, f, w)
     if e:
         print(e)
     else:
-        sql = build_query(s, f, w)
-        print(sql)
+        real_sql = build_query(s, f, w)
+        print(real_sql)
+    print('-----------------')
+    query = "UPDATE myqueries SET real_sql='%s' WHERE mq_id=%d" % (real_sql, mq_id)
+    cursor.execute(query)
