@@ -70,10 +70,18 @@ This query is:<br/>
 &nbsp;&nbsp;&nbsp;<input type="radio" name="active" value="0" {% if myquery.active == 0 or new %}checked{% endif %}> Not a streaming filter<br/>
 &nbsp;&nbsp;&nbsp;<input type="radio" name="active" value="1" {% if myquery.active == 1 %}checked{% endif %}> Convert to filter and Email to {{ email }} (max once a day) and log <br/>
 &nbsp;&nbsp;&nbsp;<input type="radio" name="active" value="2" {% if myquery.active == 2 %}checked{% endif %}> Convert to Filter and produce Kafka and log <br/>
-<font size=-1>A 'Filter' will run real time as alerts come in. 
-Results can be sent, also in real time, via email or Kafka.
-</font>
+
+A 'Filter' will run real time as alerts come in. 
+Results can be sent, also in real time, via email or Kafka. 
+{% if is_owner %}
+Note that the button "Save this Query" below will erase the exiting stream log.
+{% endif %}
+
 {% endif %} <!-- newandloggedin or is_owner -->
+{% if topic and myquery.active %}
+Click here for <a href=/streams/{{ topic }}>existing stream log</a>.
+{% endif %}
+<hr/>
 
 <!-- run, save or edit this query -->
 {% if new or is_owner %}
@@ -125,7 +133,7 @@ Results can be sent, also in real time, via email or Kafka.
 <td><input type="checkbox" name="put" id="annotator"    onclick="showannotatorradiolist();puttext();"> Annotator
 <div id="annotatorradios">
 {% for an in annotators %}
-&nbsp;&nbsp;&nbsp;<input type="radio" name="an" value="{{ an.topic }}" onclick="puttext();"> {{ an.topic }}
+&nbsp;&nbsp;&nbsp;<input type="checkbox" name="an" value="{{ an.topic }}" onclick="puttext();"> {{ an.topic }}
 {% if not an.active %}<i>(inactive)</i>{% endif %}
 <br/>
 {% endfor %}
@@ -234,10 +242,10 @@ function ConfirmDelete()
 <script type="text/javascript">
 $(document).ready(function(){
   check_boxes();
-  fill_schema('objects');
-  fill_schema('sherlock_classifications');
-  fill_schema('crossmatch_tns');
-  fill_schema('annotations');
+  fill_schema('objects',                  'objects');
+  fill_schema('sherlock_classifications', 'sherlock_classifications');
+  fill_schema('crossmatch_tns',           'crossmatch_tns');
+  fill_schema('annotations',              '&lt;topic&gt;');
 });
 </script>
 
