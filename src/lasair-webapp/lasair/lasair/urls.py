@@ -66,10 +66,11 @@ urlpatterns = [
 
     path('querylist_all/',          queries.querylist_all,      name='querylist_all'),
     path('querylist/<slug:which>/', queries.querylist,          name='querylist'),
-    path('query/',                  queries.new_myquery,          name='new_myquery'),
-    path('query/<int:mq_id>/',      queries.show_myquery,         name='show_myquery'),
+    path('query/',                  queries.new_myquery,        name='new_myquery'),
+    path('query/<int:mq_id>/',      queries.show_myquery,       name='show_myquery'),
 
-    path('runquery/',               queries.runquery,             name='runquery'),
+    path('runquery/',               queries.runquery_post,      name='runquery_post'),
+    path('runquery/<int:mq_id>/',   queries.runquery_db,        name='runquery_db'),
 
     path('skymap/',                 skymap.skymap,              name='skymap'),
     path('skymap/<skymap_id_version>/',     skymap.show_skymap, name='show_skymap'),

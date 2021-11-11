@@ -338,13 +338,26 @@ def record_query(request, query):
     f.write(s)
     f.close()
 
-def runquery(request):
+def runquery_db(request, mq_id):
+    msl = connect_db()
+    cursor = msl.cursor(buffered=True, dictionary=True)
+    cursor.execute('SELECT selected, tables, conditions FROM myqueries WHERE mq_id=%d' % mq_id)
+    for row in cursor:
+        selected   = row['selected']
+        tables     = row['tables']
+        conditions = row['conditions']
+
+    limit  = 1000
+    offset = 0
+    json_checked = False
+    return runquery(request, selected, tables, conditions, limit, offset, json_checked)
+
+def runquery_post(request):
     """runquery.
 
     Args:
         request:
     """
-    message = ''
     json_checked = False
 
     if not request.method == 'POST':
@@ -375,9 +388,10 @@ def runquery(request):
     if 'json' in request.POST and request.POST['json'] == 'on':
         json_checked = True
 
+    return runquery(request, selected, tables, conditions, limit, offset, json_checked)
 
-#    sqlquery_real = query_utilities.make_query(selected, tables, conditions, limit, offset)
-
+def runquery(request, selected, tables, conditions, limit, offset, json_checked):
+    message = ''
     e = check_query(selected, tables, conditions)
     if e:
         return render(request, 'error.html', {'message': message})
