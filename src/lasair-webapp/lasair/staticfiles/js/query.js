@@ -1,4 +1,4 @@
-function fill_schema(schema_name) {
+function fill_schema(schema_name, display_name) {
   var xmlhttp = new XMLHttpRequest();
   xmlhttp.onreadystatechange = function() {
     if (this.readyState == 4 && this.status == 200) {
@@ -8,7 +8,7 @@ function fill_schema(schema_name) {
       s += '<div id="table_' + schema_name + '" style="display:none">';
       s += '<table class="table w-auto small">';
       for (var i=0; i < fields.length; i++) {
-	s += "<tr><td>" + schema_name + "." + fields[i].name + '</td><td>' + fields[i].doc + '</td></tr>'
+	s += "<tr><td>" + display_name + "." + fields[i].name + '</td><td>' + fields[i].doc + '</td></tr>'
       }
       s += "</table></div>"
       document.getElementById("schema_" + schema_name).innerHTML = s;
@@ -29,20 +29,24 @@ function showdiv(divid){
 /* respond to clicking a checkbox */
 function puttext() {
   var boxes = document.getElementsByName('put');
-  var nonobjects = 0;
-  var text = '';
+  var fields = ['objects'];
   var checked_wl = '';
   var checked_ar = '';
-  var checked_an = '';
+  var checked_an = [];
+  document.getElementById('objects').checked = true;
+
   for(i=0; i<boxes.length; i++){
-    if(boxes[i].checked && boxes[i].id != 'objects'){
-      nonobjects += 1;
+    if(boxes[i].checked && boxes[i].id == 'sherlock_classifications'){
+      fields.push('sherlock_classifications');
+    }
+    if(boxes[i].checked && boxes[i].id == 'crossmatch_tns'){
+      fields.push('crossmatch_tns');
     }
     if(boxes[i].checked && boxes[i].id == 'watchlist'){
       var radios = document.getElementsByName("wl");
       for (var j = 0; j < radios.length; j++) {
         if (radios[j].checked) {
-          checked_wl = radios[j].value;
+          fields.push('watchlist:' + radios[j].value);
         }
       }
     }
@@ -50,7 +54,7 @@ function puttext() {
       var radios = document.getElementsByName("ar");
       for (var j = 0; j < radios.length; j++) {
         if (radios[j].checked) {
-          checked_ar = radios[j].value;
+          fields.push('area:' + radios[j].value);
         }
       }
     }
@@ -58,47 +62,13 @@ function puttext() {
       var radios = document.getElementsByName("an");
       for (var j = 0; j < radios.length; j++) {
         if (radios[j].checked) {
-          checked_an = radios[j].value;
+          fields.push('annotator:' + radios[j].value);
         }
       }
     }
   }
-  if(nonobjects > 1){
-    document.getElementById('objects').checked = true;
-  }
-  var nt = 0;
-  for(i=0; i<boxes.length; i++){
-    if(boxes[i].checked){
-      if(nt > 0){
-        text += ', '
-      }
-      if(boxes[i].id == 'watchlist'){
-        if(checked_wl.length == 0){
-          continue;
-	} else {
-          text += 'watchlist:' + checked_wl;
-        }
-      }
-      else if(boxes[i].id == 'area'){
-        if(checked_ar.length == 0){
-          continue;
-	} else {
-          text += 'area:' + checked_ar;
-        }
-      }
-      else if(boxes[i].id == 'annotator'){
-        if(checked_an.length == 0){
-          continue;
-	} else {
-          text += 'annotator:' + checked_an;
-        }
-      }
-      else {
-        text += boxes[i].id;
-      }
-      nt += 1;
-    }
-  }
+  text = fields.join(', ')
+  console.log(text);
   document.getElementById("tables").value = text;
 }
 
