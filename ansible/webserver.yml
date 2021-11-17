@@ -120,6 +120,11 @@
           executable: pip3 
           name: astropy
 
+    - name: install confluent kafka
+      pip: 
+          executable: pip3 
+          name: confluent_kafka
+
     - name: install cassandra client
       pip:
           executable: pip3 

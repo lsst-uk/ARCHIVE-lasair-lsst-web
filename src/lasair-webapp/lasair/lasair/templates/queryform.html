@@ -6,8 +6,6 @@
 <script src="/lasair/static/js/query.js"></script>
 
 <div class="row">
-	<!-- <div class="col-lg"> -->
-<!--	{{ message }} -->
 <h3>Query Builder</h3>
 The form below is a builder for SQL SELECT queries on the ZTF database of objects. 
 If you are logged in to Lasair, you can name and save your query, 
@@ -237,6 +235,7 @@ function ConfirmDelete()
 {% endif %} <!-- logged_in and not new -->
 </tr></table>
 
+<font color='green'>{{ message | safe}}</font>
 </div>
 
 <script type="text/javascript">

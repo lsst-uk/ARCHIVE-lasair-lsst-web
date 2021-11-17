@@ -9,6 +9,7 @@ from lasair.models import Myqueries
 from lasair.models import Watchlists, Areas, Annotators
 from lasair.query_builder import check_query, build_query
 from lasair.topic_name import topic_name
+from lasair.topic_refresh import topic_refresh
 import utility.date_nid as date_nid
 from datetime import datetime, timedelta
 import mysql.connector
@@ -184,6 +185,11 @@ def handle_myquery(request, mq_id=None):
                     selected=selected, conditions=conditions, tables=tables,
                     real_sql=sqlquery_real, topic_name=tn)
             myquery.save()
+
+            # after saving, delete the topic and push some records from the database
+            if myquery.active == 2:
+                message += topic_refresh(myquery.real_sql, tn, limit=10)
+
             message += "Query saved successfully"
             return render(request, 'queryform.html',{
                 'myquery'   : myquery,
@@ -247,7 +253,12 @@ def handle_myquery(request, mq_id=None):
                     conditions=myquery.conditions, tables=myquery.tables,
                     real_sql=myquery.real_sql, topic_name=tn)
             mq.save()
-            message += 'Query copied'
+
+            # after saving, delete the topic and push some records from the database
+            if myquery.active == 2:
+                message + topic_refresh(myquery.real_sql, tn, limit=10)
+
+            message += 'Query copied<br/>'
             return redirect('/query/%d/' % mq.mq_id)
 
         # Update the given query from the post
@@ -260,12 +271,12 @@ def handle_myquery(request, mq_id=None):
             public               = request.POST.get('public')
             e = check_query(myquery.selected, myquery.tables, myquery.conditions)
             if e:
-                return render(request, 'error.html', {'message': e})
+                return render(request, 'error.html', {'message': str(e)+'<br/>'})
 
             myquery.real_sql = build_query(myquery.selected, myquery.tables, myquery.conditions)
             e = check_query_zero_limit(myquery.real_sql)
             if e:
-                return render(request, 'error.html', {'message': e})
+                return render(request, 'error.html', {'message': str(e)+'<br/>'})
 
             tn = topic_name(request.user.id, myquery.name)
             myquery.topic_name = tn
@@ -280,7 +291,12 @@ def handle_myquery(request, mq_id=None):
             else:
                 myquery.public  = 0
             delete_stream_file(request, myquery.name)
-            message += 'Query updated: %s' % myquery.name
+
+            # after saving, delete the topic and push some records from the database
+            if myquery.active == 2:
+                message += topic_refresh(myquery.real_sql, tn, limit=10)
+
+            message += 'Query updated: %s<br/>' % myquery.name
 
         myquery.save()
         return render(request, 'queryform.html',{
@@ -297,7 +313,6 @@ def handle_myquery(request, mq_id=None):
             'message'   : message})
 
     # Existing query, view it 
-    message = 'Query displayed'
     return render(request, 'queryform.html',{
         'myquery'   : myquery,
         'watchlists': watchlists,
