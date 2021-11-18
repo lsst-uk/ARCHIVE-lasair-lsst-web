@@ -1,4 +1,5 @@
 import os
+import time
 import json
 import lasair.settings
 from datetime import datetime
@@ -67,7 +68,7 @@ def topic_refresh(real_sql, topic, limit=10):
             jsonout = json.dumps(out, default=datetime_converter)
             p.produce(topic, value=jsonout)
         p.flush(10.0)   # 10 second timeout
-        message += 'New messages produced to Kafka<br/>'
+        message += 'New messages produced to topic %s<br/>' % topic
     except Exception as e:
         message += "ERROR in queries/topic_refresh: cannot produce to public kafka<br/>" + str(e) + '<br/>'
     return message
