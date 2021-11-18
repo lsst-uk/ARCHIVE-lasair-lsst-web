@@ -57,6 +57,7 @@ def topic_refresh(real_sql, topic, limit=10):
         result = a.delete_topics([topic])
         result[topic].result()
         time.sleep(1)
+        message += 'Topic %s deleted<br/>' % topic
     except Exception as e:
         message += 'Topic is ' + topic + '<br/>'
         message += str(e) + '<br/>'
@@ -68,7 +69,7 @@ def topic_refresh(real_sql, topic, limit=10):
             jsonout = json.dumps(out, default=datetime_converter)
             p.produce(topic, value=jsonout)
         p.flush(10.0)   # 10 second timeout
-        message += 'New messages produced to topic %s<br/>' % topic
+        message += '%d new messages produced to topic %s<br/>' % (limit, topic)
     except Exception as e:
         message += "ERROR in queries/topic_refresh: cannot produce to public kafka<br/>" + str(e) + '<br/>'
     return message

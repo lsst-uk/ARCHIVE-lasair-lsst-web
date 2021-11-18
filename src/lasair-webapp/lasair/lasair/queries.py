@@ -296,7 +296,7 @@ def handle_myquery(request, mq_id=None):
             if myquery.active == 2:
                 message += topic_refresh(myquery.real_sql, tn, limit=10)
 
-            message += 'Query updated: %s<br/>' % myquery.name
+            message += 'Query %s updated<br/>' % myquery.name
 
         myquery.save()
         return render(request, 'queryform.html',{
