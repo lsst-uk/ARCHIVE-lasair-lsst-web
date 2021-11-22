@@ -6,8 +6,8 @@
 <script src="/lasair/static/js/query.js"></script>
 
 <div class="row">
-	<!-- <div class="col-lg"> -->
-<!--	{{ message }} -->
+<font color='green'>{{ message | safe}}</font>
+<hr/>
 <h3>Query Builder</h3>
 The form below is a builder for SQL SELECT queries on the ZTF database of objects. 
 If you are logged in to Lasair, you can name and save your query, 
@@ -188,12 +188,23 @@ The SQL <b><font color="red">WHERE</font></b>. Which objects to return. See list
 <input name='page'       type='hidden' value=0>
 {% endif %} <!-- not new and not is_owner -->
 
+<script>
+function ConfirmDelete()
+{
+  confirm("Are you sure you want to delete?");
+}
+function ConfirmSave()
+{
+  confirm("This will empty the stream log and replace the kafka topic with 10 alerts from the past. Continue?");
+}
+</script>
+
 <table border=1 cellpadding=30><tr>
 <!-- SAVE QUERY -->
 {% if newandloggedin or is_owner %}
 <td>
 <input type="submit" class="button" style="color: blue; background-color: #EEEEFF;" 
-{% if new %} value=" Create query" {% else %} value=" Save this Query" {% endif %} >
+value=" Save query" value=" Save this Query" Onclick="ConfirmSave()">
 </td>
 {% endif %} <!-- newandloggedin or is_owner -->
 
@@ -210,12 +221,6 @@ The SQL <b><font color="red">WHERE</font></b>. Which objects to return. See list
 <!-- DELETE QUERY -->
 {% if not new %}
 <td>
-<script>
-function ConfirmDelete()
-{
-  confirm("Are you sure you want to delete?");
-}
-</script>
 <form method="POST"  action="/query/{{ myquery.mq_id }}/">
 {% csrf_token %}
 <input type="hidden" name="delete" value="delete">
