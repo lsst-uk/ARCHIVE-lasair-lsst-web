@@ -12,8 +12,8 @@ $ /usr/bin/python3 manage.py collectstatic
 
 Next, insert a couple of symlinks
 $ cd static
-$ ln -s /mnt/cephfs/roy/services_log services_log
-$ ln -s /mnt/cephfs/roy/streams streams
+$ ln -s /mnt/cephfs/lasair/services_log services_log
+$ ln -s /mnt/cephfs/lasair/streams streams
 
 Get the internalal server running on port 8080
 $ ./restart_webserver
