@@ -4,7 +4,7 @@ from django.template.context_processors import csrf
 from django.views.decorators.csrf import csrf_exempt
 from django.db import connection
 from django.db.models import Q
-from lasair.models import Myqueries
+from lasair.models import Myqueries, Annotators
 import lasair.settings
 import mysql.connector
 import json
@@ -318,3 +318,16 @@ def streams(request, topic):
     table = json.loads(data)['digest']
     n = len(table)
     return render(request, 'streams.html', {'topic':topic, 'n':n, 'table':table})
+
+def annotators(request):
+    anns = Annotators.objects.filter().order_by('topic')
+    annotators = []
+    for a in anns:
+        d = {
+            'usersname'  :a.user.first_name +' '+ a.user.last_name,
+            'topic'       :a.topic,
+            'description':a.description
+        }
+        annotators.append(d)
+
+    return render(request, 'annotators.html', {'annotators': annotators})
