@@ -20,7 +20,7 @@ READWRITE_USER = '{{ settings.master_db_username }}'
 READWRITE_PASS = '{{ settings.master_db_password }}'
 
 DB_HOST        = '{{ settings.master_db_ip }}'
-DB_PORT        = 3306
+DB_PORT        =  {{ settings.master_db_port }}
 
 PUBLIC_KAFKA_PRODUCER   = 'kafka-pub:29092'
 PUBLIC_KAFKA_PASSWORD   = '{{ settings.kafka_password }}'
