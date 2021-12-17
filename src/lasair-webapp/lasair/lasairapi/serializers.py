@@ -380,6 +380,7 @@ class AnnotateSerializer(serializers.Serializer):
             if row['user'] == userId.id:
                 is_owner = True
                 active = row['active']
+
         if nrow == 0:
             return {'error':"Annotator error: topic %s does not exist" % topic}
         if not is_owner:
