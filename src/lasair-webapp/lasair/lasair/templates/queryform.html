@@ -5,9 +5,8 @@
 <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
 <script src="/lasair/static/js/query.js"></script>
 
+<div class="row"> <font color='green'>{{ message | safe}}</font> </div>
 <div class="row">
-<font color='green'>{{ message | safe}}</font>
-<hr/>
 <h3>Query Builder</h3>
 The form below is a builder for SQL SELECT queries on the ZTF database of objects. 
 If you are logged in to Lasair, you can name and save your query, 
@@ -82,6 +81,8 @@ Note that the button "Save this Query" below will erase the exiting stream log.
 Click here for <a href=/streams/{{ topic }}>existing stream log</a>.
 {% endif %}
 <hr/>
+<input name='query_name' type='hidden' value='{{ myquery.name }}'/>
+<input name='mq_id' type='hidden' value='{{ myquery.mq_id }}'/>
 
 <!-- run, save or edit this query -->
 {% if new or is_owner %}
@@ -204,7 +205,8 @@ function ConfirmSave()
 {% if newandloggedin or is_owner %}
 <td>
 <input type="submit" class="button" style="color: blue; background-color: #EEEEFF;" 
-value=" Save query" value=" Save this Query" Onclick="ConfirmSave()">
+value=" Save query" value=" Save this Query" 
+{% if myquery.active == 2 %}Onclick="ConfirmSave(){% endif %}">
 </td>
 {% endif %} <!-- newandloggedin or is_owner -->
 

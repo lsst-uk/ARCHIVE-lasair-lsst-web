@@ -19,7 +19,7 @@ def connect_db():
 
 def datetime_converter(o):
 # used by json encoder when it gets a type it doesn't understand
-    if isinstance(o, datetime.datetime):
+    if isinstance(o, datetime):
         return o.__str__()
 
 def topic_refresh(real_sql, topic, limit=10):
@@ -43,11 +43,11 @@ def topic_refresh(real_sql, topic, limit=10):
         recent.append(recorddict)
 
     conf = {
-        'bootstrap.servers': lasair.settings.KAFKA_PRODUCER,
+        'bootstrap.servers': lasair.settings.PUBLIC_KAFKA_PRODUCER,
         'security.protocol': 'SASL_PLAINTEXT',
         'sasl.mechanisms'  : 'SCRAM-SHA-256',
         'sasl.username'    : 'admin',
-        'sasl.password'    : lasair.settings.KAFKA_PASSWORD
+        'sasl.password'    : lasair.settings.PUBLIC_KAFKA_PASSWORD
     }
 
     # delete the old topic

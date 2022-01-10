@@ -69,6 +69,8 @@ urlpatterns = [
     path('query/',                  queries.new_myquery,        name='new_myquery'),
     path('query/<int:mq_id>/',      queries.show_myquery,       name='show_myquery'),
 
+    path('annotators/',            views.annotators,          name='annotators'),
+
     path('runquery/',               queries.runquery_post,      name='runquery_post'),
     path('runquery/<int:mq_id>/',   queries.runquery_db,        name='runquery_db'),
 

@@ -356,8 +356,9 @@ def record_query(request, query):
 def runquery_db(request, mq_id):
     msl = connect_db()
     cursor = msl.cursor(buffered=True, dictionary=True)
-    cursor.execute('SELECT selected, tables, conditions FROM myqueries WHERE mq_id=%d' % mq_id)
+    cursor.execute('SELECT name, selected, tables, conditions FROM myqueries WHERE mq_id=%d' % mq_id)
     for row in cursor:
+        query_name = row['name']
         selected   = row['selected']
         tables     = row['tables']
         conditions = row['conditions']
@@ -365,7 +366,7 @@ def runquery_db(request, mq_id):
     limit  = 1000
     offset = 0
     json_checked = False
-    return runquery(request, selected, tables, conditions, limit, offset, json_checked)
+    return runquery(request, mq_id, query_name, selected, tables, conditions, limit, offset, json_checked)
 
 def runquery_post(request):
     """runquery.
@@ -378,6 +379,8 @@ def runquery_post(request):
     if not request.method == 'POST':
         return render(request, 'error.html', {'message': 'This code expects a POST'})
 
+    query_name = request.POST['query_name'].strip()
+    mq_id      = request.POST['mq_id'].strip()
     selected   = request.POST['selected'].strip()
     tables     = request.POST['tables'].strip()
     conditions = request.POST['conditions'].strip()
@@ -403,9 +406,9 @@ def runquery_post(request):
     if 'json' in request.POST and request.POST['json'] == 'on':
         json_checked = True
 
-    return runquery(request, selected, tables, conditions, limit, offset, json_checked)
+    return runquery(request, mq_id, query_name, selected, tables, conditions, limit, offset, json_checked)
 
-def runquery(request, selected, tables, conditions, limit, offset, json_checked):
+def runquery(request, mq_id, query_name, selected, tables, conditions, limit, offset, json_checked):
     message = ''
     e = check_query(selected, tables, conditions)
     if e:
@@ -437,6 +440,8 @@ def runquery(request, selected, tables, conditions, limit, offset, json_checked)
     else:
         return render(request, 'runquery.html',
             {'table': queryset, 'nalert': nalert, 
+                'query_name': query_name,
+                'mq_id': mq_id,
                 'selected'  :selected, 
                 'tables'    :tables, 
                 'conditions'  :conditions, 

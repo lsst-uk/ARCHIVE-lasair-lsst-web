@@ -1,0 +1,22 @@
+{% extends "base.html"%}
+{% block content %}
+
+<div class="row">
+<p>
+An annotator adds extra information, called annotations to Lasair objects.
+</p>
+
+<div class="col-xs-12">
+<h3>Annotators</h3>
+<ul>
+{% for ann in annotators %}
+<li><b>{{ ann.topic }}</b><br/>
+	{{ ann.description | safe }}<br/>
+	<i>responsible user: {{ ann.usersname }}</i>
+</li>
+{% endfor %}
+</ul>
+</div>
+</div>
+
+{% endblock %}

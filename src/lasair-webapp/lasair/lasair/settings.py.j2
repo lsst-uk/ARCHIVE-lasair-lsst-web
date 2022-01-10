@@ -20,10 +20,13 @@ READWRITE_USER = '{{ settings.master_db_username }}'
 READWRITE_PASS = '{{ settings.master_db_password }}'
 
 DB_HOST        = '{{ settings.master_db_ip }}'
-DB_PORT        = 3306
+DB_PORT        =  {{ settings.master_db_port }}
 
-KAFKA_PRODUCER   = 'kafka-pub:29092'
-KAFKA_PASSWORD   = '{{ settings.kafka_password }}'
+PUBLIC_KAFKA_PRODUCER   = 'kafka-pub:29092'
+PUBLIC_KAFKA_PASSWORD   = '{{ settings.kafka_password }}'
+
+INTERNAL_KAFKA_PRODUCER = '{{ settings.kafka_producer }}:9092'
+ANNOTATION_TOPIC_OUT    = 'ztf_annotations'
 
 DATA_UPLOAD_MAX_MEMORY_SIZE = 26214400
 

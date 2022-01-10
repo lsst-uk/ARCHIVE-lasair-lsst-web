@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from gkutils.commonutils import coneSearchHTM, FULL, QUICK, CAT_ID_RA_DEC_COLS, base26, Struct
+from confluent_kafka import Producer, KafkaError
 from datetime import datetime
 from django.db import connection
 from django.db import IntegrityError
@@ -343,9 +344,9 @@ class AnnotateSerializer(serializers.Serializer):
     objectId       = serializers.CharField(max_length=256, required=True)
     classification = serializers.CharField(max_length=256, required=True)
     version        = serializers.CharField(max_length=256, required=True)
-    explanation    = serializers.CharField(max_length=256, required=True, allow_blank=True)
-    classdict      = serializers.CharField(max_length=256, required=True)
-    url            = serializers.CharField(max_length=256, required=True, allow_blank=True)
+    explanation    = serializers.CharField(max_length=1024, required=True, allow_blank=True)
+    classdict      = serializers.CharField(max_length=4096, required=True)
+    url            = serializers.CharField(max_length=1024, required=True, allow_blank=True)
 
     def save(self):
         topic          = self.validated_data['topic']
@@ -378,10 +379,14 @@ class AnnotateSerializer(serializers.Serializer):
             nrow += 1
             if row['user'] == userId.id:
                 is_owner = True
+                active = row['active']
+
         if nrow == 0:
             return {'error':"Annotator error: topic %s does not exist" % topic}
         if not is_owner:
             return {'error':"Annotator error: %s is not allowed to submit to topic %s" % (user_name, topic)}
+        if active == 0:
+            return {'error':"Annotator error: topic %s is not active -- ask Lasair team" % topic}
 
         # form the insert query
         query = 'REPLACE INTO annotations ('
@@ -398,5 +403,22 @@ class AnnotateSerializer(serializers.Serializer):
         except mysql.connector.Error as e:
             return {'error':"Query failed %d: %s\n" % (e.args[0], e.args[1])}
 
-        result = {'status': 'success', 'query':query}
-        return result
+        if active < 2:
+            return {'status': 'success', 'query':query}
+
+        # when active=2, we push a kafka message to make sure queries are run immediately
+        message = {'objectId': objectId, 'annotator':topic}
+        conf = {
+            'bootstrap.servers': lasair.settings.INTERNAL_KAFKA_PRODUCER,
+            'client.id': 'client-1',
+        }
+        producer = Producer(conf)
+        topicout = lasair.settings.ANNOTATION_TOPIC_OUT
+        try:
+            s = json.dumps(message)
+            producer.produce(topicout, s)
+        except Exception as e:
+            return {'error':"Kafka production failed: %s\n" % e}
+        producer.flush()
+
+        return {'status': 'success', 'query':query, 'annotation_topic':topicout, 'message':s}
