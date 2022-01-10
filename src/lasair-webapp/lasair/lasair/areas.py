@@ -8,7 +8,7 @@ import lasair.settings
 from lasair.models import Areas, AreaHits
 import mysql.connector
 import json
-import random
+from random import randrange
 from subprocess import Popen, PIPE
 import time
 import base64
@@ -79,7 +79,7 @@ def make_image_of_MOC(fits_bytes):
 
 def area_new(request):
     return render(request, 'area_new.html',
-        {'random': '%d'%random.randrange(1000),
+        {'random': '%d'%randrange(1000),
         'authenticated': request.user.is_authenticated
         })
 
@@ -128,7 +128,7 @@ def areas_home(request):
 
     return render(request, 'areas_home.html',
         {'my_areas': my_areas, 
-        'random': '%d'%random.randrange(1000),
+        'random': '%d'%randrange(1000),
         'other_areas': other_areas, 
         'authenticated': request.user.is_authenticated,
         'message': message})
@@ -152,8 +152,8 @@ def show_area_file(request, ar_id):
 
     moc = string2bytes(area.moc)
 
-    filename = area.name + '.fits'
-    f = open('/home/ubuntu/tmp/blah.fits', 'wb')
+    filename = area.name + '%d.fits'%randrange(1000)
+    f = open('/home/ubuntu/tmp/%s' % filename, 'wb')
     f.write(moc)
     f.close()
 
