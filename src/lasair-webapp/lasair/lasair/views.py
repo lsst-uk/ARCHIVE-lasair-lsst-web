@@ -75,7 +75,7 @@ def status(request, nid):
         status = None
         return render(request, 'error.html', {'message': 'Cannot parse status file for nid=%d'%nid})
 
-    if status:
+    if status and 'today_filter' in status:
         status['today_singleton'] = \
             status['today_filter'] - status['today_filter_out'] - status['today_filter_ss']
 
