@@ -20,10 +20,7 @@ or that indicate the user is not understanding what to do, and the input
 rejected if these are found, with an error message returned.
 """
 
-try:
-   import lasair.settings
-except:
-    pass
+import lasair.settings
 import re
 max_execution_time = 300000  # maximum execution time in milliseconds
 max_query_rows     = 1000    # default LIMIT if none specified
