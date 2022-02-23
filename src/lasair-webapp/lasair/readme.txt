@@ -3,4 +3,4 @@
 export PYTHONPATH=/home/ubuntu/lasair-lsst-web/src:/home/ubuntu/lasair-lsst-web/src/lasair-webapp/lasair
 
 # when you change the static files do
-python manage.py collectstatic
+python3 manage.py collectstatic

@@ -49,28 +49,29 @@ candidates.forEach(function(item){
     fid = Number(item.fid);
     det = (item.candid)
     if(det){
-        if(fid == 1 && item.isdiffpos == 't'){
+	pos = (item.isdiffpos == 't' || item.isdiffpos == '1');
+        if(fid == 1 && pos){
             gmag.push(y);
             gt.push(x);
             gerror.push(e);
             gra.push(x2);
             gdec.push(y2);
         }
-        else if(fid ==2 && item.isdiffpos == 't'){
+        else if(fid ==2 && pos){
             rmag.push(y);
             rt.push(x);
             rerror.push(e);
             rra.push(x2);
             rdec.push(y2);
         }
-        if(fid == 1 && item.isdiffpos == 'f'){
+        if(fid == 1 && !pos){
             gfmag.push(y);
             gft.push(x);
             gferror.push(e);
             gra.push(x2);
             gdec.push(y2);
         }
-        else if(fid ==2 && item.isdiffpos == 'f'){
+        else if(fid ==2 && !pos){
             rfmag.push(y);
             rft.push(x);
             rferror.push(e);
