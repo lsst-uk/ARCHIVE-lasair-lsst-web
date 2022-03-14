@@ -104,8 +104,8 @@ Best crossmatch is {{ data.sherlock.catalogue_object_type }}{% endif %}
 <li>TNS name is {{ data.TNS.tns_prefix }} <a href=https://www.wis-tns.org/object/{{ data.TNS.tns_name }}>{{ data.TNS.tns_name }}</a><br/>
 {% if data.TNS.type %} 
   <li> type {{ data.TNS.type }}, z={{ data.TNS.z }}, host is {{ data.TNS.host_name }} {% endif %}
-{% if data.TNS.associated_groups %} 
-  <li>discovered by {{ data.TNS.associated_groups }} {% endif %}
+{% if data.TNS.source_group %} 
+  <li>discovered by {{ data.TNS.source_group }} {% endif %}
 {% if data.TNS.disc_mag %} 
   <li>discovery magnitude {{ data.TNS.disc_mag }} {% endif %}
 </ul>
