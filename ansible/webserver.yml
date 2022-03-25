@@ -167,6 +167,13 @@
           path: /home/ubuntu/mod_wsgi_space
           state: directory
 
+    - name: install git
+      apt: 
+          name: git
+          state: present
+          update_cache: true
+      become: yes
+
     - name: Make sure the repo is up to date
       git:
           repo: https://github.com/lsst-uk/lasair-lsst-web.git
@@ -174,5 +181,5 @@
 
     - name: settings.py for django
       template:
-        src:  /home/ubuntu/lasair-lsst-web/src/lasair-webapp/lasair/lasair/settings.py.j2
+        src:  ../src/lasair-webapp/lasair/lasair/settings.py.j2
         dest: /home/ubuntu/lasair-lsst-web/src/lasair-webapp/lasair/lasair/settings.py 
