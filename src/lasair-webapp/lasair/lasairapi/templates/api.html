@@ -348,14 +348,20 @@ status= 200
 
 <dt class="url-label">Description</dt> <dd>
 <p>
-This method returns simple lightcurves for a number of objects. Each lightcurve is a sequence of
-detections, each of which has the quantities:
+This method returns simple lightcurves for a number of objects. 
+<b>NOTE:</b> these are difference magnitudes from a reference source, not apparent magnitudes.
+See <a href=/lasair/static/mag.py>this python code</a> to convert the quantities below to apparent magnitude.
+
+Each lightcurve is a sequence of detections, or <i>candidates</i>, each of which has the quantities:
 <ul>
   <li><code>candid</code>: the candidate ID for the detection</li>
   <li><code>fid</code>: The filter ID for the detection (1 = g and 2 = r)</li>
   <li><code>magpsf</code>: The difference magnitude</li>
   <li><code>sigmapsf</code>: the error in the difference magnitude.</li>
   <li><code>isdiffpos</code>:set to 't' if positive difference magnitude, 'f' for negative</li>
+  <li><code>magnr</code>: Magnitude of the reference source</li>
+  <li><code>sigmagnr</code>: the error in the reference magnitude</li>
+  <li><code>magzpsci</code>: Zero-point magnitude of the science image</li>
   <li><code>mjd</code>: Modified Julain Day for the detection </li>
 </ul>
 The arguments are:<ul>
