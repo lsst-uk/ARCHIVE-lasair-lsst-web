@@ -27,11 +27,16 @@ class lightcurve_fetcher():
     def fetch(self, objectId):
         if self.using_cassandra:
             query = "SELECT candid, jd, ra, dec, fid, nid, magpsf, sigmapsf, "
+            query += "magnr,sigmagnr, magzpsci, "
             query += "isdiffpos, ssdistnr, ssnamenr, drb "
             query += "from candidates where objectId = '%s'" % objectId
             ret = self.session.execute(query)
             candidates = []
             for cand in ret:
+                if cand['isdiffpos'] == '1': 
+                    cand['isdiffpos'] = 't'
+                if cand['isdiffpos'] == '0': 
+                    cand['isdiffpos'] = 'f'
                 candidates.append(cand)
 
             query = "SELECT jd, fid, diffmaglim "
