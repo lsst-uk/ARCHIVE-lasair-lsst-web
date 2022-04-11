@@ -5,7 +5,7 @@ from django.db import connection
 from django.contrib.auth.models import User
 from django.http import HttpResponse
 import lasair.settings
-from lasair.models import Watchlists, WatchlistCones, WatchlistHits
+from lasair.models import Watchlists, WatchlistCones
 import mysql.connector
 import json
 import random
@@ -101,8 +101,15 @@ def watchlists_home(request):
             wl_id = int(delete)
             watchlist = get_object_or_404(Watchlists, wl_id=wl_id)
             if request.user == watchlist.user:
+                # delete all the cones of this watchlist
                 WatchlistCones.objects.filter(wl_id=wl_id).delete()
-                WatchlistHits.objects.filter(wl_id=wl_id).delete()
+                # delete all the hits of this watchlist
+                query = 'DELETE from watchlist_hits WHERE wl_id=%d' % wl_id
+                msl = connect_db()
+                cursor = msl.cursor(buffered=True, dictionary=True)
+                cursor.execute(query)
+                msl.commit()
+                # delete the watchlist
                 watchlist.delete()
                 message = 'Watchlist %s deleted successfully' % watchlist.name
             else:
