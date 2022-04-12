@@ -27,25 +27,6 @@ class WatchlistCones(models.Model):
         managed = True
         db_table = 'watchlist_cones'
 
-class WatchlistHits(models.Model):
-    """WatchlistHits.
-    """
-
-    candid   = models.BigIntegerField(primary_key=True)
-    wl       = models.ForeignKey('Watchlists', models.DO_NOTHING)
-    cone     = models.ForeignKey(WatchlistCones, models.DO_NOTHING, blank=True, null=True)
-    objectid = models.CharField(db_column='objectId', max_length=16, blank=True, null=True)  # Field name made lowercase.
-    arcsec   = models.FloatField(blank=True, null=True)
-    name     = models.CharField(max_length=32, blank=True, null=True)
-
-    class Meta:
-        """Meta.
-        """
-
-        managed         = False
-        db_table        = 'watchlist_hits'
-        unique_together = (('candid', 'wl'),)
-
 class Watchlists(models.Model):
     """Watchlists.
     """
@@ -68,21 +49,6 @@ class Watchlists(models.Model):
 
     def __str__(self):
         return self.user.first_name +' '+ self.user.last_name +': '+ self.name
-
-class AreaHits(models.Model):
-    """AreaHits.
-    """
-
-    ar_id         = models.AutoField(primary_key=True)
-#    ar_id = models.IntegerField(blank=True, null=True)
-    objectid = models.CharField(db_column='objectId', max_length=16, blank=True, null=True)  # Field name made lowercase.
-
-    class Meta:
-        """Meta.
-        """
-
-        managed = False
-        db_table = 'area_hits'
 
 class Areas(models.Model):
     """Areas.
@@ -134,22 +100,6 @@ class Myqueries(models.Model):
     def __str__(self):
         return self.user.first_name +' '+ self.user.last_name +': '+ self.name
 
-class Annotations(models.Model):
-    annotationid = models.AutoField(db_column='annotationID', primary_key=True) 
-    objectid = models.CharField(db_column='objectId', max_length=16)
-    topic = models.CharField(max_length=32, blank=True, null=True)
-    version = models.CharField(max_length=8)
-    timestamp = models.DateTimeField()
-    classification = models.CharField(max_length=16)
-    explanation = models.CharField(max_length=1024, blank=True, null=True)
-    classdict = models.JSONField(blank=True, null=True)
-    url = models.CharField(max_length=1024, blank=True, null=True)
-
-    class Meta:
-        managed = False
-        db_table = 'annotations'
-        unique_together = (('objectid', 'topic'),)
-
 class Annotators(models.Model):
     topic = models.CharField(primary_key=True, max_length=32)
     description = models.TextField(blank=True, null=True)
@@ -162,7 +112,7 @@ class Annotators(models.Model):
     public = models.IntegerField(blank=True, null=True)
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'annotators'
 
     def __str__(self):

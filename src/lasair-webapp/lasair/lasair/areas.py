@@ -5,7 +5,7 @@ from django.db import connection
 from django.contrib.auth.models import User
 from django.http import HttpResponse, FileResponse
 import lasair.settings
-from lasair.models import Areas, AreaHits
+from lasair.models import Areas
 import mysql.connector
 import json
 from random import randrange
