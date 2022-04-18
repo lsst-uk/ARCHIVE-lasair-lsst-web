@@ -189,16 +189,9 @@ def show_watchlist(request, wl_id):
             watchlist.save()
             message += 'watchlist updated'
         else:
-            import os
-#            from run_crossmatch import run_watchlist
-#            hitlist = run_watchlist(wl_id)
-            py = lasair.settings.LASAIR_ROOT + 'anaconda3/envs/lasair/bin/python'
-            process = Popen([py, lasair.settings.LASAIR_ROOT + 'lasair-lsst-web/src/utility/run_crossmatch.py', '%d'%wl_id], stdout=PIPE, stderr=PIPE)
-            stdout, stderr = process.communicate()
-
-            stdout = stdout.decode('utf-8')
-            stderr = stderr.decode('utf-8')
-            message += 'watchlist crossmatched [%s, %s]' % (stdout, stderr)
+            from lasair.run_crossmatch import run_watchlist
+            hits = run_watchlist(wl_id)
+            message += '%d crossmatches found' % hits
 
     cursor = connection.cursor()
     cursor.execute('SELECT count(*) AS count FROM watchlist_cones WHERE wl_id=%d' % wl_id)
