@@ -12,15 +12,24 @@ import random
 from subprocess import Popen, PIPE
 import time
 
-def connect_db():
+def connect_db(write=False):
     """connect_db.
     """
-    msl = mysql.connector.connect(
+    if write:
+        msl = mysql.connector.connect(
+        user    =lasair.settings.READWRITE_USER,
+        password=lasair.settings.READWRITE_PASS,
+        host    =lasair.settings.DATABASES['default']['HOST'],
+        port    =lasair.settings.DATABASES['default']['PORT'],
+        database='ztf')
+    else:
+        msl = mysql.connector.connect(
         user    =lasair.settings.READONLY_USER,
         password=lasair.settings.READONLY_PASS,
         host    =lasair.settings.DATABASES['default']['HOST'],
         port    =lasair.settings.DATABASES['default']['PORT'],
         database='ztf')
+
     return msl
 
 def handle_uploaded_file(f):
@@ -36,6 +45,11 @@ def watchlist_new(request):
         {'random': '%d'%random.randrange(1000),
         'authenticated': request.user.is_authenticated
         })
+
+def get_numbers(watchlists):
+    for wl in watchlists:
+        wl['number'] = WatchlistCones.objects.filter(wl_id=wl['wl_id']).count()
+    return watchlists
 
 @csrf_exempt
 def watchlists_home(request):
@@ -105,7 +119,7 @@ def watchlists_home(request):
                 WatchlistCones.objects.filter(wl_id=wl_id).delete()
                 # delete all the hits of this watchlist
                 query = 'DELETE from watchlist_hits WHERE wl_id=%d' % wl_id
-                msl = connect_db()
+                msl = connect_db(write=True)
                 cursor = msl.cursor(buffered=True, dictionary=True)
                 cursor.execute(query)
                 msl.commit()
@@ -116,9 +130,12 @@ def watchlists_home(request):
                 message = 'Must be owner to delete watchlist'
 
 # public watchlists belong to the anonymous user
-    other_watchlists = Watchlists.objects.filter(public=1)
+    other_watchlists = Watchlists.objects.filter(public=1).values()
+    other_watchlists = get_numbers(other_watchlists)
+
     if request.user.is_authenticated:
-        my_watchlists    = Watchlists.objects.filter(user=request.user)
+        my_watchlists    = Watchlists.objects.filter(user=request.user).values()
+        my_watchlists = get_numbers(my_watchlists)
     else:
         my_watchlists    = None
 
@@ -189,16 +206,9 @@ def show_watchlist(request, wl_id):
             watchlist.save()
             message += 'watchlist updated'
         else:
-            import os
-#            from run_crossmatch import run_watchlist
-#            hitlist = run_watchlist(wl_id)
-            py = lasair.settings.LASAIR_ROOT + 'anaconda3/envs/lasair/bin/python'
-            process = Popen([py, lasair.settings.LASAIR_ROOT + 'lasair-lsst-web/src/utility/run_crossmatch.py', '%d'%wl_id], stdout=PIPE, stderr=PIPE)
-            stdout, stderr = process.communicate()
-
-            stdout = stdout.decode('utf-8')
-            stderr = stderr.decode('utf-8')
-            message += 'watchlist crossmatched [%s, %s]' % (stdout, stderr)
+            from lasair.run_crossmatch import run_watchlist
+            hits = run_watchlist(wl_id)
+            message += '%d crossmatches found' % hits
 
     cursor = connection.cursor()
     cursor.execute('SELECT count(*) AS count FROM watchlist_cones WHERE wl_id=%d' % wl_id)
