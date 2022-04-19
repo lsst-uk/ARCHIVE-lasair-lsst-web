@@ -21,6 +21,7 @@ above to make a new one. Click on the name of the watchlist for more information
     <tr>
       <th style="width:10%">Name</th>
       <th class="width:70%">Description</th>
+      <th class="width:5%">Number</th>
       <th class="width:5%">Radius</th>
       <th class="width:5%">Active</th>
       <th class="width:5%">Public</th>
@@ -30,6 +31,7 @@ above to make a new one. Click on the name of the watchlist for more information
 {% for wl in my_watchlists %}
 <tr><td><b><a href=/watchlist/{{ wl.wl_id }}>{{ wl.name }}</a></b></td>
 <td>{{ wl.description }}</td>
+<td> {{ wl.number }} </td>
 <td> {{ wl.radius }} arcsec </td>
 <td> {% if wl.active == 1 %}&#x2714;{% endif %} </td>
 <td> {% if wl.public == 1 %}&#x2714;{% endif %} </td>
