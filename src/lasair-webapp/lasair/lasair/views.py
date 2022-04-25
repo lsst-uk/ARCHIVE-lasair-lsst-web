@@ -11,6 +11,7 @@ import json
 import math
 import time
 import utility.date_nid as date_nid
+from lasair.objects import obj
 
 from django.contrib.auth.models import User
 from django.contrib.auth import login, authenticate
@@ -85,12 +86,44 @@ def status(request, nid):
 
 def index(request):
     """index.
-
     Args:
         request:
     """
     web_domain = lasair.settings.WEB_DOMAIN
     return render(request, 'index.html', {'web_domain': web_domain})
+
+def index2(request):
+    """index.
+
+    Args:
+        request:
+    """
+    web_domain = lasair.settings.WEB_DOMAIN
+
+    objectIds = ['ZTF17aaatdwi', 'ZTF17aabjwwr', 'ZTF18aaawcta']
+    datas = []
+    json_datas = []
+    jdnow = time.time()/86400 + 2440587.5
+    message = ''
+    for objectId in objectIds:
+        d = obj(objectId)
+        fewcand = []
+        for c in d['candidates']:
+            if 'candid' in c:
+                if len(fewcand) > 9 or jdnow - c['jd'] > 30:
+                    break
+                fewcand.append(c)
+                mjdmin_ago = jdnow - c['jd']
+        d['candidates'] = fewcand
+        d['json'] = json.dumps(d)
+        d['objectData']['mjdmin_ago'] = mjdmin_ago
+        if len(fewcand) > 1:
+            datas.append(d)
+
+
+    return render(request, 'index2.html', {
+        'datas':datas, 'message':message,
+        })
 
 def about(request):
     """about.

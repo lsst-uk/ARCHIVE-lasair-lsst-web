@@ -1,4 +1,4 @@
-function plotlc(data){
+function plotlc(data, div_id, bluelines){
 gmag = []
 gfmag = []
 ngmag = []
@@ -90,7 +90,7 @@ candidates.forEach(function(item){
     }
 });
 
-lc_div = document.getElementById('lc');
+lc_div = document.getElementById(div_id);
 var lcg = {x:gt, y: gmag, error_y:{
         type:'data',
         color: g,
@@ -146,6 +146,17 @@ var nlcr = {x:nrt, y: nrmag,
     type:'scatter'
 }
 
+if(bluelines){
+    var shapes = [
+        { type:'line', x0:-mjdmin_ago, x1:-mjdmin_ago, y0:minmag, y1:maxmag,
+	line: { color: 'blue', dash:'dot'} },
+        { type:'line', x0:-mjdmax_ago, x1:-mjdmax_ago, y0:minmag, y1:maxmag,
+	line: { color: 'blue', dash:'dot'} },
+    ];
+} else {
+    var shapes = []
+}
+
 Plotly.plot(lc_div, [lcg, lcr, lcfg, lcfr, nlcg, nlcr], {
     margin: { t: 0 }, 
     displayModeBar: false, 
@@ -158,12 +169,7 @@ Plotly.plot(lc_div, [lcg, lcr, lcfg, lcfr, nlcg, nlcr], {
         title: 'Difference Magnitude',
         autorange: 'reversed'    
     },
-    shapes: [
-        { type:'line', x0:-mjdmin_ago, x1:-mjdmin_ago, y0:minmag, y1:maxmag,
-	line: { color: 'blue', dash:'dot'} },
-        { type:'line', x0:-mjdmax_ago, x1:-mjdmax_ago, y0:minmag, y1:maxmag,
-	line: { color: 'blue', dash:'dot'} },
-    ]
+    shapes: shapes,
   },
     {displayModeBar: false});
 
