@@ -186,7 +186,7 @@ var radecr = {x:rra, y: rdec,
     marker: { color:'rgb(244,2,52)' },
     type:'scatter'
 }
-
+/*
 Plotly.plot(radec_div, [radecg, radecr], {
     margin: { t: 0 },
     showlegend: false,
@@ -209,6 +209,6 @@ Plotly.plot(radec_div, [radecg, radecr], {
         }]
 }, {displayModeBar: false}
 );
-
+*/
 }
 

@@ -99,8 +99,21 @@ def index2(request):
         request:
     """
     web_domain = lasair.settings.WEB_DOMAIN
+    topic = 'lasair_2BrightSNe'
+    try:
+        jsonstreamdata = open(lasair.settings.BLOB_STORE_ROOT + '/streams/%s' % topic, 'r').read()
+        streamdata = json.loads(jsonstreamdata)
+    except:
+        return redirect('/')
 
-    objectIds = ['ZTF17aaatdwi', 'ZTF17aabjwwr', 'ZTF18aaawcta']
+    objectIds = []
+    for s in streamdata['digest']:
+        objectId = s['objectId']
+        if not objectId in objectIds:
+            objectIds.append(objectId)
+            if len(objectIds) >= 3:
+                break
+
     datas = []
     json_datas = []
     jdnow = time.time()/86400 + 2440587.5
@@ -115,11 +128,12 @@ def index2(request):
                 fewcand.append(c)
                 mjdmin_ago = jdnow - c['jd']
         d['candidates'] = fewcand
-        d['json'] = json.dumps(d)
         d['objectData']['mjdmin_ago'] = mjdmin_ago
+        if 'sherlock' in d:
+            d['sherlock']['description'] = ''
         if len(fewcand) > 1:
+            d['json'] = json.dumps(d)
             datas.append(d)
-
 
     return render(request, 'index2.html', {
         'datas':datas, 'message':message,
