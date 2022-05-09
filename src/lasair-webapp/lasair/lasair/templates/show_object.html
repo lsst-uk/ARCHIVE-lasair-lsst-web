@@ -223,7 +223,7 @@ $(document).ready(function()
     var pd = "{{ json_data }}";
     pd = pd.replace(/&quot;/g,'"')
     var json_data = JSON.parse(pd);
-    plotlc(json_data);
+    plotlc(json_data, 'lc', true);
 </script>
 {% endif %}
 {% endblock %}
