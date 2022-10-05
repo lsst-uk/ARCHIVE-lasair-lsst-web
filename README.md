@@ -1,6 +1,8 @@
 # lasair-lsst-web
 Web/Django code for webserver for Lasair-LSST
 
+Note : This repo has been archived as agreed at 08/SEP/22 Lasair SE process meeting. It is no longer in use.
+
 
 Copyright 2022 The University of Edinburgh and Queen's University Belfast
 
